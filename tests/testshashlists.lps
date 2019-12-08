@@ -3,50 +3,79 @@
   <ProjectSession>
     <Version Value="11"/>
     <BuildModes Active="Default"/>
-    <Units Count="5">
+    <Units Count="8">
       <Unit0>
         <Filename Value="testshashlists.lpr"/>
         <IsPartOfProject Value="True"/>
-        <CursorPos X="124" Y="14"/>
-        <UsageCount Value="20"/>
+        <CursorPos X="40" Y="14"/>
+        <UsageCount Value="21"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
+        <Filename Value="tests_objecthash.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="22"/>
+        <UsageCount Value="21"/>
+      </Unit1>
+      <Unit2>
         <Filename Value="testcase1.pas"/>
         <UnitName Value="TestCase1"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="3"/>
         <CursorPos X="21" Y="15"/>
         <UsageCount Value="20"/>
-      </Unit1>
-      <Unit2>
-        <Filename Value="../../fptest/src/TestFramework.pas"/>
-        <EditorIndex Value="3"/>
-        <TopLine Value="16"/>
-        <CursorPos X="19" Y="36"/>
-        <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit2>
       <Unit3>
-        <Filename Value="../../fptest/src/TextTestRunner.pas"/>
-        <EditorIndex Value="2"/>
-        <TopLine Value="19"/>
-        <CursorPos X="20" Y="36"/>
-        <UsageCount Value="10"/>
+        <Filename Value="../../fptest/src/TestFramework.pas"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="16"/>
+        <CursorPos X="19" Y="36"/>
+        <UsageCount Value="11"/>
         <Loaded Value="True"/>
       </Unit3>
       <Unit4>
-        <Filename Value="tests_objecthash.pas"/>
+        <Filename Value="../../fptest/src/TextTestRunner.pas"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="19"/>
+        <CursorPos X="20" Y="36"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="../src/pointerhash.pas"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="35"/>
+        <CursorPos X="20" Y="50"/>
+        <UsageCount Value="21"/>
+        <Loaded Value="True"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="../src/stringhash.pas"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <TopLine Value="-1"/>
+        <CursorPos X="-1" Y="-1"/>
+        <UsageCount Value="21"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="src/tests_objecthash.pas"/>
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="23"/>
-        <CursorPos X="121" Y="34"/>
+        <TopLine Value="96"/>
+        <CursorPos X="22" Y="120"/>
         <UsageCount Value="20"/>
         <Loaded Value="True"/>
-      </Unit4>
+      </Unit7>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="1">
+      <Position1>
+        <Filename Value="../src/pointerhash.pas"/>
+        <Caret TopLine="13"/>
+      </Position1>
+    </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
       <Modes Count="0" ActiveMode=""/>

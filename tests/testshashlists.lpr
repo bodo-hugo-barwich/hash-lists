@@ -8,7 +8,7 @@ uses
 
 begin
   // Register all tests
-  sample_tests.RegisterTests;
+  tests_objecthash.RegisterTests;
 
   RunRegisteredTests;
 end.
