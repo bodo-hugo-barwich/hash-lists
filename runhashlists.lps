@@ -7,18 +7,19 @@
       <Unit0>
         <Filename Value="runhashlists.pas"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
         <CursorPos X="59" Y="20"/>
-        <UsageCount Value="75"/>
+        <UsageCount Value="76"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
         <Filename Value="src/pointerhash.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="92"/>
-        <CursorPos Y="116"/>
-        <UsageCount Value="75"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="314"/>
+        <CursorPos X="36" Y="329"/>
+        <UsageCount Value="76"/>
+        <Loaded Value="True"/>
       </Unit1>
       <Unit2>
         <Filename Value="src/stringhash.pas"/>
@@ -26,7 +27,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="25"/>
         <CursorPos Y="34"/>
-        <UsageCount Value="31"/>
+        <UsageCount Value="32"/>
       </Unit2>
       <Unit3>
         <Filename Value="src/appperlhash.pas"/>
@@ -35,7 +36,20 @@
         <UsageCount Value="74"/>
       </Unit3>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="3" HistoryIndex="2">
+      <Position1>
+        <Filename Value="src/pointerhash.pas"/>
+        <Caret Line="301" Column="21" TopLine="65"/>
+      </Position1>
+      <Position2>
+        <Filename Value="src/pointerhash.pas"/>
+        <Caret Line="58" Column="26" TopLine="42"/>
+      </Position2>
+      <Position3>
+        <Filename Value="src/pointerhash.pas"/>
+        <Caret Line="293" Column="8" TopLine="293"/>
+      </Position3>
+    </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
       <Modes Count="1" ActiveMode="default">

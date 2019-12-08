@@ -55,6 +55,7 @@ type
     imaxkeycount: Integer;
     ibucketcount: Integer;
     igrowfactor: Integer;
+    iloadfactor: Integer;
     procedure extendList(brebuild: Boolean = True); virtual;
     procedure rebuildList();
     function computeHash(pskey: PAnsiString): Cardinal;
@@ -297,7 +298,8 @@ implementation
     self.ikeycount := 0;
     self.imaxkeycount := 0;
     self.ibucketcount := 0;
-    self.igrowfactor := 2;
+    self.igrowfactor := 3;
+    self.iloadfactor := 3;
     self.pcurrentnode := nil;
 
     //Create the Buckets
@@ -323,7 +325,12 @@ implementation
     ibkt: Integer;
   begin
     self.ibucketcount := self.ibucketcount + self.igrowfactor;
-    self.imaxkeycount := (self.ibucketcount * 3) - 1;
+
+    //Forcing a uneven Bucket Count
+    if (self.ibucketcount mod 2) = 0 then
+      dec(self.ibucketcount);
+
+    self.imaxkeycount := self.ibucketcount * self.iloadfactor;
 
     SetLength(self.arrbuckets, self.ibucketcount);
 

@@ -8,3 +8,5 @@ lib/*
 
 #Compiled Application 
 *.run
+#Debug Version of the Application
+*.dbg
