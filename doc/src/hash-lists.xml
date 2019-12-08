@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<docproject>
+  <options>
+    <option name="ostarget" value="Linux"/>
+    <option name="cputarget" value="x86_64"/>
+    <option name="format" value="TXT"/>
+    <option name="hide-protected" value="false"/>
+    <option name="warn-no-node" value="false"/>
+    <option name="show-private" value="false"/>
+    <option name="stop-on-parser-error" value="false"/>
+    <option name="parse-impl" value="false"/>
+    <option name="dont-trim" value="false"/>
+    <option name="emit-notes" value="false"/>
+  </options>
+  <packages>
+    <package name="hash-lists" output="hash-lists" content="">
+      <units>
+        <unit file="src/pointerhash.pas" options=""/>
+        <unit file="src/stringhash.pas" options=""/>
+      </units>
+      <descriptions>
+        <description file="doc/src/pointerhash.xml"/>
+        <description file="doc/src/stringhash.xml"/>
+      </descriptions>
+      <imports/>
+    </package>
+  </packages>
+</docproject>

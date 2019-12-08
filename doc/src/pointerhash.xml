@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<fpdoc-descriptions>
+<package name="hash-lists>
+<module name="pointerhash">
+<element name="PPLHashNode">
+<short>A Pointer to the <link id="TPLHashNode"/> Structure</short>
+</element>
+<element name="TPLHashNode">
+<short>The Structure that stores the Key and it's Data</short>
+</element>
+<element name="TPLHashNode.ibucketindex">
+<short>The Index of the Bucket where the Node is actually stored</short>
+</element>
+<element name="TPLHashNode.inodeindex">
+<short>The Index within the Node List</short>
+</element>
+</module>
+</package>
+</fpdoc-descriptions>

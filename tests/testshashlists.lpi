@@ -20,13 +20,10 @@
       <FormatVersion Value="2"/>
       <Modes Count="0"/>
     </RunParams>
-    <RequiredPackages Count="2">
+    <RequiredPackages Count="1">
       <Item1>
         <PackageName Value="fptest"/>
       </Item1>
-      <Item2>
-        <PackageName Value="FCL"/>
-      </Item2>
     </RequiredPackages>
     <Units Count="4">
       <Unit0>
@@ -50,7 +47,7 @@
   <CompilerOptions>
     <Version Value="11"/>
     <Target>
-      <Filename Value="testshashlists"/>
+      <Filename Value="testshashlists.run"/>
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>

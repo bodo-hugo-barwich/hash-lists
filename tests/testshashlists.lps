@@ -8,7 +8,7 @@
         <Filename Value="testshashlists.lpr"/>
         <IsPartOfProject Value="True"/>
         <CursorPos X="40" Y="14"/>
-        <UsageCount Value="21"/>
+        <UsageCount Value="24"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
@@ -27,27 +27,26 @@
       </Unit2>
       <Unit3>
         <Filename Value="../../fptest/src/TestFramework.pas"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="16"/>
         <CursorPos X="19" Y="36"/>
-        <UsageCount Value="11"/>
-        <Loaded Value="True"/>
+        <UsageCount Value="10"/>
       </Unit3>
       <Unit4>
         <Filename Value="../../fptest/src/TextTestRunner.pas"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="19"/>
         <CursorPos X="20" Y="36"/>
-        <UsageCount Value="11"/>
-        <Loaded Value="True"/>
+        <UsageCount Value="10"/>
       </Unit4>
       <Unit5>
         <Filename Value="../src/pointerhash.pas"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="35"/>
-        <CursorPos X="20" Y="50"/>
-        <UsageCount Value="21"/>
+        <TopLine Value="362"/>
+        <CursorPos X="73" Y="372"/>
+        <UsageCount Value="23"/>
         <Loaded Value="True"/>
       </Unit5>
       <Unit6>
@@ -57,16 +56,15 @@
         <WindowIndex Value="-1"/>
         <TopLine Value="-1"/>
         <CursorPos X="-1" Y="-1"/>
-        <UsageCount Value="21"/>
+        <UsageCount Value="23"/>
       </Unit6>
       <Unit7>
         <Filename Value="src/tests_objecthash.pas"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <TopLine Value="96"/>
-        <CursorPos X="22" Y="120"/>
-        <UsageCount Value="20"/>
+        <CursorPos X="122" Y="107"/>
+        <UsageCount Value="23"/>
         <Loaded Value="True"/>
       </Unit7>
     </Units>
