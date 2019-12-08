@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <fpdoc-descriptions>
-<package name="hash-lists>
+<package name="hash-lists">
 <module name="pointerhash">
 <element name="PPLHashNode">
 <short>A Pointer to the <link id="TPLHashNode"/> Structure</short>
