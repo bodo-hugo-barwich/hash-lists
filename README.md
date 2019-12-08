@@ -4,7 +4,7 @@ https://www.perl.com/pub/2002/10/01/hashes.html/
 
 # Implementation
 The Hash Lists are implemented as 2 Dynamic Arrays which are the Bucket and the List of Buckets.
-As Hash Function I decided to use the sdbm / ndbm Algorythmn
+As Hash Function I decided to use the sdbm / ndbm Algorithm
 
 # Motivation
 Using the FCL Data Types`TFPObjectHashTable` and `TFPStringHashTable` the performance of the Application dropped drastically.
