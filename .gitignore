@@ -1,0 +1,10 @@
+#Lazarus Backup Directories
+backup
+backup/*
+
+#Build Directories
+lib
+lib/*
+
+#Compiled Application 
+*.run
