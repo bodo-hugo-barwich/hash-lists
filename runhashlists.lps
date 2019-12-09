@@ -14,9 +14,10 @@
       <Unit1>
         <Filename Value="src/pointerhash.pas"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="43"/>
-        <CursorPos X="20" Y="50"/>
+        <TopLine Value="277"/>
+        <CursorPos X="32" Y="293"/>
         <UsageCount Value="81"/>
         <Loaded Value="True"/>
       </Unit1>
@@ -36,10 +37,9 @@
       </Unit3>
       <Unit4>
         <Filename Value="doc/src/pointerhash.xml"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
         <TopLine Value="11"/>
-        <CursorPos X="41" Y="22"/>
+        <CursorPos Y="17"/>
         <UsageCount Value="22"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="XML"/>

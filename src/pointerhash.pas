@@ -5,7 +5,7 @@ unit pointerhash;
 interface
 
 uses
-  Classes, SysUtils;
+  Classes;
 
 type
   PPLHashNode = ^TPLHashNode;
@@ -74,7 +74,7 @@ type
 
 implementation
   (*==========================================================================*)
-  // Class TPLHashNodeList
+  (* Class TPLHashNodeList *)
 
 
   constructor TPLHashNodeList.Create;
@@ -290,7 +290,7 @@ implementation
 
 
   (*==========================================================================*)
-  // Class TPLObjectHashList
+  (* Class TPLObjectHashList *)
 
 
   constructor TPLObjectHashList.Create;
