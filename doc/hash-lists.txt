@@ -48,7 +48,16 @@ Section 1.3 : TPLHashNodeList
 
 
 
-1.3.1 : Method overview
+1.3.1 : Description
+------------------------------------------------------------------------
+
+
+The TPLHashNodeList Object manages the TPLHashNode Structures that match
+into the same Bucket within the [TPLObjectHashList]  List Object.
+ With the Constructor the TPLObjectHashList List Object assigns an Index
+which the TPLObjectHashList assigns to all TPLHashNode Structures that
+are added to it. 
+1.3.2 : Method overview
 ------------------------------------------------------------------------
 
 
@@ -57,32 +66,17 @@ Method Description
 addNode  
 Create  
 Destroy  
-extendList  
 getCount  
-getLastIndex
+getLastIndex  
+getNode
  
-getNode  
 searchIndex  
 searchNode  
 searchValue  
-setValue 
-
-unsetIndex  
+setValue  
+unsetIndex
+ 
 ------------------------------------------------------------------------
-
-
-1.3.2 : TPLHashNodeList.extendList
-------------------------------------------------------------------------
-
-
-Procedure:
-
-Declaration:
-
-procedure extendList
-
-Visibility:
-protected
 
 
 1.3.3 : TPLHashNodeList.Create
@@ -258,66 +252,20 @@ Section 1.4 : TPLObjectHashList
 
 Method Description
 ------------------
-computeHash  
 Create  
 Destroy  
-extendList  
 getCount  
-getCurrentKey
- 
+getCurrentKey  
 getCurrentValue  
 getValue  
 hasKey  
 moveFirst  
 moveNext  
-rebuildList  
 setValue  
 ------------------------------------------------------------------------
 
 
-1.4.2 : TPLObjectHashList.extendList
-------------------------------------------------------------------------
-
-
-Procedure:
-
-Declaration:
-
-procedure extendList(brebuild: Boolean);  Virtual
-
-Visibility:
-protected
-
-
-1.4.3 : TPLObjectHashList.rebuildList
-------------------------------------------------------------------------
-
-
-Procedure:
-
-Declaration:
-
-procedure rebuildList
-
-Visibility:
-protected
-
-
-1.4.4 : TPLObjectHashList.computeHash
-------------------------------------------------------------------------
-
-
-Procedure:
-
-Declaration:
-
-function computeHash(pskey: PAnsiString) : Cardinal
-
-Visibility:
-protected
-
-
-1.4.5 : TPLObjectHashList.Create
+1.4.2 : TPLObjectHashList.Create
 ------------------------------------------------------------------------
 
 
@@ -331,7 +279,7 @@ Visibility:
 public
 
 
-1.4.6 : TPLObjectHashList.Destroy
+1.4.3 : TPLObjectHashList.Destroy
 ------------------------------------------------------------------------
 
 
@@ -345,7 +293,7 @@ Visibility:
 public
 
 
-1.4.7 : TPLObjectHashList.setValue
+1.4.4 : TPLObjectHashList.setValue
 ------------------------------------------------------------------------
 
 
@@ -359,7 +307,7 @@ Visibility:
 public
 
 
-1.4.8 : TPLObjectHashList.getValue
+1.4.5 : TPLObjectHashList.getValue
 ------------------------------------------------------------------------
 
 
@@ -373,7 +321,7 @@ Visibility:
 public
 
 
-1.4.9 : TPLObjectHashList.hasKey
+1.4.6 : TPLObjectHashList.hasKey
 ------------------------------------------------------------------------
 
 
@@ -387,7 +335,7 @@ Visibility:
 public
 
 
-1.4.10 : TPLObjectHashList.moveFirst
+1.4.7 : TPLObjectHashList.moveFirst
 ------------------------------------------------------------------------
 
 
@@ -401,7 +349,7 @@ Visibility:
 public
 
 
-1.4.11 : TPLObjectHashList.moveNext
+1.4.8 : TPLObjectHashList.moveNext
 ------------------------------------------------------------------------
 
 
@@ -415,7 +363,7 @@ Visibility:
 public
 
 
-1.4.12 : TPLObjectHashList.getCurrentKey
+1.4.9 : TPLObjectHashList.getCurrentKey
 ------------------------------------------------------------------------
 
 
@@ -429,7 +377,7 @@ Visibility:
 public
 
 
-1.4.13 : TPLObjectHashList.getCurrentValue
+1.4.10 : TPLObjectHashList.getCurrentValue
 ------------------------------------------------------------------------
 
 
@@ -443,7 +391,7 @@ Visibility:
 public
 
 
-1.4.14 : TPLObjectHashList.getCount
+1.4.11 : TPLObjectHashList.getCount
 ------------------------------------------------------------------------
 
 
@@ -488,26 +436,11 @@ Section 2.2 : TPLStringHashList
 
 Method Description
 ------------------
-extendList  
 setValue  
 ------------------------------------------------------------------------
 
 
-2.2.2 : TPLStringHashList.extendList
-------------------------------------------------------------------------
-
-
-Procedure:
-
-Declaration:
-
-procedure extendList(brebuild: Boolean);  Override
-
-Visibility:
-protected
-
-
-2.2.3 : TPLStringHashList.setValue
+2.2.2 : TPLStringHashList.setValue
 ------------------------------------------------------------------------
 
 

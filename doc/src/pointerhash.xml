@@ -10,10 +10,39 @@
 </element>
 <element name="TPLHashNode.ibucketindex">
 <short>The Index of the Bucket where the Node is actually stored</short>
+<descr>
+The Bucket Index will be assigned by the <link id="TPLHashNodeList"/> when
+the Structure will be assigned to it.
+</descr>
 </element>
 <element name="TPLHashNode.inodeindex">
 <short>The Index within the Node List</short>
+<descr>
+inodeindex defines the Index of the TPLHashNode Structure within the
+<link id="TPLHashNodeList"/> List Object<br />
+The Node Index will be assigned by the <link id="TPLHashNodeList"/> when
+the Structure will be assigned to it.
+</descr>
 </element>
+<element name="TPLHashNode.ihash">
+<short>The Hash Value of the Key</short>
+</element>
+<element name="TPLHashNode.skey">
+<short>The Key Value</short>
+</element>
+<element name="TPLHashNode.pvalue">
+<short>The Data Value for the Key</short>
+</element>
+<element name="TPLHashNodeList">
+<short>The Data Node Bucket implemented as dynamic array of PPLHashNode</short>
+<descr>
+The TPLHashNodeList Object manages the TPLHashNode Structures that match into the
+same Bucket within the <link id="TPLObjectHashList"/> List Object.<br />
+With the Constructor the TPLObjectHashList List Object assigns an Index which
+the TPLObjectHashList assigns to all TPLHashNode Structures that are added to it.
+</descr>
+</element>
+
 </module>
 </package>
 </fpdoc-descriptions>

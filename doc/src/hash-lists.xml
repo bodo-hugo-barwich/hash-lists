@@ -4,7 +4,7 @@
     <option name="ostarget" value="Linux"/>
     <option name="cputarget" value="x86_64"/>
     <option name="format" value="TXT"/>
-    <option name="hide-protected" value="false"/>
+    <option name="hide-protected" value="true"/>
     <option name="warn-no-node" value="false"/>
     <option name="show-private" value="false"/>
     <option name="stop-on-parser-error" value="false"/>
