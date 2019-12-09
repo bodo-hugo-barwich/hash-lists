@@ -15,6 +15,8 @@ type
     procedure Teardown; override;
   published
     procedure TestInsertCheckElements;
+    procedure TestCheckFirstElement;
+    procedure TestCheckNextElement;
   end;
 
  procedure RegisterTests;
@@ -58,8 +60,8 @@ begin
   self.lsthshobjs.Free;
 end;
 
-(*Test Adding 7 Keys and their Values (which should grow the List twice)
-And Looking up their Values
+(*Test Adding 10 Keys and their Values (which should grow the List at least once)
+And Looking up their Values (they must match their inserted Values)
 *)
 procedure TTestsObjectHashList.TestInsertCheckElements;
 var
@@ -100,6 +102,21 @@ begin
 
   self.lsthshobjs.setValue('key7', psvl);
 
+  New(psvl);
+  psvl^ := 'value8';
+
+  self.lsthshobjs.setValue('key8', psvl);
+
+  New(psvl);
+  psvl^ := 'value9';
+
+  self.lsthshobjs.setValue('key9', psvl);
+
+  New(psvl);
+  psvl^ := 'value10';
+
+  self.lsthshobjs.setValue('key10', psvl);
+
   psvl := self.lsthshobjs.getValue('key1');
 
   CheckEquals('value1', psvl^, 'key '  + chr(39) + 'key1' + chr(39)
@@ -119,6 +136,101 @@ begin
 
   CheckEquals('value4', psvl^, 'key '  + chr(39) + 'key4' + chr(39)
     + ': value lookup failed! It is: ' + chr(39) + psvl^ + chr(39));
+
+  psvl := self.lsthshobjs.getValue('key5');
+
+  CheckEquals('value5', psvl^, 'key '  + chr(39) + 'key5' + chr(39)
+    + ': value lookup failed! It is: ' + chr(39) + psvl^ + chr(39));
+
+  psvl := self.lsthshobjs.getValue('key6');
+
+  CheckEquals('value6', psvl^, 'key '  + chr(39) + 'key6' + chr(39)
+    + ': value lookup failed! It is: ' + chr(39) + psvl^ + chr(39));
+
+  psvl := self.lsthshobjs.getValue('key7');
+
+  CheckEquals('value7', psvl^, 'key '  + chr(39) + 'key7' + chr(39)
+    + ': value lookup failed! It is: ' + chr(39) + psvl^ + chr(39));
+
+  psvl := self.lsthshobjs.getValue('key8');
+
+  CheckEquals('value8', psvl^, 'key '  + chr(39) + 'key8' + chr(39)
+    + ': value lookup failed! It is: ' + chr(39) + psvl^ + chr(39));
+
+  psvl := self.lsthshobjs.getValue('key9');
+
+  CheckEquals('value9', psvl^, 'key '  + chr(39) + 'key9' + chr(39)
+    + ': value lookup failed! It is: ' + chr(39) + psvl^ + chr(39));
+
+  psvl := self.lsthshobjs.getValue('key10');
+
+  CheckEquals('value10', psvl^, 'key '  + chr(39) + 'key10' + chr(39)
+    + ': value lookup failed! It is: ' + chr(39) + psvl^ + chr(39));
+
+end;
+
+procedure TTestsObjectHashList.TestCheckFirstElement;
+var
+  sky: String;
+  psvl: PAnsiString;
+begin
+  New(psvl);
+  psvl^ := 'first_value';
+
+  self.lsthshobjs.setValue('first_key', psvl);
+
+  Check(self.lsthshobjs.moveFirst() = True, 'TPLObjectHashList.moveFirst(): failed!');
+
+  sky := self.lsthshobjs.getCurrentKey();
+
+  CheckEquals('first_key', sky, 'TPLObjectHashList.getCurrentKey(): failed! '
+    + 'Returned Key: ' + chr(39) + sky + chr(39));
+
+  psvl := self.lsthshobjs.getCurrentValue();
+
+  CheckEquals('first_value', psvl^, 'TPLObjectHashList.getCurrentValue(): failed! '
+    + 'Returned Key: ' + chr(39) + psvl^ + chr(39));
+
+end;
+
+procedure TTestsObjectHashList.TestCheckNextElement;
+var
+  sky: String;
+  psvl: PAnsiString;
+begin
+  New(psvl);
+  psvl^ := 'first_value';
+
+  self.lsthshobjs.setValue('first_key', psvl);
+
+  New(psvl);
+  psvl^ := 'next_value';
+
+  self.lsthshobjs.setValue('next_key', psvl);
+
+  Check(self.lsthshobjs.moveNext() = True, 'TPLObjectHashList.moveNext() No. 1 : failed!');
+
+  sky := self.lsthshobjs.getCurrentKey();
+
+  CheckEquals('first_key', sky, 'TPLObjectHashList.getCurrentKey() No. 1 : failed! '
+    + 'Returned Key: ' + chr(39) + sky + chr(39));
+
+  psvl := self.lsthshobjs.getCurrentValue();
+
+  CheckEquals('first_value', psvl^, 'TPLObjectHashList.getCurrentValue() No. 1 : failed! '
+    + 'Returned Key: ' + chr(39) + psvl^ + chr(39));
+
+  Check(self.lsthshobjs.moveNext() = True, 'TPLObjectHashList.moveNext() No. 2 : failed!');
+
+  sky := self.lsthshobjs.getCurrentKey();
+
+  CheckEquals('next_key', sky, 'TPLObjectHashList.getCurrentKey() No. 2 : failed! '
+    + 'Returned Key: ' + chr(39) + sky + chr(39));
+
+  psvl := self.lsthshobjs.getCurrentValue();
+
+  CheckEquals('next_value', psvl^, 'TPLObjectHashList.getCurrentValue() No. 2 : failed! '
+    + 'Returned Key: ' + chr(39) + psvl^ + chr(39));
 
 end;
 

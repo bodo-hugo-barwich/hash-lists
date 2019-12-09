@@ -73,6 +73,12 @@ type
   end;
 
 implementation
+
+  uses
+    sysutils;
+
+
+
   (*==========================================================================*)
   (* Class TPLHashNodeList *)
 
@@ -324,7 +330,7 @@ implementation
   var
     ibkt: Integer;
   begin
-    self.ibucketcount := self.ibucketcount + self.igrowfactor;
+    inc(self.ibucketcount, self.igrowfactor);
 
     //Forcing a uneven Bucket Count
     if (self.ibucketcount mod 2) = 0 then
