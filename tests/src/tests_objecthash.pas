@@ -60,7 +60,8 @@ begin
   self.lsthshobjs.Free;
 end;
 
-(*Test Adding 10 Keys and their Values (which should grow the List at least once)
+(*
+Test Adding 10 Keys and their Values (which should grow the List at least once)
 And Looking up their Values (they must match their inserted Values)
 *)
 procedure TTestsObjectHashList.TestInsertCheckElements;
@@ -169,6 +170,11 @@ begin
 
 end;
 
+(*
+Test Adding 3 Keys and their Values for a valid List Test
+And Iterating to the First Key (this is not necessary the first inserted key)
+It should return the defined Key and its Value
+*)
 procedure TTestsObjectHashList.TestCheckFirstElement;
 var
   sky: String;
@@ -178,6 +184,16 @@ begin
   psvl^ := 'first_value';
 
   self.lsthshobjs.setValue('first_key', psvl);
+
+  New(psvl);
+  psvl^ := 'next_value';
+
+  self.lsthshobjs.setValue('next_key', psvl);
+
+  New(psvl);
+  psvl^ := 'last_value';
+
+  self.lsthshobjs.setValue('last_key', psvl);
 
   Check(self.lsthshobjs.moveFirst() = True, 'TPLObjectHashList.moveFirst(): failed!');
 
@@ -193,6 +209,12 @@ begin
 
 end;
 
+(*
+Test Adding 3 Keys and their Values for a valid List Test
+And Iterating to the First Key and to the Next Key (they are not necessary
+the first and second inserted keys)
+It should return the defined Keys and their Values
+*)
 procedure TTestsObjectHashList.TestCheckNextElement;
 var
   sky: String;
@@ -207,6 +229,11 @@ begin
   psvl^ := 'next_value';
 
   self.lsthshobjs.setValue('next_key', psvl);
+
+  New(psvl);
+  psvl^ := 'last_value';
+
+  self.lsthshobjs.setValue('last_key', psvl);
 
   Check(self.lsthshobjs.moveNext() = True, 'TPLObjectHashList.moveNext() No. 1 : failed!');
 
