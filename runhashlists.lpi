@@ -13,17 +13,19 @@
       <UseAppBundle Value="False"/>
       <ResourceType Value="res"/>
     </General>
-    <LazDoc Paths="doc/src"/>
+    <LazDoc Paths="doc/src" PackageName="hash-lists"/>
     <BuildModes Count="3">
       <Item1 Name="Default" Default="True"/>
       <Item2 Name="Debug">
         <CompilerOptions>
           <Version Value="11"/>
           <Target>
-            <Filename Value="string-hash.run"/>
+            <Filename Value="hash-lists.run"/>
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
+            <Libraries Value="src"/>
+            <OtherUnitFiles Value="src"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <Parsing>
@@ -86,7 +88,7 @@
       <FormatVersion Value="2"/>
       <Modes Count="0"/>
     </RunParams>
-    <Units Count="3">
+    <Units Count="4">
       <Unit0>
         <Filename Value="runhashlists.pas"/>
         <IsPartOfProject Value="True"/>
@@ -99,6 +101,10 @@
         <Filename Value="src/stringhash.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit2>
+      <Unit3>
+        <Filename Value="src/objecthash.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit3>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -108,6 +114,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
+      <OtherUnitFiles Value="src"/>
       <UnitOutputDirectory Value="../lib/$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <CodeGeneration>

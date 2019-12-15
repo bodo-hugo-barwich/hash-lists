@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fpdoc-descriptions>
+<package name="hash-lists">
+<module name="objecthash">
+<element name="TPLObjectNodeList"><short>Implements a Hash Table Bucket with TObject Objects</short>
+      <descr>This Node List handles TObject nodes.
+If the property <var>TPLObjectNodeList.bowned</var> is set to <code>TRUE</code> on Destruction it will call the <code>TObject.Free</code> method.
+</descr>
+      </element>
+    <element name="TPLObjectNodeList.bowned"><short>indicates whether the Node Data should be freed</short>
+      </element>
+    </module>
+</package>
+</fpdoc-descriptions>

@@ -1,7 +1,11 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <fpdoc-descriptions>
 <package name="hash-lists">
 <module name="stringhash">
-</module>
+<element name="TPLStringNodeList"><short>Implements a Hash Table Bucket with String Elements</short><descr>The <var>TPLStringNodeList</var> implements the Use Case of the String Hash Table where the Keys and the Values are both Strings.
+For convenience it allocates and disposes the Memory of the Strings.
+</descr>
+      </element>
+    </module>
 </package>
 </fpdoc-descriptions>

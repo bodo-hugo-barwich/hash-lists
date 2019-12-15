@@ -17,7 +17,7 @@ type
     pvalue: Pointer;
   end;
 
-  TPLHashNodeList = class
+  TPLPointerNodeList = class
   protected
     arrnodes: array of PPLHashNode;
     ibucketindex: Integer;
@@ -27,27 +27,30 @@ type
     igrowfactor: Integer;
     procedure extendList();
   public
-    constructor Create; overload;
-    constructor Create(iindex: Integer); overload;
+    constructor Create; virtual; overload;
+    constructor Create(iindex: Integer); virtual; overload;
     destructor Destroy; override;
     function addNode(pnode: PPLHashNode = nil): Integer; overload;
     function addNode(ihash: Cardinal; pskey: PAnsiString; ppointer: Pointer): Integer; overload;
-    procedure setValue(ihash: Cardinal; ppointer: Pointer); overload;
+    procedure setValue(ihash: Cardinal; pskey: PAnsiString; ppointer: Pointer); overload;
     procedure setValue(pskey: PAnsiString; ppointer: Pointer); overload;
     procedure unsetIndex(iindex: Integer);
+    function removeNode(pnode: PPLHashNode = nil): Boolean; overload;
+    function removeNode(ihash: Cardinal; pskey: PAnsiString): Boolean; virtual; overload;
+    function removeNode(pskey: PAnsiString): Boolean; virtual; overload;
+    procedure Clear; virtual;
     function getNode(iindex: Integer): PPLHashNode; overload;
-    function searchNode(ihash: Cardinal): PPLHashNode; overload;
+    function searchNode(ihash: Cardinal; pskey: PAnsiString): PPLHashNode; overload;
     function searchNode(pskey: PAnsiString): PPLHashNode; overload;
-    function searchValue(ihash: Cardinal): Pointer; overload;
+    function searchValue(ihash: Cardinal; pskey: PAnsiString): Pointer; overload;
     function searchValue(pskey: PAnsiString): Pointer; overload;
-    function searchIndex(ihash: Cardinal): Integer; overload;
+    function searchIndex(ihash: Cardinal; pskey: PAnsiString): Integer; overload;
     function searchIndex(pskey: PAnsiString): Integer; overload;
     function getLastIndex(): Integer;
-    function getCount(): Integer;
   end;
 
 
-  TPLObjectHashList = class
+  TPLPointerHashList = class
   protected
     arrbuckets: array of TObject;
     pcurrentnode: PPLHashNode;
@@ -63,6 +66,8 @@ type
     constructor Create;
     destructor Destroy; override;
     procedure setValue(const skey: String; ppointer: Pointer); virtual;
+    procedure removeKey(const skey: String); virtual;
+    procedure Clear(); virtual;
     function getValue(const skey: String): Pointer; virtual;
     function hasKey(const skey: String): Boolean;
     function moveFirst(): Boolean;
@@ -80,10 +85,10 @@ implementation
 
 
   (*==========================================================================*)
-  (* Class TPLHashNodeList *)
+  (* Class TPLPointerNodeList *)
 
 
-  constructor TPLHashNodeList.Create;
+  constructor TPLPointerNodeList.Create;
   begin
     self.ibucketindex := -1;
     self.ilastindex := 0;
@@ -94,7 +99,7 @@ implementation
     SetLength(self.arrnodes, self.imaxcount);
   end;
 
-  constructor TPLHashNodeList.Create(iindex: Integer);
+  constructor TPLPointerNodeList.Create(iindex: Integer);
   begin
     self.ibucketindex := iindex;
     self.ilastindex := 0;
@@ -105,7 +110,7 @@ implementation
     SetLength(self.arrnodes, self.imaxcount);
   end;
 
-  destructor TPLHashNodeList.Destroy;
+  destructor TPLPointerNodeList.Destroy;
   var
     ind: Integer;
   begin
@@ -122,14 +127,14 @@ implementation
     inherited Destroy;
   end;
 
-  procedure TPLHashNodeList.extendList();
+  procedure TPLPointerNodeList.extendList();
   begin
     self.imaxcount := self.imaxcount + self.igrowfactor;
 
     SetLength(self.arrnodes, self.imaxcount);
   end;
 
-  function TPLHashNodeList.addNode(pnode: PPLHashNode = nil): Integer;
+  function TPLPointerNodeList.addNode(pnode: PPLHashNode = nil): Integer;
   begin
     if self.inextindex >= self.imaxcount then self.extendList;
 
@@ -152,7 +157,7 @@ implementation
     inc(self.inextindex);
   end;
 
-  function TPLHashNodeList.addNode(ihash: Cardinal; pskey: PAnsiString; ppointer: Pointer): Integer;
+  function TPLPointerNodeList.addNode(ihash: Cardinal; pskey: PAnsiString; ppointer: Pointer): Integer;
   var
     plstnd: PPLHashNode;
   begin
@@ -167,16 +172,16 @@ implementation
     Result := self.addNode(plstnd);
   end;
 
-  procedure TPLHashNodeList.setValue(ihash: Cardinal; ppointer: Pointer);
+  procedure TPLPointerNodeList.setValue(ihash: Cardinal; pskey: PAnsiString; ppointer: Pointer);
   var
     plstnd: PPLHashNode;
   begin
-    plstnd := self.searchNode(ihash);
+    plstnd := self.searchNode(ihash, pskey);
 
     if plstnd <> nil then plstnd^.pvalue := ppointer;
   end;
 
-  procedure TPLHashNodeList.setValue(pskey: PAnsiString; ppointer: Pointer);
+  procedure TPLPointerNodeList.setValue(pskey: PAnsiString; ppointer: Pointer);
   var
     plstnd: PPLHashNode;
   begin
@@ -185,7 +190,7 @@ implementation
     if plstnd <> nil then plstnd^.pvalue := ppointer;
   end;
 
-  procedure TPLHashNodeList.unsetIndex(iindex: Integer);
+  procedure TPLPointerNodeList.unsetIndex(iindex: Integer);
   begin
     if (iindex > -1)
       and (iindex < self.imaxcount) then
@@ -194,7 +199,48 @@ implementation
     end;
   end;
 
-  function TPLHashNodeList.getNode(iindex: Integer): PPLHashNode;
+  function TPLPointerNodeList.removeNode(pnode: PPLHashNode): Boolean;
+  begin
+    Result := False;
+
+    if pnode <> nil then
+    begin
+      self.unsetIndex(pnode^.inodeindex);
+      Dispose(pnode);
+
+      Result := True;
+    end;  //if pnode <> nil then
+  end;
+
+
+  function TPLPointerNodeList.removeNode(ihash: Cardinal; pskey: PAnsiString): Boolean;
+  begin
+    Result := self.removeNode(self.searchNode(ihash, pskey));
+  end;
+
+  function TPLPointerNodeList.removeNode(pskey: PAnsiString): Boolean;
+  begin
+    Result := self.removeNode(self.searchNode(pskey));
+  end;
+
+  procedure TPLPointerNodeList.Clear;
+  var
+     ind: Integer;
+  begin
+    for ind := 0 to self.imaxcount - 1 do
+    begin
+     if self.arrnodes[ind] <> nil then
+     begin
+       Dispose(self.arrnodes[ind]);
+       self.arrnodes[ind] := nil;
+     end;
+    end; //for ind := 0 to self.imaxcount - 1 do
+
+    //Shrink the List to its initial Size
+    SetLength(self.arrnodes, self.igrowfactor);
+  end;
+
+  function TPLPointerNodeList.getNode(iindex: Integer): PPLHashNode;
   begin
     Result := nil;
 
@@ -205,7 +251,7 @@ implementation
     end;
   end;
 
-  function TPLHashNodeList.searchNode(ihash: Cardinal): PPLHashNode;
+  function TPLPointerNodeList.searchNode(ihash: Cardinal; pskey: PAnsiString): PPLHashNode;
   var
     ind: Integer;
   begin
@@ -215,8 +261,11 @@ implementation
     repeat  //while Result = nil and ind = self.inodelast;
       if self.arrnodes[ind] <> nil then
       begin
-        if self.arrnodes[ind]^.ihash = ihash then Result := self.arrnodes[ind];
-      end;
+        if (self.arrnodes[ind]^.ihash = ihash)
+          and (self.arrnodes[ind]^.skey = pskey^) then
+          Result := self.arrnodes[ind];
+
+      end;  //if self.arrnodes[ind] <> nil then
 
       inc(ind);
     until (Result <> nil)
@@ -224,7 +273,7 @@ implementation
 
   end;
 
-  function TPLHashNodeList.searchNode(pskey: PAnsiString): PPLHashNode;
+  function TPLPointerNodeList.searchNode(pskey: PAnsiString): PPLHashNode;
   var
     ind: Integer;
   begin
@@ -243,17 +292,17 @@ implementation
 
   end;
 
-  function TPLHashNodeList.searchValue(ihash: Cardinal): Pointer;
+  function TPLPointerNodeList.searchValue(ihash: Cardinal; pskey: PAnsiString): Pointer;
   var
     plstnd: PPLHashNode;
   begin
     Result := nil;
-    plstnd := self.searchNode(ihash);
+    plstnd := self.searchNode(ihash, pskey);
 
     if plstnd <> nil then Result := plstnd^.pvalue;
   end;
 
-  function TPLHashNodeList.searchValue(pskey: PAnsiString): Pointer;
+  function TPLPointerNodeList.searchValue(pskey: PAnsiString): Pointer;
   var
     plstnd: PPLHashNode;
   begin
@@ -263,17 +312,17 @@ implementation
     if plstnd <> nil then Result := plstnd^.pvalue;
   end;
 
-  function TPLHashNodeList.searchIndex(ihash: Cardinal): Integer;
+  function TPLPointerNodeList.searchIndex(ihash: Cardinal; pskey: PAnsiString): Integer;
   var
     plstnd: PPLHashNode;
   begin
     Result := -1;
-    plstnd := self.searchNode(ihash);
+    plstnd := self.searchNode(ihash, pskey);
 
     if plstnd <> nil then Result := plstnd^.inodeindex;
   end;
 
-  function TPLHashNodeList.searchIndex(pskey: PAnsiString): Integer;
+  function TPLPointerNodeList.searchIndex(pskey: PAnsiString): Integer;
   var
     plstnd: PPLHashNode;
   begin
@@ -283,23 +332,18 @@ implementation
     if plstnd <> nil then Result := plstnd^.inodeindex;
   end;
 
-  function TPLHashNodeList.getLastIndex(): Integer;
+  function TPLPointerNodeList.getLastIndex(): Integer;
   begin
     Result := self.ilastindex;
-  end;
-
-  function TPLHashNodeList.getCount(): Integer;
-  begin
-    Result := self.ilastindex + 1;
   end;
 
 
 
   (*==========================================================================*)
-  (* Class TPLObjectHashList *)
+  (* Class TPLPointerHashList *)
 
 
-  constructor TPLObjectHashList.Create;
+  constructor TPLPointerHashList.Create;
   begin
     self.ikeycount := 0;
     self.imaxkeycount := 0;
@@ -312,7 +356,7 @@ implementation
     self.extendList(False);
   end;
 
-  destructor TPLObjectHashList.Destroy;
+  destructor TPLPointerHashList.Destroy;
   var
     ibkt: Integer;
   begin
@@ -326,7 +370,7 @@ implementation
     inherited Destroy;
   end;
 
-  procedure TPLObjectHashList.extendList(brebuild: Boolean = True);
+  procedure TPLPointerHashList.extendList(brebuild: Boolean = True);
   var
     ibkt: Integer;
   begin
@@ -342,7 +386,7 @@ implementation
 
     for ibkt := 0 to self.ibucketcount - 1 do
     begin
-      if self.arrbuckets[ibkt] = nil then self.arrbuckets[ibkt] := TPLHashNodeList.Create(ibkt);
+      if self.arrbuckets[ibkt] = nil then self.arrbuckets[ibkt] := TPLPointerNodeList.Create(ibkt);
     end;
 
     if brebuild then
@@ -386,7 +430,7 @@ implementation
       return hash;
   }
 *)
-  function TPLObjectHashList.computeHash(pskey: PAnsiString): Cardinal;
+  function TPLPointerHashList.computeHash(pskey: PAnsiString): Cardinal;
   var
     arrbts: TBytes;
     ibt, ibtcnt: Integer;
@@ -405,7 +449,7 @@ implementation
     end;  //if pskey <> nil then
   end;
 
-  procedure TPLObjectHashList.setValue(const skey: String; ppointer: Pointer);
+  procedure TPLPointerHashList.setValue(const skey: String; ppointer: Pointer);
   var
     plstnd: PPLHashNode;
     ihsh: Cardinal;
@@ -415,7 +459,7 @@ implementation
     ihsh := computeHash(@skey);
     ibktidx := ihsh mod self.ibucketcount;
 
-    plstnd := TPLHashNodeList(self.arrbuckets[ibktidx]).searchNode(ihsh);
+    plstnd := TPLPointerNodeList(self.arrbuckets[ibktidx]).searchNode(ihsh, @skey);
 
     if plstnd = nil then
     begin
@@ -429,7 +473,7 @@ implementation
         ibktidx := ihsh mod self.ibucketcount;
       end;  //if self.ikeycount = self.imaxkeycount then
 
-      TPLHashNodeList(self.arrbuckets[ibktidx]).addNode(ihsh, @skey, ppointer);
+      TPLPointerNodeList(self.arrbuckets[ibktidx]).addNode(ihsh, @skey, ppointer);
 
       inc(self.ikeycount);
     end
@@ -441,18 +485,32 @@ implementation
     end;  //if plstnd = nil then
   end;
 
-  procedure TPLObjectHashList.rebuildList();
+  procedure TPLPointerHashList.removeKey(const skey: String);
+  var
+    ihsh: Cardinal;
+    ibktidx: Integer;
+  begin
+    //Build the Hash Index
+    ihsh := computeHash(@skey);
+    ibktidx := ihsh mod self.ibucketcount;
+
+    if TPLPointerNodeList(self.arrbuckets[ibktidx]).removeNode(ihsh, @skey) then
+      dec(Self.ikeycount);
+
+  end;
+
+  procedure TPLPointerHashList.rebuildList();
   var
     plstnd: PPLHashNode;
     ibktnwidx, ibktidx, indidx, indlstidx: Integer;
   begin
     for ibktidx := 0 to self.ibucketcount -1 do
     begin
-      indlstidx := TPLHashNodeList(self.arrbuckets[ibktidx]).getLastIndex();
+      indlstidx := TPLPointerNodeList(self.arrbuckets[ibktidx]).getLastIndex();
 
       for indidx := 0 to indlstidx do
       begin
-        plstnd := TPLHashNodeList(self.arrbuckets[ibktidx]).getNode(indidx);
+        plstnd := TPLPointerNodeList(self.arrbuckets[ibktidx]).getNode(indidx);
         ibktnwidx := -1;
 
         if plstnd <> nil then
@@ -463,14 +521,31 @@ implementation
         if (ibktnwidx > -1)
           and (ibktnwidx <> ibktidx) then
         begin
-          TPLHashNodeList(self.arrbuckets[ibktidx]).unsetIndex(indidx);
-          TPLHashNodeList(self.arrbuckets[ibktnwidx]).addNode(plstnd);
+          TPLPointerNodeList(self.arrbuckets[ibktidx]).unsetIndex(indidx);
+          TPLPointerNodeList(self.arrbuckets[ibktnwidx]).addNode(plstnd);
         end;  //if (ibktnwidx > -1) and (ibktnwidx <> ibktidx) then
       end; //for indidx := 0 to indlstidx do
     end;  //for ibktidx := 0 to self.ibucketcount -1 do
   end;
 
-  function TPLObjectHashList.getValue(const skey: String): Pointer;
+  procedure TPLPointerHashList.Clear();
+  var
+    ibkt: Integer;
+  begin
+    for ibkt := 0 to self.ibucketcount - 1 do
+    begin
+      TPLPointerNodeList(self.arrbuckets[ibkt]).Clear;
+
+      if ibkt >= self.igrowfactor then
+        self.arrbuckets[ibkt].Free;
+
+    end;  //for ibkt := 0 to self.ibucketcount - 1 do
+
+    //Shrink the List to its initial Size
+    SetLength(self.arrbuckets, self.igrowfactor);
+  end;
+
+  function TPLPointerHashList.getValue(const skey: String): Pointer;
   var
     ihsh: Cardinal;
     ibktidx: Integer;
@@ -480,10 +555,10 @@ implementation
     ibktidx := ihsh mod self.ibucketcount;
 
     //Search the Hash within the Bucket
-    Result := TPLHashNodeList(self.arrbuckets[ibktidx]).searchValue(ihsh);
+    Result := TPLPointerNodeList(self.arrbuckets[ibktidx]).searchValue(ihsh, @skey);
   end;
 
-  function TPLObjectHashList.hasKey(const skey: String): Boolean;
+  function TPLPointerHashList.hasKey(const skey: String): Boolean;
   var
     ihsh: Cardinal;
     ibktidx: Integer;
@@ -494,12 +569,12 @@ implementation
     ihsh := computeHash(@skey);
     ibktidx := ihsh mod self.ibucketcount;
 
-    if TPLHashNodeList(self.arrbuckets[ibktidx]).searchNode(ihsh) <> nil then
+    if TPLPointerNodeList(self.arrbuckets[ibktidx]).searchNode(ihsh, @skey) <> nil then
       Result := True;
 
   end;
 
-  function TPLObjectHashList.moveFirst(): Boolean;
+  function TPLPointerHashList.moveFirst(): Boolean;
   var
     ibkt, indidx, indlstidx: Integer;
   begin
@@ -508,11 +583,11 @@ implementation
     ibkt := 0;
 
     repeat //until (self.pcurrentnode <> nil) or (ibkt >= self.ibucketcount);
-      indlstidx := TPLHashNodeList(self.arrbuckets[ibkt]).getLastIndex();
+      indlstidx := TPLPointerNodeList(self.arrbuckets[ibkt]).getLastIndex();
       indidx := 0;
 
       repeat
-        self.pcurrentnode := TPLHashNodeList(self.arrbuckets[ibkt]).getNode(indidx);
+        self.pcurrentnode := TPLPointerNodeList(self.arrbuckets[ibkt]).getNode(indidx);
 
         inc(indidx);
       until (self.pcurrentnode <> nil)
@@ -527,7 +602,7 @@ implementation
 
   end;
 
-  function TPLObjectHashList.moveNext(): Boolean;
+  function TPLPointerHashList.moveNext(): Boolean;
   var
     plstnd: PPLHashNode;
     ibktidx, indidx, indlstidx: Integer;
@@ -543,12 +618,12 @@ implementation
       if ibktidx < self.ibucketcount then
       begin
         repeat  //until (plstnd <> nil) or (ibktidx >= self.ibucketcount);
-          indlstidx := TPLHashNodeList(self.arrbuckets[ibktidx]).getLastIndex();
+          indlstidx := TPLPointerNodeList(self.arrbuckets[ibktidx]).getLastIndex();
 
           repeat  //until (plstnd <> nil) or (indidx > indlstidx);
             inc(indidx);
 
-            plstnd := TPLHashNodeList(self.arrbuckets[ibktidx]).getNode(indidx);
+            plstnd := TPLPointerNodeList(self.arrbuckets[ibktidx]).getNode(indidx);
           until (plstnd <> nil)
             or (indidx > indlstidx);
 
@@ -575,7 +650,7 @@ implementation
     end;  //if self.pcurrentnode <> nil then
   end;
 
-  function TPLObjectHashList.getCurrentKey(): String;
+  function TPLPointerHashList.getCurrentKey(): String;
   begin
     Result := '';
 
@@ -584,7 +659,7 @@ implementation
 
   end;
 
-  function TPLObjectHashList.getCurrentValue(): Pointer;
+  function TPLPointerHashList.getCurrentValue(): Pointer;
   begin
     Result := nil;
 
@@ -593,7 +668,7 @@ implementation
 
   end;
 
-  function TPLObjectHashList.getCount(): Integer;
+  function TPLPointerHashList.getCount(): Integer;
   begin
     Result := self.ikeycount;
   end;

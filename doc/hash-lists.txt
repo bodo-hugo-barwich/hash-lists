@@ -42,43 +42,35 @@ end
 The Structure that stores the Key and it's Data
 
 ------------------------------------------------------------------------
-Section 1.3 : TPLHashNodeList
+Section 1.3 : TPLPointerHashList
 ------------------------------------------------------------------------
 
 
 
-1.3.1 : Description
-------------------------------------------------------------------------
-
-
-The TPLHashNodeList Object manages the TPLHashNode Structures that match
-into the same Bucket within the [TPLObjectHashList]  List Object.
- With the Constructor the TPLObjectHashList List Object assigns an Index
-which the TPLObjectHashList assigns to all TPLHashNode Structures that
-are added to it. 
-1.3.2 : Method overview
+1.3.1 : Method overview
 ------------------------------------------------------------------------
 
 
 Method Description
 ------------------
-addNode  
+Clear  
 Create  
 Destroy  
 getCount  
-getLastIndex  
-getNode
+getCurrentKey  
+getCurrentValue
  
-searchIndex  
-searchNode  
-searchValue  
-setValue  
-unsetIndex
+getValue  
+hasKey  
+moveFirst  
+moveNext  
+removeKey  
+setValue
  
 ------------------------------------------------------------------------
 
 
-1.3.3 : TPLHashNodeList.Create
+1.3.2 : TPLPointerHashList.Create
 ------------------------------------------------------------------------
 
 
@@ -86,14 +78,13 @@ Procedure:
 
 Declaration:
 
-constructor Create;  Overload
-constructor Create(iindex: Integer);  Overload
+constructor Create
 
 Visibility:
 public
 
 
-1.3.4 : TPLHashNodeList.Destroy
+1.3.3 : TPLPointerHashList.Destroy
 ------------------------------------------------------------------------
 
 
@@ -107,7 +98,213 @@ Visibility:
 public
 
 
-1.3.5 : TPLHashNodeList.addNode
+1.3.4 : TPLPointerHashList.setValue
+------------------------------------------------------------------------
+
+
+Procedure:
+
+Declaration:
+
+procedure setValue(const skey: string; ppointer: Pointer);  Virtual
+
+Visibility:
+public
+
+
+1.3.5 : TPLPointerHashList.removeKey
+------------------------------------------------------------------------
+
+
+Procedure:
+
+Declaration:
+
+procedure removeKey(const skey: string);  Virtual
+
+Visibility:
+public
+
+
+1.3.6 : TPLPointerHashList.Clear
+------------------------------------------------------------------------
+
+
+Procedure:
+
+Declaration:
+
+procedure Clear;  Virtual
+
+Visibility:
+public
+
+
+1.3.7 : TPLPointerHashList.getValue
+------------------------------------------------------------------------
+
+
+Procedure:
+
+Declaration:
+
+function getValue(const skey: string) : Pointer;  Virtual
+
+Visibility:
+public
+
+
+1.3.8 : TPLPointerHashList.hasKey
+------------------------------------------------------------------------
+
+
+Procedure:
+
+Declaration:
+
+function hasKey(const skey: string) : Boolean
+
+Visibility:
+public
+
+
+1.3.9 : TPLPointerHashList.moveFirst
+------------------------------------------------------------------------
+
+
+Procedure:
+
+Declaration:
+
+function moveFirst : Boolean
+
+Visibility:
+public
+
+
+1.3.10 : TPLPointerHashList.moveNext
+------------------------------------------------------------------------
+
+
+Procedure:
+
+Declaration:
+
+function moveNext : Boolean
+
+Visibility:
+public
+
+
+1.3.11 : TPLPointerHashList.getCurrentKey
+------------------------------------------------------------------------
+
+
+Procedure:
+
+Declaration:
+
+function getCurrentKey : string
+
+Visibility:
+public
+
+
+1.3.12 : TPLPointerHashList.getCurrentValue
+------------------------------------------------------------------------
+
+
+Procedure:
+
+Declaration:
+
+function getCurrentValue : Pointer;  Virtual
+
+Visibility:
+public
+
+
+1.3.13 : TPLPointerHashList.getCount
+------------------------------------------------------------------------
+
+
+Procedure:
+
+Declaration:
+
+function getCount : Integer
+
+Visibility:
+public
+
+
+------------------------------------------------------------------------
+Section 1.4 : TPLPointerNodeList
+------------------------------------------------------------------------
+
+
+
+1.4.1 : Description
+------------------------------------------------------------------------
+
+
+The TPLPointerNodeList Object manages the TPLHashNode Structures that
+match into the same Bucket within the [TPLPointerHashList]  List
+Object.
+ With the Constructor the Superior TPLPointerHashList List Object
+assigns an Index which the TPLPointerNodeList assigns to all TPLHashNode
+Structures that are added to it. 
+1.4.2 : Method overview
+------------------------------------------------------------------------
+
+
+Method Description
+------------------
+addNode  
+Clear  
+Create  
+Destroy  
+getLastIndex  
+getNode  
+removeNode  
+searchIndex  
+searchNode  
+searchValue  
+setValue  
+unsetIndex  
+------------------------------------------------------------------------
+
+
+1.4.3 : TPLPointerNodeList.Create
+------------------------------------------------------------------------
+
+
+Procedure:
+
+Declaration:
+
+constructor Create;  Virtual;  Overload
+constructor Create(iindex: Integer);  Virtual;  Overload
+
+Visibility:
+public
+
+
+1.4.4 : TPLPointerNodeList.Destroy
+------------------------------------------------------------------------
+
+
+Procedure:
+
+Declaration:
+
+destructor Destroy;  Override
+
+Visibility:
+public
+
+
+1.4.5 : TPLPointerNodeList.addNode
 ------------------------------------------------------------------------
 
 
@@ -123,7 +320,7 @@ Visibility:
 public
 
 
-1.3.6 : TPLHashNodeList.setValue
+1.4.6 : TPLPointerNodeList.setValue
 ------------------------------------------------------------------------
 
 
@@ -131,14 +328,16 @@ Procedure:
 
 Declaration:
 
-procedure setValue(ihash: Cardinal; ppointer: Pointer);  Overload
+procedure setValue(ihash: Cardinal; pskey: PAnsiString; 
+               
+  ppointer: Pointer);  Overload
 procedure setValue(pskey: PAnsiString; ppointer: Pointer);  Overload
 
 Visibility:
 public
 
 
-1.3.7 : TPLHashNodeList.unsetIndex
+1.4.7 : TPLPointerNodeList.unsetIndex
 ------------------------------------------------------------------------
 
 
@@ -152,7 +351,39 @@ Visibility:
 public
 
 
-1.3.8 : TPLHashNodeList.getNode
+1.4.8 : TPLPointerNodeList.removeNode
+------------------------------------------------------------------------
+
+
+Procedure:
+
+Declaration:
+
+function removeNode(pnode: PPLHashNode) : Boolean;  Overload
+function removeNode(ihash: Cardinal; pskey: PAnsiString) : Boolean
+     
+             ;  Virtual;  Overload
+function removeNode(pskey: PAnsiString) : Boolean;  Virtual;  Overload
+
+Visibility:
+public
+
+
+1.4.9 : TPLPointerNodeList.Clear
+------------------------------------------------------------------------
+
+
+Procedure:
+
+Declaration:
+
+procedure Clear;  Virtual
+
+Visibility:
+public
+
+
+1.4.10 : TPLPointerNodeList.getNode
 ------------------------------------------------------------------------
 
 
@@ -166,7 +397,7 @@ Visibility:
 public
 
 
-1.3.9 : TPLHashNodeList.searchNode
+1.4.11 : TPLPointerNodeList.searchNode
 ------------------------------------------------------------------------
 
 
@@ -174,14 +405,16 @@ Procedure:
 
 Declaration:
 
-function searchNode(ihash: Cardinal) : PPLHashNode;  Overload
+function searchNode(ihash: Cardinal; pskey: PAnsiString) : PPLHashNode
+ 
+                 ;  Overload
 function searchNode(pskey: PAnsiString) : PPLHashNode;  Overload
 
 Visibility:
 public
 
 
-1.3.10 : TPLHashNodeList.searchValue
+1.4.12 : TPLPointerNodeList.searchValue
 ------------------------------------------------------------------------
 
 
@@ -189,14 +422,16 @@ Procedure:
 
 Declaration:
 
-function searchValue(ihash: Cardinal) : Pointer;  Overload
+function searchValue(ihash: Cardinal; pskey: PAnsiString) : Pointer
+    
+               ;  Overload
 function searchValue(pskey: PAnsiString) : Pointer;  Overload
 
 Visibility:
 public
 
 
-1.3.11 : TPLHashNodeList.searchIndex
+1.4.13 : TPLPointerNodeList.searchIndex
 ------------------------------------------------------------------------
 
 
@@ -204,14 +439,16 @@ Procedure:
 
 Declaration:
 
-function searchIndex(ihash: Cardinal) : Integer;  Overload
+function searchIndex(ihash: Cardinal; pskey: PAnsiString) : Integer
+    
+               ;  Overload
 function searchIndex(pskey: PAnsiString) : Integer;  Overload
 
 Visibility:
 public
 
 
-1.3.12 : TPLHashNodeList.getLastIndex
+1.4.14 : TPLPointerNodeList.getLastIndex
 ------------------------------------------------------------------------
 
 
@@ -220,185 +457,6 @@ Procedure:
 Declaration:
 
 function getLastIndex : Integer
-
-Visibility:
-public
-
-
-1.3.13 : TPLHashNodeList.getCount
-------------------------------------------------------------------------
-
-
-Procedure:
-
-Declaration:
-
-function getCount : Integer
-
-Visibility:
-public
-
-
-------------------------------------------------------------------------
-Section 1.4 : TPLObjectHashList
-------------------------------------------------------------------------
-
-
-
-1.4.1 : Method overview
-------------------------------------------------------------------------
-
-
-Method Description
-------------------
-Create  
-Destroy  
-getCount  
-getCurrentKey  
-getCurrentValue  
-getValue  
-hasKey  
-moveFirst  
-moveNext  
-setValue  
-------------------------------------------------------------------------
-
-
-1.4.2 : TPLObjectHashList.Create
-------------------------------------------------------------------------
-
-
-Procedure:
-
-Declaration:
-
-constructor Create
-
-Visibility:
-public
-
-
-1.4.3 : TPLObjectHashList.Destroy
-------------------------------------------------------------------------
-
-
-Procedure:
-
-Declaration:
-
-destructor Destroy;  Override
-
-Visibility:
-public
-
-
-1.4.4 : TPLObjectHashList.setValue
-------------------------------------------------------------------------
-
-
-Procedure:
-
-Declaration:
-
-procedure setValue(const skey: string; ppointer: Pointer);  Virtual
-
-Visibility:
-public
-
-
-1.4.5 : TPLObjectHashList.getValue
-------------------------------------------------------------------------
-
-
-Procedure:
-
-Declaration:
-
-function getValue(const skey: string) : Pointer;  Virtual
-
-Visibility:
-public
-
-
-1.4.6 : TPLObjectHashList.hasKey
-------------------------------------------------------------------------
-
-
-Procedure:
-
-Declaration:
-
-function hasKey(const skey: string) : Boolean
-
-Visibility:
-public
-
-
-1.4.7 : TPLObjectHashList.moveFirst
-------------------------------------------------------------------------
-
-
-Procedure:
-
-Declaration:
-
-function moveFirst : Boolean
-
-Visibility:
-public
-
-
-1.4.8 : TPLObjectHashList.moveNext
-------------------------------------------------------------------------
-
-
-Procedure:
-
-Declaration:
-
-function moveNext : Boolean
-
-Visibility:
-public
-
-
-1.4.9 : TPLObjectHashList.getCurrentKey
-------------------------------------------------------------------------
-
-
-Procedure:
-
-Declaration:
-
-function getCurrentKey : string
-
-Visibility:
-public
-
-
-1.4.10 : TPLObjectHashList.getCurrentValue
-------------------------------------------------------------------------
-
-
-Procedure:
-
-Declaration:
-
-function getCurrentValue : Pointer;  Virtual
-
-Visibility:
-public
-
-
-1.4.11 : TPLObjectHashList.getCount
-------------------------------------------------------------------------
-
-
-Procedure:
-
-Declaration:
-
-function getCount : Integer
 
 Visibility:
 public
@@ -459,18 +517,27 @@ Section 2.3 : TPLStringNodeList
 
 
 
-2.3.1 : Method overview
+2.3.1 : Description
+------------------------------------------------------------------------
+
+
+The TPLStringNodeList implements the Use Case of the String Hash Table
+where the Keys and the Values are both Strings. For convenience it
+allocates and disposes the Memory of the Strings. 
+2.3.2 : Method overview
 ------------------------------------------------------------------------
 
 
 Method Description
 ------------------
 addNode  
+Clear  
 Destroy  
+removeNode  
 ------------------------------------------------------------------------
 
 
-2.3.2 : TPLStringNodeList.Destroy
+2.3.3 : TPLStringNodeList.Destroy
 ------------------------------------------------------------------------
 
 
@@ -484,7 +551,7 @@ Visibility:
 public
 
 
-2.3.3 : TPLStringNodeList.addNode
+2.3.4 : TPLStringNodeList.addNode
 ------------------------------------------------------------------------
 
 
@@ -495,6 +562,37 @@ Declaration:
 function addNode(ihash: Cardinal; pskey: PAnsiString; 
                
 psvalue: PAnsiString) : Integer;  Overload
+
+Visibility:
+public
+
+
+2.3.5 : TPLStringNodeList.removeNode
+------------------------------------------------------------------------
+
+
+Procedure:
+
+Declaration:
+
+function removeNode(ihash: Cardinal; pskey: PAnsiString) : Boolean
+     
+             ;  Override;  Overload
+function removeNode(pskey: PAnsiString) : Boolean;  Override;  Overload
+
+Visibility:
+public
+
+
+2.3.6 : TPLStringNodeList.Clear
+------------------------------------------------------------------------
+
+
+Procedure:
+
+Declaration:
+
+procedure Clear;  Override
 
 Visibility:
 public

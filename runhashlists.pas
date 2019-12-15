@@ -6,14 +6,14 @@ uses
   {$IFDEF UNIX}{$IFDEF UseCThreads}
   cthreads,
   {$ENDIF}{$ENDIF}
-  Classes, SysUtils, CustApp, pointerhash, stringhash
-  { you can add units after this };
+  Classes, SysUtils, CustApp
+  { you can add units after this }
+  , pointerhash, stringhash;
+
 
 type
-
-  { TAppPerlHash }
-
-  TAppPerlHash = class(TCustomApplication)
+  { TRunHashLists }
+  TRunHashLists = class(TCustomApplication)
   protected
     procedure DoRun; override;
   public
@@ -22,11 +22,11 @@ type
     procedure WriteHelp; virtual;
   end;
 
-{ TAppPerlHash }
 
-procedure TAppPerlHash.DoRun;
+{ TRunHashLists }
+procedure TRunHashLists.DoRun;
 var
-  hshmap: TPLObjectHashList;
+  hshmap: TPLPointerHashList;
   strmap: TPLStringHashList;
   psvl: PAnsiString;
   ErrorMsg: String;
@@ -47,7 +47,7 @@ begin
   end;
 
 (*   *)
-  hshmap := TPLObjectHashList.Create;
+  hshmap := TPLPointerHashList.Create;
   strmap := TPLStringHashList.Create;
 
   hshmap.setValue('en', strmap);
@@ -122,27 +122,27 @@ begin
   Terminate;
 end;
 
-constructor TAppPerlHash.Create(TheOwner: TComponent);
+constructor TRunHashLists.Create(TheOwner: TComponent);
 begin
   inherited Create(TheOwner);
   StopOnException:=True;
 end;
 
-destructor TAppPerlHash.Destroy;
+destructor TRunHashLists.Destroy;
 begin
   inherited Destroy;
 end;
 
-procedure TAppPerlHash.WriteHelp;
+procedure TRunHashLists.WriteHelp;
 begin
   { add your help code here }
   writeln('Usage: ', ExeName, ' -h');
 end;
 
 var
-  Application: TAppPerlHash;
+  Application: TRunHashLists;
 begin
-  Application:=TAppPerlHash.Create(nil);
+  Application:=TRunHashLists.Create(nil);
   Application.Title:='App Perl Hash';
   Application.Run;
   Application.Free;

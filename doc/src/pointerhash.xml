@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <fpdoc-descriptions>
 <package name="hash-lists">
 <module name="pointerhash">
@@ -19,7 +19,7 @@ the Structure will be assigned to it.
 <short>The Index within the Node List</short>
 <descr>
 inodeindex defines the Index of the TPLHashNode Structure within the
-<link id="TPLHashNodeList"/> List Object<br />
+<link id="TPLHashNodeList"/> List Object<br/>
 The Node Index will be assigned by the <link id="TPLHashNodeList"/> when
 the Structure will be assigned to it.
 </descr>
@@ -33,16 +33,20 @@ the Structure will be assigned to it.
 <element name="TPLHashNode.pvalue">
 <short>The Data Value for the Key</short>
 </element>
-<element name="TPLHashNodeList">
+<element name="TPLPointerNodeList">
 <short>The Data Node Bucket implemented as dynamic array of PPLHashNode</short>
-<descr>
-The TPLHashNodeList Object manages the TPLHashNode Structures that match into the
-same Bucket within the <link id="TPLObjectHashList"/> List Object.<br />
-With the Constructor the TPLObjectHashList List Object assigns an Index which
-the TPLObjectHashList assigns to all TPLHashNode Structures that are added to it.
+<descr>The TPLPointerNodeList Object manages the TPLHashNode Structures that match into the
+same Bucket within the <link id="TPLPointerHashList"/> List Object.<br/>
+With the Constructor the Superior TPLPointerHashList List Object assigns an Index which
+the TPLPointerNodeList assigns to all TPLHashNode Structures that are added to it.
 </descr>
 </element>
 
-</module>
+<element name="TPLPointerNodeList.arrnodes"><short>Dynamic Array of Pointers to TPLHashNode Structures</short><descr>The Keys and their Values are stored within the TPLHashNode Structures which are
+hold in the Dynamic Array.
+The <var>TPLPointerNodeList.ilastindex</var> indicates the Position within the Dynamic Array
+</descr>
+      </element>
+    </module>
 </package>
 </fpdoc-descriptions>

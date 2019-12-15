@@ -8,13 +8,16 @@ uses
   Classes, SysUtils, pointerhash;
 
 type
-  TPLStringNodeList = class(TPLHashNodeList)
+  TPLStringNodeList = class(TPLPointerNodeList)
   public
     destructor Destroy; override;
     function addNode(ihash: Cardinal; pskey: PAnsiString; psvalue: PAnsiString): Integer; overload;
+    function removeNode(ihash: Cardinal; pskey: PAnsiString): Boolean; override; overload;
+    function removeNode(pskey: PAnsiString): Boolean; override; overload;
+    procedure Clear; override;
   end;
 
-  TPLStringHashList = class(TPLObjectHashList)
+  TPLStringHashList = class(TPLPointerHashList)
   protected
     procedure extendList(brebuild: Boolean = True); override;
   public
@@ -59,6 +62,60 @@ implementation
     Result := inherited addNode(ihash, pskey, psvl);
   end;
 
+  function TPLStringNodeList.removeNode(ihash: Cardinal; pskey: PAnsiString): Boolean;
+  var
+    plstnd: PPLHashNode;
+  begin
+    Result := False;
+
+    plstnd := self.searchNode(ihash, pskey);
+
+    if plstnd <> nil then
+    begin
+      self.unsetIndex(plstnd^.inodeindex);
+      Dispose(PAnsiString(plstnd^.pvalue));
+
+      Result := inherited removeNode(plstnd);
+    end;  //if plstnd <> nil then
+  end;
+
+  function TPLStringNodeList.removeNode(pskey: PAnsiString): Boolean;
+  var
+    plstnd: PPLHashNode;
+  begin
+    Result := False;
+
+    plstnd := self.searchNode(pskey);
+
+    if plstnd <> nil then
+    begin
+      self.unsetIndex(plstnd^.inodeindex);
+      Dispose(PAnsiString(plstnd^.pvalue));
+
+      Result := inherited removeNode(plstnd);
+    end;  //if plstnd <> nil then
+  end;
+
+  procedure TPLStringNodeList.Clear;
+  var
+    ind: Integer;
+  begin
+    for ind := 0 to self.imaxcount - 1 do
+    begin
+      if self.arrnodes[ind] <> nil then
+      begin
+        if self.arrnodes[ind]^.pvalue <> nil then
+        begin
+          //Free the String Data
+          Dispose(PAnsiString(self.arrnodes[ind]^.pvalue));
+          self.arrnodes[ind]^.pvalue := nil;
+        end;
+      end;  //if self.arrnodes[ind] <> nil then
+    end; //for ind := 0 to self.imaxcount - 1 do
+
+    //Do the Clearing of the Nodes
+    inherited Clear;
+  end;
 
   (*==========================================================================*)
   // Class TPLStringHashList
@@ -75,6 +132,7 @@ implementation
 
     for ibkt := 0 to self.ibucketcount - 1 do
     begin
+      //Create the Buckets as TPLStringNodeList
       if self.arrbuckets[ibkt] = nil then self.arrbuckets[ibkt] := TPLStringNodeList.Create(ibkt);
     end;
 
@@ -95,7 +153,7 @@ implementation
     ihsh := computeHash(@skey);
     ibktidx := ihsh mod self.ibucketcount;
 
-    plstnd := TPLStringNodeList(self.arrbuckets[ibktidx]).searchNode(ihsh);
+    plstnd := TPLStringNodeList(self.arrbuckets[ibktidx]).searchNode(ihsh, @skey);
 
     if plstnd = nil then
     begin

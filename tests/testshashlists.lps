@@ -14,7 +14,7 @@
       <Unit1>
         <Filename Value="../src/pointerhash.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="3"/>
         <TopLine Value="562"/>
         <CursorPos Y="576"/>
         <UsageCount Value="29"/>
@@ -23,19 +23,19 @@
       <Unit2>
         <Filename Value="../src/stringhash.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="-1"/>
-        <WindowIndex Value="-1"/>
-        <TopLine Value="-1"/>
-        <CursorPos X="-1" Y="-1"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="27"/>
+        <CursorPos X="122" Y="47"/>
         <UsageCount Value="29"/>
+        <Loaded Value="True"/>
       </Unit2>
       <Unit3>
         <Filename Value="src/tests_objecthash.pas"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <TopLine Value="195"/>
-        <CursorPos X="51" Y="216"/>
+        <CursorPos X="77" Y="212"/>
         <UsageCount Value="29"/>
         <Loaded Value="True"/>
       </Unit3>
