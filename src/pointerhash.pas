@@ -54,6 +54,7 @@ type
   protected
     arrbuckets: array of TObject;
     pcurrentnode: PPLHashNode;
+    psearchednode: PPLHashNode;
     ikeycount: Integer;
     imaxkeycount: Integer;
     ibucketcount: Integer;
@@ -451,17 +452,25 @@ implementation
 
   procedure TPLPointerHashList.setValue(const skey: String; ppointer: Pointer);
   var
-    plstnd: PPLHashNode;
     ihsh: Cardinal;
-    ibktidx: Integer;
+    ibktidx, indidx: Integer;
   begin
     //Build the Hash Index
     ihsh := computeHash(@skey);
     ibktidx := ihsh mod self.ibucketcount;
 
-    plstnd := TPLPointerNodeList(self.arrbuckets[ibktidx]).searchNode(ihsh, @skey);
+    if self.psearchednode <> nil then
+    begin
+      if not ((self.psearchednode^.ihash = ihsh)
+        and (self.psearchednode^.skey = skey)) then
+        self.psearchednode := nil;
 
-    if plstnd = nil then
+    end;  //if self.psearchednode <> nil then
+
+    if self.psearchednode = nil then
+      self.psearchednode := TPLPointerNodeList(self.arrbuckets[ibktidx]).searchNode(ihsh, @skey);
+
+    if self.psearchednode = nil then
     begin
       //Add a New Node
 
@@ -473,7 +482,8 @@ implementation
         ibktidx := ihsh mod self.ibucketcount;
       end;  //if self.ikeycount = self.imaxkeycount then
 
-      TPLPointerNodeList(self.arrbuckets[ibktidx]).addNode(ihsh, @skey, ppointer);
+      indidx := TPLPointerNodeList(self.arrbuckets[ibktidx]).addNode(ihsh, @skey, ppointer);
+      self.psearchednode := TPLPointerNodeList(self.arrbuckets[ibktidx]).getNode(indidx);
 
       inc(self.ikeycount);
     end
@@ -481,8 +491,8 @@ implementation
     begin
       //Update the Node Value
 
-      plstnd^.pvalue := ppointer;
-    end;  //if plstnd = nil then
+      self.psearchednode^.pvalue := ppointer;
+    end;  //if self.psearchednode = nil then
   end;
 
   procedure TPLPointerHashList.removeKey(const skey: String);
@@ -494,9 +504,29 @@ implementation
     ihsh := computeHash(@skey);
     ibktidx := ihsh mod self.ibucketcount;
 
-    if TPLPointerNodeList(self.arrbuckets[ibktidx]).removeNode(ihsh, @skey) then
-      dec(Self.ikeycount);
+    if self.psearchednode <> nil then
+    begin
+      if not ((self.psearchednode^.ihash = ihsh)
+        and (self.psearchednode^.skey = skey)) then
+        self.psearchednode := nil;
 
+    end;  //if self.psearchednode <> nil then
+
+    if self.psearchednode <> nil then
+    begin
+      if TPLPointerNodeList(self.arrbuckets[ibktidx]).removeNode(self.psearchednode) then
+      begin
+        self.psearchednode := nil;
+
+        dec(Self.ikeycount);
+      end;  //if TPLPointerNodeList(self.arrbuckets[ibktidx]).removeNode(self.psearchednode) then
+    end
+    else  //Searched Node does not match
+    begin
+      if TPLPointerNodeList(self.arrbuckets[ibktidx]).removeNode(ihsh, @skey) then
+        dec(Self.ikeycount);
+
+    end;  //if self.psearchednode <> nil then
   end;
 
   procedure TPLPointerHashList.rebuildList();
@@ -550,12 +580,27 @@ implementation
     ihsh: Cardinal;
     ibktidx: Integer;
   begin
+    Result := nil;
+
     //Compute Bucket Index
     ihsh := computeHash(@skey);
     ibktidx := ihsh mod self.ibucketcount;
 
-    //Search the Hash within the Bucket
-    Result := TPLPointerNodeList(self.arrbuckets[ibktidx]).searchValue(ihsh, @skey);
+    if self.psearchednode <> nil then
+    begin
+      if not ((self.psearchednode^.ihash = ihsh)
+        and (self.psearchednode^.skey = skey)) then
+        self.psearchednode := nil;
+
+    end; //if self.psearchednode <> nil then
+
+    if self.psearchednode = nil then
+      //Search the Hash within the Bucket
+      self.psearchednode := TPLPointerNodeList(self.arrbuckets[ibktidx]).searchNode(ihsh, @skey);
+
+    if self.psearchednode <> nil then
+      Result := self.psearchednode^.pvalue;
+
   end;
 
   function TPLPointerHashList.hasKey(const skey: String): Boolean;
@@ -569,7 +614,19 @@ implementation
     ihsh := computeHash(@skey);
     ibktidx := ihsh mod self.ibucketcount;
 
-    if TPLPointerNodeList(self.arrbuckets[ibktidx]).searchNode(ihsh, @skey) <> nil then
+    if self.psearchednode <> nil then
+    begin
+      if not ((self.psearchednode^.ihash = ihsh)
+        and (self.psearchednode^.skey = skey)) then
+        self.psearchednode := nil;
+
+    end; //if self.psearchednode <> nil then
+
+    if self.psearchednode = nil then
+      //Search the Hash within the Bucket
+      self.psearchednode := TPLPointerNodeList(self.arrbuckets[ibktidx]).searchNode(ihsh, @skey);
+
+    if self.psearchednode <> nil then
       Result := True;
 
   end;

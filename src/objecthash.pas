@@ -97,7 +97,7 @@ implementation
       self.unsetIndex(plstnd^.inodeindex);
       TObject(plstnd^.pvalue).Free;
 
-      Result := inherited addNode(plstnd);
+      Result := inherited removeNode(plstnd);
     end;  //if plstnd <> nil then
   end;
 
@@ -114,26 +114,29 @@ implementation
       self.unsetIndex(plstnd^.inodeindex);
       TObject(plstnd^.pvalue).Free;
 
-      Result := inherited addNode(plstnd);
+      Result := inherited removeNode(plstnd);
     end;  //if plstnd <> nil then
   end;
 
-  function TPLObjectNodeList.Clear:
+  procedure TPLObjectNodeList.Clear;
   var
     ind: Integer;
   begin
-    for ind := 0 to self.imaxcount - 1 do
+    if self.bowned then
     begin
-      if self.arrnodes[ind] <> nil then
+      for ind := 0 to self.imaxcount - 1 do
       begin
-        if self.arrnodes[ind]^.pvalue <> nil then
+        if self.arrnodes[ind] <> nil then
         begin
-          //Free the added Data Object
-          TObject(self.arrnodes[ind]^.pvalue).Free;
-          self.arrnodes[ind]^.pvalue := nil;
-        end;
-      end;  //if self.arrnodes[ind] <> nil then
-    end; //for ind := 0 to self.imaxcount - 1 do
+          if self.arrnodes[ind]^.pvalue <> nil then
+          begin
+            //Free the added Data Object
+            TObject(self.arrnodes[ind]^.pvalue).Free;
+            self.arrnodes[ind]^.pvalue := nil;
+          end;
+        end;  //if self.arrnodes[ind] <> nil then
+      end; //for ind := 0 to self.imaxcount - 1 do
+    end;  //if self.bowned then
 
     //Do the Clearing of the Nodes
     inherited Clear;
@@ -174,17 +177,26 @@ implementation
 
   procedure TPLObjectHashList.setValue(const skey: String; value: TObject);
   var
-    plstnd: PPLHashNode;
     ihsh: Cardinal;
-    ibktidx: Integer;
+    ibktidx, indidx: Integer;
   begin
     //Build the Hash Index
     ihsh := computeHash(@skey);
     ibktidx := ihsh mod self.ibucketcount;
 
-    plstnd := TPLStringNodeList(self.arrbuckets[ibktidx]).searchNode(ihsh);
+    if self.psearchednode <> nil then
+    begin
+      if not ((self.psearchednode^.ihash = ihsh)
+        and (self.psearchednode^.skey = skey)) then
+        self.psearchednode := nil;
 
-    if plstnd = nil then
+    end;  //if self.psearchednode <> nil then
+
+
+    if self.psearchednode = nil then
+      self.psearchednode := TPLObjectNodeList(self.arrbuckets[ibktidx]).searchNode(ihsh, @skey);
+
+    if self.psearchednode = nil then
     begin
       //Add a New Node
 
@@ -196,7 +208,8 @@ implementation
         ibktidx := ihsh mod self.ibucketcount;
       end;  //if self.ikeycount = self.imaxkeycount then
 
-      TPLStringNodeList(self.arrbuckets[ibktidx]).addNode(ihsh, @skey, TObject(value));
+      indidx := TPLObjectNodeList(self.arrbuckets[ibktidx]).addNode(ihsh, @skey, TObject(value));
+      self.psearchednode := TPLObjectNodeList(self.arrbuckets[ibktidx]).getNode(indidx);
 
       inc(self.ikeycount);
     end
@@ -204,8 +217,8 @@ implementation
     begin
       //Update the Node Value
 
-      TObject(plstnd^.pvalue) := svalue;
-    end;  //if plstnd = nil then
+      TObject(self.psearchednode^.pvalue) := value;
+    end;  //if self.psearchednode = nil then
   end;
 
 end.
