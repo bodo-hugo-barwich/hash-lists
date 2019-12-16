@@ -1,4 +1,4 @@
-unit tests_objecthash;
+unit tests_pointerhash;
 
 {$mode objfpc}{$H+}
 
@@ -8,9 +8,9 @@ uses
   TestFramework, pointerhash;
 
 type
-  TTestsObjectHashList = class(TTestCase)
+  TTestsPointerHashList = class(TTestCase)
   protected
-    lsthshobjs: TPLObjectHashList;
+    lsthshobjs: TPLPointerHashList;
     procedure SetUp; override;
     procedure Teardown; override;
   published
@@ -35,16 +35,16 @@ uses
 { here we register all our test classes }
 procedure RegisterTests;
 begin
-  TestFramework.RegisterTest(TTestsObjectHashList.Suite);
+  TestFramework.RegisterTest(TTestsPointerHashList.Suite);
 end;
 
 
-procedure TTestsObjectHashList.SetUp;
+procedure TTestsPointerHashList.SetUp;
 begin
   self.lsthshobjs := TPLObjectHashList.Create();
 end;
 
-procedure TTestsObjectHashList.Teardown;
+procedure TTestsPointerHashList.Teardown;
 var
   psvl: PAnsiString;
 begin
@@ -64,7 +64,7 @@ end;
 Test Adding 10 Keys and their Values (which should grow the List at least once)
 And Looking up their Values (they must match their inserted Values)
 *)
-procedure TTestsObjectHashList.TestInsertCheckElements;
+procedure TTestsPointerHashList.TestInsertCheckElements;
 var
   psvl: PAnsiString;
 begin
@@ -175,7 +175,7 @@ Test Adding 3 Keys and their Values for a valid List Test
 And Iterating to the First Key (this is not necessary the first inserted key)
 It should return the defined Key and its Value
 *)
-procedure TTestsObjectHashList.TestCheckFirstElement;
+procedure TTestsPointerHashList.TestCheckFirstElement;
 var
   sky: String;
   psvl: PAnsiString;
@@ -215,7 +215,7 @@ And Iterating to the First Key and to the Next Key (they are not necessary
 the first and second inserted keys)
 It should return the defined Keys and their Values
 *)
-procedure TTestsObjectHashList.TestCheckNextElement;
+procedure TTestsPointerHashList.TestCheckNextElement;
 var
   sky: String;
   psvl: PAnsiString;

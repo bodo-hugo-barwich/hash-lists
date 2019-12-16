@@ -7,6 +7,8 @@
       <Unit0>
         <Filename Value="runhashlists.pas"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="4"/>
         <CursorPos X="122" Y="21"/>
         <UsageCount Value="105"/>
         <Loaded Value="True"/>
@@ -14,16 +16,16 @@
       <Unit1>
         <Filename Value="src/pointerhash.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="1"/>
         <TopLine Value="17"/>
-        <CursorPos Y="32"/>
+        <CursorPos X="32" Y="28"/>
         <UsageCount Value="105"/>
         <Loaded Value="True"/>
       </Unit1>
       <Unit2>
         <Filename Value="src/stringhash.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="2"/>
         <TopLine Value="7"/>
         <CursorPos X="18" Y="159"/>
         <UsageCount Value="61"/>
@@ -32,7 +34,7 @@
       <Unit3>
         <Filename Value="src/objecthash.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="3"/>
         <TopLine Value="7"/>
         <CursorPos X="61" Y="18"/>
         <UsageCount Value="43"/>
@@ -63,23 +65,21 @@
         <Filename Value="doc/src/stringhash.xml"/>
         <EditorIndex Value="-1"/>
         <CursorPos Y="10"/>
-        <UsageCount Value="14"/>
+        <UsageCount Value="13"/>
         <DefaultSyntaxHighlighter Value="XML"/>
       </Unit7>
       <Unit8>
         <Filename Value="doc/src/objecthash.xml"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="25" Y="4"/>
-        <UsageCount Value="13"/>
+        <UsageCount Value="12"/>
         <DefaultSyntaxHighlighter Value="XML"/>
       </Unit8>
       <Unit9>
         <Filename Value="README.md"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="1"/>
-        <CursorPos X="37" Y="11"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="122" Y="17"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit9>
     </Units>
