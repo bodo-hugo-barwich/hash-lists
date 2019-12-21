@@ -11,7 +11,7 @@ type
   TPLStringNodeList = class(TPLPointerNodeList)
   public
     destructor Destroy; override;
-    function addNode(ihash: Cardinal; pskey: PAnsiString; psvalue: PAnsiString): Integer; overload;
+    function addNode(ihash: Cardinal; pskey: PAnsiString; psvalue: PAnsiString): PPLHashNode; overload;
     function removeNode(ihash: Cardinal; pskey: PAnsiString): Boolean; override; overload;
     function removeNode(pskey: PAnsiString): Boolean; override; overload;
     procedure Clear; override;
@@ -51,7 +51,7 @@ implementation
     inherited Destroy;
   end;
 
-  function TPLStringNodeList.addNode(ihash: Cardinal; pskey: PAnsiString; psvalue: PAnsiString): Integer;
+  function TPLStringNodeList.addNode(ihash: Cardinal; pskey: PAnsiString; psvalue: PAnsiString): PPLHashNode;
   var
     psvl: PAnsiString;
   begin
@@ -145,7 +145,6 @@ implementation
 
   procedure TPLStringHashList.setValue(const skey: String; svalue: String);
   var
-    plstnd: PPLHashNode;
     ihsh: Cardinal;
     ibktidx: Integer;
   begin
@@ -153,9 +152,18 @@ implementation
     ihsh := computeHash(@skey);
     ibktidx := ihsh mod self.ibucketcount;
 
-    plstnd := TPLStringNodeList(self.arrbuckets[ibktidx]).searchNode(ihsh, @skey);
+    if self.psearchednode <> nil then
+    begin
+      if not ((self.psearchednode^.ihash = ihsh)
+        and (self.psearchednode^.skey = skey)) then
+        self.psearchednode := nil;
 
-    if plstnd = nil then
+    end;  //if self.psearchednode <> nil then
+
+    if self.psearchednode = nil then
+      self.psearchednode := TPLStringNodeList(self.arrbuckets[ibktidx]).searchNode(ihsh, @skey);
+
+    if self.psearchednode = nil then
     begin
       //Add a New Node
 
@@ -167,7 +175,7 @@ implementation
         ibktidx := ihsh mod self.ibucketcount;
       end;  //if self.ikeycount = self.imaxkeycount then
 
-      TPLStringNodeList(self.arrbuckets[ibktidx]).addNode(ihsh, @skey, PAnsiString(@svalue));
+      self.psearchednode := TPLStringNodeList(self.arrbuckets[ibktidx]).addNode(ihsh, @skey, PAnsiString(@svalue));
 
       inc(self.ikeycount);
     end
@@ -175,8 +183,8 @@ implementation
     begin
       //Update the Node Value
 
-      PAnsiString(plstnd^.pvalue)^ := svalue;
-    end;  //if plstnd = nil then
+      PAnsiString(self.psearchednode^.pvalue)^ := svalue;
+    end;  //if self.psearchednode = nil then
   end;
 
 end.

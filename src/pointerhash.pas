@@ -23,15 +23,17 @@ type
     ibucketindex: Integer;
     ilastindex: Integer;
     inextindex: Integer;
+    inodecount: Integer;
     imaxcount: Integer;
     igrowfactor: Integer;
-    procedure extendList();
+    procedure reindexList;
+    procedure extendList;
   public
     constructor Create; virtual; overload;
     constructor Create(iindex: Integer); virtual; overload;
     destructor Destroy; override;
-    function addNode(pnode: PPLHashNode = nil): Integer; overload;
-    function addNode(ihash: Cardinal; pskey: PAnsiString; ppointer: Pointer): Integer; overload;
+    function addNode(pnode: PPLHashNode = nil): PPLHashNode; overload;
+    function addNode(ihash: Cardinal; pskey: PAnsiString; ppointer: Pointer): PPLHashNode; overload;
     procedure setValue(ihash: Cardinal; pskey: PAnsiString; ppointer: Pointer); overload;
     procedure setValue(pskey: PAnsiString; ppointer: Pointer); overload;
     procedure unsetIndex(iindex: Integer);
@@ -94,6 +96,7 @@ implementation
     self.ibucketindex := -1;
     self.ilastindex := 0;
     self.inextindex := 0;
+    self.inodecount := 0;
     self.imaxcount := 3;
     self.igrowfactor := 2;
 
@@ -105,6 +108,7 @@ implementation
     self.ibucketindex := iindex;
     self.ilastindex := 0;
     self.inextindex := 0;
+    self.inodecount := 0;
     self.imaxcount := 3;
     self.igrowfactor := 2;
 
@@ -128,16 +132,84 @@ implementation
     inherited Destroy;
   end;
 
-  procedure TPLPointerNodeList.extendList();
+  procedure TPLPointerNodeList.reindexList;
+  var
+    plstnd: PPLHashNode;
+    ifridx, inxtidx, ilstidx: Integer;
+    ind: Integer;
+  begin
+    ilstidx := -1;
+    ind := 0;
+
+    repeat  //until ind = self.inextindex;
+      if self.arrnodes[ind] = nil then
+      begin
+        ifridx := ind;
+      end
+      else
+      begin
+        ilstidx := ind;
+        ifridx := -1;
+      end;
+
+      if (ifridx > -1)
+        and (ifridx < self.ilastindex) then
+      begin
+        plstnd := nil;
+        inxtidx := ifridx + 1;
+
+        repeat
+          plstnd := self.arrnodes[inxtidx];
+
+          inc(inxtidx);
+        until (plstnd <> nil)
+          or (inxtidx >= self.inextindex);
+
+        if plstnd <> nil then
+        begin
+          self.arrnodes[ifridx] := plstnd;
+
+          plstnd^.inodeindex := ifridx;
+        end
+        else  //There aren't any more Nodes
+        begin
+          self.inextindex := ifridx;
+          self.ilastindex := ifridx - 1;
+        end;  //if plstnd <> nil then
+      end; //if (ifridx > -1) and (ifridx < self.ilastindex) then
+
+      inc(ind);
+    until ind >= self.inextindex;
+
+    if ilstidx > -1 then
+    begin
+      self.ilastindex := ilstidx;
+      self.inextindex := ilstidx + 1;
+    end;  //if ilstidx > -1 then
+  end;
+
+  procedure TPLPointerNodeList.extendList;
   begin
     self.imaxcount := self.imaxcount + self.igrowfactor;
 
     SetLength(self.arrnodes, self.imaxcount);
   end;
 
-  function TPLPointerNodeList.addNode(pnode: PPLHashNode = nil): Integer;
+  function TPLPointerNodeList.addNode(pnode: PPLHashNode = nil): PPLHashNode;
   begin
-    if self.inextindex >= self.imaxcount then self.extendList;
+    if self.inextindex >= self.imaxcount then
+    begin
+      if self.inodecount < self.imaxcount - self.igrowfactor then
+      begin
+        //Make Space by Reindexing
+        self.reindexList;
+      end
+      else
+      begin
+        //Get more Space by Growing
+        self.extendList;
+      end;
+    end;  //if self.inextindex >= self.imaxcount then
 
     if pnode = nil then
     begin
@@ -153,12 +225,13 @@ implementation
     pnode^.ibucketindex := self.ibucketindex;
     pnode^.inodeindex := self.ilastindex;
 
-    Result := self.ilastindex;
+    Result := pnode;
 
+    inc(self.inodecount);
     inc(self.inextindex);
   end;
 
-  function TPLPointerNodeList.addNode(ihash: Cardinal; pskey: PAnsiString; ppointer: Pointer): Integer;
+  function TPLPointerNodeList.addNode(ihash: Cardinal; pskey: PAnsiString; ppointer: Pointer): PPLHashNode;
   var
     plstnd: PPLHashNode;
   begin
@@ -197,7 +270,9 @@ implementation
       and (iindex < self.imaxcount) then
     begin
       self.arrnodes[iindex] := nil;
-    end;
+
+      dec(self.inodecount);
+    end; //if (iindex > -1) and (iindex < self.imaxcount) then
   end;
 
   function TPLPointerNodeList.removeNode(pnode: PPLHashNode): Boolean;
@@ -453,7 +528,7 @@ implementation
   procedure TPLPointerHashList.setValue(const skey: String; ppointer: Pointer);
   var
     ihsh: Cardinal;
-    ibktidx, indidx: Integer;
+    ibktidx: Integer;
   begin
     //Build the Hash Index
     ihsh := computeHash(@skey);
@@ -482,8 +557,7 @@ implementation
         ibktidx := ihsh mod self.ibucketcount;
       end;  //if self.ikeycount = self.imaxkeycount then
 
-      indidx := TPLPointerNodeList(self.arrbuckets[ibktidx]).addNode(ihsh, @skey, ppointer);
-      self.psearchednode := TPLPointerNodeList(self.arrbuckets[ibktidx]).getNode(indidx);
+      self.psearchednode := TPLPointerNodeList(self.arrbuckets[ibktidx]).addNode(ihsh, @skey, ppointer);
 
       inc(self.ikeycount);
     end

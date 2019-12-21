@@ -16,7 +16,7 @@ type
     constructor Create(iindex: Integer); override; overload;
     destructor Destroy; override;
     procedure setOwned(bisowned: Boolean);
-    function addNode(ihash: Cardinal; pskey: PAnsiString; value: TObject): Integer; overload;
+    function addNode(ihash: Cardinal; pskey: PAnsiString; value: TObject): PPLHashNode; overload;
     function removeNode(ihash: Cardinal; pskey: PAnsiString): Boolean; override; overload;
     function removeNode(pskey: PAnsiString): Boolean; override; overload;
     procedure Clear; override;
@@ -79,7 +79,7 @@ implementation
     self.bowned := bisowned;
   end;
 
-  function TPLObjectNodeList.addNode(ihash: Cardinal; pskey: PAnsiString; value: TObject): Integer;
+  function TPLObjectNodeList.addNode(ihash: Cardinal; pskey: PAnsiString; value: TObject): PPLHashNode;
   begin
     Result := inherited addNode(ihash, pskey, value);
   end;
@@ -178,7 +178,7 @@ implementation
   procedure TPLObjectHashList.setValue(const skey: String; value: TObject);
   var
     ihsh: Cardinal;
-    ibktidx, indidx: Integer;
+    ibktidx: Integer;
   begin
     //Build the Hash Index
     ihsh := computeHash(@skey);
@@ -208,8 +208,7 @@ implementation
         ibktidx := ihsh mod self.ibucketcount;
       end;  //if self.ikeycount = self.imaxkeycount then
 
-      indidx := TPLObjectNodeList(self.arrbuckets[ibktidx]).addNode(ihsh, @skey, TObject(value));
-      self.psearchednode := TPLObjectNodeList(self.arrbuckets[ibktidx]).getNode(indidx);
+      self.psearchednode := TPLObjectNodeList(self.arrbuckets[ibktidx]).addNode(ihsh, @skey, TObject(value));
 
       inc(self.ikeycount);
     end

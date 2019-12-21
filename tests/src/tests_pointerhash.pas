@@ -5,11 +5,13 @@ unit tests_pointerhash;
 interface
 
 uses
-  TestFramework, pointerhash;
+  TestFramework, fgl, pointerhash;
 
 type
+  TPMap = Specialize TFPGMap<String, Pointer>;
   TTestsPointerHashList = class(TTestCase)
   protected
+    mpobjs: TPMap;
     lsthshobjs: TPLPointerHashList;
     procedure SetUp; override;
     procedure Teardown; override;
@@ -17,6 +19,10 @@ type
     procedure TestInsertCheckElements;
     procedure TestCheckFirstElement;
     procedure TestCheckNextElement;
+    procedure TestMapInsertCheck1000Elements;
+    procedure TestInsertCheck1000Elements;
+    procedure TestMapInsertCheck5000Elements;
+    procedure TestInsertCheck5000Elements;
   end;
 
  procedure RegisterTests;
@@ -29,7 +35,7 @@ type
 implementation
 
 uses
-  SysUtils;
+  SysUtils, DateUtils;
 
 
 { here we register all our test classes }
@@ -41,13 +47,27 @@ end;
 
 procedure TTestsPointerHashList.SetUp;
 begin
-  self.lsthshobjs := TPLObjectHashList.Create();
+  self.mpobjs:= TPMap.Create;
+  self.lsthshobjs := TPLPointerHashList.Create();
 end;
 
 procedure TTestsPointerHashList.Teardown;
 var
   psvl: PAnsiString;
+  imp, impcnt: Integer;
 begin
+  impcnt := self.mpobjs.Count;
+
+  for imp := 0 to impcnt - 1 do
+  begin
+    psvl := self.mpobjs.Data[imp];
+
+    if psvl <> nil then Dispose(psvl);
+  end;  //for imp := 0 to impcnt - 1 do
+
+  self.mpobjs.Free;
+
+
   if self.lsthshobjs.moveFirst then
   begin
     repeat  //until not self.lsthshobjs.moveNext();
@@ -195,16 +215,16 @@ begin
 
   self.lsthshobjs.setValue('last_key', psvl);
 
-  Check(self.lsthshobjs.moveFirst() = True, 'TPLObjectHashList.moveFirst(): failed!');
+  Check(self.lsthshobjs.moveFirst() = True, 'TPLPointerHashList.moveFirst(): failed!');
 
   sky := self.lsthshobjs.getCurrentKey();
 
-  CheckEquals('first_key', sky, 'TPLObjectHashList.getCurrentKey(): failed! '
+  CheckEquals('first_key', sky, 'TPLPointerHashList.getCurrentKey(): failed! '
     + 'Returned Key: ' + chr(39) + sky + chr(39));
 
   psvl := self.lsthshobjs.getCurrentValue();
 
-  CheckEquals('first_value', psvl^, 'TPLObjectHashList.getCurrentValue(): failed! '
+  CheckEquals('first_value', psvl^, 'TPLPointerHashList.getCurrentValue(): failed! '
     + 'Returned Key: ' + chr(39) + psvl^ + chr(39));
 
 end;
@@ -235,32 +255,373 @@ begin
 
   self.lsthshobjs.setValue('last_key', psvl);
 
-  Check(self.lsthshobjs.moveNext() = True, 'TPLObjectHashList.moveNext() No. 1 : failed!');
+  Check(self.lsthshobjs.moveNext() = True, 'TPLPointerHashList.moveNext() No. 1 : failed!');
 
   sky := self.lsthshobjs.getCurrentKey();
 
-  CheckEquals('first_key', sky, 'TPLObjectHashList.getCurrentKey() No. 1 : failed! '
+  CheckEquals('first_key', sky, 'TPLPointerHashList.getCurrentKey() No. 1 : failed! '
     + 'Returned Key: ' + chr(39) + sky + chr(39));
 
   psvl := self.lsthshobjs.getCurrentValue();
 
-  CheckEquals('first_value', psvl^, 'TPLObjectHashList.getCurrentValue() No. 1 : failed! '
+  CheckEquals('first_value', psvl^, 'TPLPointerHashList.getCurrentValue() No. 1 : failed! '
     + 'Returned Key: ' + chr(39) + psvl^ + chr(39));
 
-  Check(self.lsthshobjs.moveNext() = True, 'TPLObjectHashList.moveNext() No. 2 : failed!');
+  Check(self.lsthshobjs.moveNext() = True, 'TPLPointerHashList.moveNext() No. 2 : failed!');
 
   sky := self.lsthshobjs.getCurrentKey();
 
-  CheckEquals('next_key', sky, 'TPLObjectHashList.getCurrentKey() No. 2 : failed! '
+  CheckEquals('next_key', sky, 'TPLPointerHashList.getCurrentKey() No. 2 : failed! '
     + 'Returned Key: ' + chr(39) + sky + chr(39));
 
   psvl := self.lsthshobjs.getCurrentValue();
 
-  CheckEquals('next_value', psvl^, 'TPLObjectHashList.getCurrentValue() No. 2 : failed! '
+  CheckEquals('next_value', psvl^, 'TPLPointerHashList.getCurrentValue() No. 2 : failed! '
     + 'Returned Key: ' + chr(39) + psvl^ + chr(39));
 
 end;
 
+(*
+Reference Performance Test against the Standard TFPGMap
+Adding 1000 Keys and their Values
+Looking Up all their Values
+It should return the defined Keys and their Values
+*)
+procedure TTestsPointerHashList.TestMapInsertCheck1000Elements;
+var
+  sky, schk: String;
+  psvl: PAnsiString;
+  tmstrt, tmend : TDateTime;
+  tmins: Double;
+  DT : TDateTime;
+  TS: TTimeStamp;
+  MS : Comp;
+  iky, ikyidx: Integer;
+begin
+  WriteLn('TestMapInsertCheck1000Elements: do ...');
+
+  TS:=DateTimeToTimeStamp(Now);
+  Writeln ('Now in days since 1/1/0001      : ',TS.Date);
+  Writeln ('Now in millisecs since midnight : ',TS.Time);
+  MS:=TimeStampToMSecs(TS);
+  Writeln ('Now in millisecs since 1/1/0001 : ',MS);
+  MS:=MS-1000*3600*2;
+  TS:=MSecsToTimeStamp(MS);
+  DT:=TimeStampToDateTime(TS);
+  Writeln ('Now minus 1 day : ',DateTimeToStr(DT));
+
+
+  tmstrt := Now;
+
+  for iky := 1 to 1000 do
+  begin
+    sky := 'key' + IntToStr(iky);
+
+    New(psvl);
+    psvl^ := 'value' + IntToStr(iky);
+
+    self.mpobjs.Add(sky, psvl);
+  end;  //for iky := 1 to 1000 do
+
+  tmend := Now;
+  tmins := MilliSecondSpan(tmend, tmstrt);
+
+  WriteLn('INS Operation completed in ', chr(39), FloatToStr(tmins), chr(39), ' ms.');
+
+  TS:=DateTimeToTimeStamp(Now);
+  WriteLn ('Now in millisecs since midnight : ',TS.Time);
+
+  Check(tmins < 106, 'INS Operation: Operation slower than 106 ms! It took: '
+    + chr(39) + FloatToStr(tmins) + chr(39) + ' ms.');
+
+
+  tmstrt := Now;
+
+  for iky := 1 to 1000 do
+  begin
+    sky := 'key' + IntToStr(iky);
+    schk := 'value' + IntToStr(iky);
+
+    ikyidx := self.mpobjs.IndexOf(sky);
+
+    if ikyidx > -1 then
+    begin
+      psvl := self.mpobjs.Data[ikyidx];
+
+      if psvl <> nil then
+      begin
+        if psvl^ <> schk then
+          CheckEquals(schk, psvl^, 'key '  + chr(39) + sky + chr(39)
+            + ': value lookup failed! It is: ' + chr(39) + psvl^ + chr(39));
+
+      end
+      else  //Value is nil
+      begin
+        Check(ikyidx > -1, 'key '  + chr(39) + sky + chr(39)
+          + ': value lookup failed! Value is: ' + chr(39) + 'nil' + chr(39));
+      end;  //if psvl <> nil then
+    end
+    else  //Key Lookup failed
+    begin
+      Check(ikyidx > -1, 'key '  + chr(39) + sky + chr(39)
+        + ': value lookup failed! Index is: ' + chr(39) + IntToStr(ikyidx) + chr(39));
+    end; //if ikyidx > -1 then
+  end;  //for iky := 1 to 1000 do
+
+  tmend := Now;
+  tmins := MilliSecondSpan(tmend, tmstrt);
+
+  WriteLn('LKP Operation completed in ', chr(39), FloatToStr(tmins), chr(39), ' ms.');
+
+  TS:=DateTimeToTimeStamp(Now);
+  WriteLn ('Now in millisecs since midnight : ',TS.Time);
+
+  Check(tmins < 3, 'INS Operation: Operation slower than 3 ms! It took: '
+    + chr(39) + FloatToStr(tmins) + chr(39) + ' ms.');
+
+end;
+
+procedure TTestsPointerHashList.TestInsertCheck1000Elements;
+var
+  sky, schk: String;
+  psvl: PAnsiString;
+  tmstrt, tmend : TDateTime;
+  tmins: Double;
+  TS: TTimeStamp;
+  iky: Integer;
+begin
+  WriteLn('TestInsertCheck1000Elements: do ...');
+
+  TS:=DateTimeToTimeStamp(Now);
+  Writeln ('Now in millisecs since midnight : ',TS.Time);
+
+
+  tmstrt := Now;
+
+  for iky := 1 to 1000 do
+  begin
+    sky := 'key' + IntToStr(iky);
+
+    New(psvl);
+    psvl^ := 'value' + IntToStr(iky);
+
+    self.lsthshobjs.setValue(sky, psvl);
+  end;  //for iky := 1 to 1000 do
+
+  tmend := Now;
+  tmins := MilliSecondSpan(tmend, tmstrt);
+
+  WriteLn('INS Operation completed in ', chr(39), FloatToStr(tmins), chr(39), ' ms.');
+
+  TS:=DateTimeToTimeStamp(Now);
+  WriteLn ('Now in millisecs since midnight : ',TS.Time);
+
+  Check(tmins < 105, 'INS Operation: Operation slower than 105 ms! It took: '
+    + chr(39) + FloatToStr(tmins) + chr(39) + ' ms.');
+
+
+  tmstrt := Now;
+
+  for iky := 1 to 1000 do
+  begin
+    sky := 'key' + IntToStr(iky);
+    schk := 'value' + IntToStr(iky);
+
+    psvl := self.lsthshobjs.getValue(sky);
+
+    if psvl <> nil then
+    begin
+      if psvl^ <> schk then
+        CheckEquals(schk, psvl^, 'key '  + chr(39) + sky + chr(39)
+          + ': value lookup failed! It is: ' + chr(39) + psvl^ + chr(39));
+
+    end
+    else  //Key Lookup failed
+    begin
+      Check(psvl <> nil, 'key '  + chr(39) + sky + chr(39)
+        + ': value lookup failed! It is: ' + chr(39) + 'nil' + chr(39));
+    end; //if psvl <> nil then
+  end;  //for iky := 1 to 1000 do
+
+  tmend := Now;
+  tmins := MilliSecondSpan(tmend, tmstrt);
+
+  WriteLn('LKP Operation completed in ', chr(39), FloatToStr(tmins), chr(39), ' ms.');
+
+  TS:=DateTimeToTimeStamp(Now);
+  WriteLn ('Now in millisecs since midnight : ',TS.Time);
+
+  Check(tmins < 3, 'INS Operation: Operation slower than 3 ms! It took: '
+    + chr(39) + FloatToStr(tmins) + chr(39) + ' ms.');
+
+end;
+
+
+(*
+Reference Performance Test against the Standard TFPGMap
+Adding 5000 Keys and their Values
+Looking Up all their Values
+It should return the defined Keys and their Values
+*)
+procedure TTestsPointerHashList.TestMapInsertCheck5000Elements;
+var
+  sky, schk: String;
+  psvl: PAnsiString;
+  tmstrt, tmend : TDateTime;
+  tmins: Double;
+  TS: TTimeStamp;
+  iky, ikyidx: Integer;
+begin
+  WriteLn('TestMapInsertCheck5000Elements: do ...');
+
+  TS:=DateTimeToTimeStamp(Now);
+  Writeln ('Now in millisecs since midnight : ',TS.Time);
+
+
+  tmstrt := Now;
+
+  for iky := 1 to 5000 do
+  begin
+    sky := 'key' + IntToStr(iky);
+
+    New(psvl);
+    psvl^ := 'value' + IntToStr(iky);
+
+    self.mpobjs.Add(sky, psvl);
+  end;  //for iky := 1 to 1000 do
+
+  tmend := Now;
+  tmins := MilliSecondSpan(tmend, tmstrt);
+
+  WriteLn('INS Operation completed in ', chr(39), FloatToStr(tmins), chr(39), ' ms.');
+
+  TS:=DateTimeToTimeStamp(Now);
+  WriteLn ('Now in millisecs since midnight : ',TS.Time);
+
+  Check(tmins < 106, 'INS Operation: Operation slower than 106 ms! It took: '
+    + chr(39) + FloatToStr(tmins) + chr(39) + ' ms.');
+
+
+  tmstrt := Now;
+
+  for iky := 1 to 5000 do
+  begin
+    sky := 'key' + IntToStr(iky);
+    schk := 'value' + IntToStr(iky);
+
+    ikyidx := self.mpobjs.IndexOf(sky);
+
+    if ikyidx > -1 then
+    begin
+      psvl := self.mpobjs.Data[ikyidx];
+
+      if psvl <> nil then
+      begin
+        if psvl^ <> schk then
+          CheckEquals(schk, psvl^, 'key '  + chr(39) + sky + chr(39)
+            + ': value lookup failed! It is: ' + chr(39) + psvl^ + chr(39));
+
+      end
+      else  //Value is nil
+      begin
+        Check(ikyidx > -1, 'key '  + chr(39) + sky + chr(39)
+          + ': value lookup failed! Value is: ' + chr(39) + 'nil' + chr(39));
+      end;  //if psvl <> nil then
+    end
+    else  //Key Lookup failed
+    begin
+      Check(ikyidx > -1, 'key '  + chr(39) + sky + chr(39)
+        + ': value lookup failed! Index is: ' + chr(39) + IntToStr(ikyidx) + chr(39));
+    end; //if ikyidx > -1 then
+  end;  //for iky := 1 to 1000 do
+
+  tmend := Now;
+  tmins := MilliSecondSpan(tmend, tmstrt);
+
+  WriteLn('LKP Operation completed in ', chr(39), FloatToStr(tmins), chr(39), ' ms.');
+
+  TS:=DateTimeToTimeStamp(Now);
+  WriteLn ('Now in millisecs since midnight : ',TS.Time);
+
+  Check(tmins < 3, 'INS Operation: Operation slower than 3 ms! It took: '
+    + chr(39) + FloatToStr(tmins) + chr(39) + ' ms.');
+
+end;
+
+procedure TTestsPointerHashList.TestInsertCheck5000Elements;
+var
+  sky, schk: String;
+  psvl: PAnsiString;
+  tmstrt, tmend : TDateTime;
+  tmins: Double;
+  TS: TTimeStamp;
+  iky: Integer;
+begin
+  WriteLn('TestInsertCheck5000Elements: do ...');
+
+  TS:=DateTimeToTimeStamp(Now);
+  Writeln ('Now in millisecs since midnight : ',TS.Time);
+
+
+  tmstrt := Now;
+
+  for iky := 1 to 5000 do
+  begin
+    sky := 'key' + IntToStr(iky);
+
+    New(psvl);
+    psvl^ := 'value' + IntToStr(iky);
+
+    self.lsthshobjs.setValue(sky, psvl);
+  end;  //for iky := 1 to 1000 do
+
+  tmend := Now;
+  tmins := MilliSecondSpan(tmend, tmstrt);
+
+  WriteLn('INS Operation completed in ', chr(39), FloatToStr(tmins), chr(39), ' ms.');
+
+  TS:=DateTimeToTimeStamp(Now);
+  WriteLn ('Now in millisecs since midnight : ',TS.Time);
+
+  Check(tmins < 106, 'INS Operation: Operation slower than 106 ms! It took: '
+    + chr(39) + FloatToStr(tmins) + chr(39) + ' ms.');
+
+
+  tmstrt := Now;
+
+  for iky := 1 to 5000 do
+  begin
+    sky := 'key' + IntToStr(iky);
+    schk := 'value' + IntToStr(iky);
+
+    psvl := self.lsthshobjs.getValue(sky);
+
+    if psvl <> nil then
+    begin
+      if psvl^ <> schk then
+        CheckEquals(schk, psvl^, 'key '  + chr(39) + sky + chr(39)
+          + ': value lookup failed! It is: ' + chr(39) + psvl^ + chr(39));
+
+    end
+    else  //Key Lookup failed
+    begin
+      Check(psvl <> nil, 'key '  + chr(39) + sky + chr(39)
+        + ': value lookup failed! It is: ' + chr(39) + 'nil' + chr(39));
+    end; //if psvl <> nil then
+  end;  //for iky := 1 to 1000 do
+
+  tmend := Now;
+  tmins := MilliSecondSpan(tmend, tmstrt);
+
+  WriteLn('LKP Operation completed in ', chr(39), FloatToStr(tmins), chr(39), ' ms.');
+
+  TS:=DateTimeToTimeStamp(Now);
+  WriteLn ('Now in millisecs since midnight : ',TS.Time);
+
+  Check(tmins < 3, 'INS Operation: Operation slower than 3 ms! It took: '
+    + chr(39) + FloatToStr(tmins) + chr(39) + ' ms.');
+
+end;
 
 end.
 
