@@ -167,6 +167,8 @@ implementation
 
         if plstnd <> nil then
         begin
+          //Move the Node to the Free Index
+          self.arrnodes[plstnd^.inodeindex] := nil;
           self.arrnodes[ifridx] := plstnd;
 
           plstnd^.inodeindex := ifridx;
@@ -181,11 +183,12 @@ implementation
       inc(ind);
     until ind >= self.inextindex;
 
-    if ilstidx > -1 then
+    if (ilstidx > -1)
+      and (ifridx = -1) then
     begin
       self.ilastindex := ilstidx;
       self.inextindex := ilstidx + 1;
-    end;  //if ilstidx > -1 then
+    end;  //if (ilstidx > -1) and (ifridx = -1) then
   end;
 
   procedure TPLPointerNodeList.extendList;
