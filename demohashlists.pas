@@ -1,4 +1,4 @@
-program runhashlists;
+program demohashlists;
 
 {$mode objfpc}{$H+}
 
@@ -12,8 +12,8 @@ uses
 
 
 type
-  { TRunHashLists }
-  TRunHashLists = class(TCustomApplication)
+  { TDemoHashLists }
+  TDemoHashLists = class(TCustomApplication)
   protected
     procedure DoRun; override;
   public
@@ -23,8 +23,8 @@ type
   end;
 
 
-{ TRunHashLists }
-procedure TRunHashLists.DoRun;
+{ TDemoHashLists }
+procedure TDemoHashLists.DoRun;
 var
   hshmap: TPLPointerHashList;
   strmap: TPLStringHashList;
@@ -79,6 +79,8 @@ begin
   if psvl <> nil then Write(psvl^);
   WriteLn(chr(39));
 
+  strmap.setValue('trying a somwhat very long key 1', 'inserting it''s somewhat very long value 1');
+
   WriteLn('hsh map (cnt: ', chr(39), hshmap.getCount(), chr(39), '):');
 
   if hshmap.moveFirst() then
@@ -122,28 +124,28 @@ begin
   Terminate;
 end;
 
-constructor TRunHashLists.Create(TheOwner: TComponent);
+constructor TDemoHashLists.Create(TheOwner: TComponent);
 begin
   inherited Create(TheOwner);
   StopOnException:=True;
 end;
 
-destructor TRunHashLists.Destroy;
+destructor TDemoHashLists.Destroy;
 begin
   inherited Destroy;
 end;
 
-procedure TRunHashLists.WriteHelp;
+procedure TDemoHashLists.WriteHelp;
 begin
   { add your help code here }
   writeln('Usage: ', ExeName, ' -h');
 end;
 
 var
-  Application: TRunHashLists;
+  Application: TDemoHashLists;
 begin
-  Application:=TRunHashLists.Create(nil);
-  Application.Title:='App Perl Hash';
+  Application:=TDemoHashLists.Create(nil);
+  Application.Title:='Demo Hash Lists';
   Application.Run;
   Application.Free;
 end.

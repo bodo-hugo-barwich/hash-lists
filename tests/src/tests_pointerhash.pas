@@ -376,7 +376,7 @@ begin
   TS:=DateTimeToTimeStamp(Now);
   WriteLn ('Now in millisecs since midnight : ',TS.Time);
 
-  Check(tmins < 3, 'INS Operation: Operation slower than 3 ms! It took: '
+  Check(tmins < 3, 'LKP Operation: Operation slower than 3 ms! It took: '
     + chr(39) + FloatToStr(tmins) + chr(39) + ' ms.');
 
 end;
@@ -406,6 +406,12 @@ begin
     psvl^ := 'value' + IntToStr(iky);
 
     self.lsthshobjs.setValue(sky, psvl);
+
+    psvl := self.lsthshobjs.getValue('key1');
+
+    if psvl = nil then
+      WriteLn('key1 lost on ', chr(39), sky, chr(39), '!');
+
   end;  //for iky := 1 to 1000 do
 
   tmend := Now;
@@ -451,7 +457,7 @@ begin
   TS:=DateTimeToTimeStamp(Now);
   WriteLn ('Now in millisecs since midnight : ',TS.Time);
 
-  Check(tmins < 3, 'INS Operation: Operation slower than 3 ms! It took: '
+  Check(tmins < 3, 'LKP Operation: Operation slower than 3 ms! It took: '
     + chr(39) + FloatToStr(tmins) + chr(39) + ' ms.');
 
 end;
@@ -543,7 +549,7 @@ begin
   TS:=DateTimeToTimeStamp(Now);
   WriteLn ('Now in millisecs since midnight : ',TS.Time);
 
-  Check(tmins < 3, 'INS Operation: Operation slower than 3 ms! It took: '
+  Check(tmins < 3, 'LKP Operation: Operation slower than 3 ms! It took: '
     + chr(39) + FloatToStr(tmins) + chr(39) + ' ms.');
 
 end;
@@ -618,7 +624,7 @@ begin
   TS:=DateTimeToTimeStamp(Now);
   WriteLn ('Now in millisecs since midnight : ',TS.Time);
 
-  Check(tmins < 3, 'INS Operation: Operation slower than 3 ms! It took: '
+  Check(tmins < 3, 'LKP Operation: Operation slower than 3 ms! It took: '
     + chr(39) + FloatToStr(tmins) + chr(39) + ' ms.');
 
 end;

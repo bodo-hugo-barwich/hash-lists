@@ -26,7 +26,6 @@ type
     inodecount: Integer;
     imaxcount: Integer;
     igrowfactor: Integer;
-    procedure reindexList;
     procedure extendList;
   public
     constructor Create; virtual; overload;
@@ -40,6 +39,7 @@ type
     function removeNode(pnode: PPLHashNode = nil): Boolean; overload;
     function removeNode(ihash: Cardinal; pskey: PAnsiString): Boolean; virtual; overload;
     function removeNode(pskey: PAnsiString): Boolean; virtual; overload;
+    procedure reindexList;
     procedure Clear; virtual;
     function getNode(iindex: Integer): PPLHashNode; overload;
     function searchNode(ihash: Cardinal; pskey: PAnsiString): PPLHashNode; overload;
@@ -132,65 +132,6 @@ implementation
     inherited Destroy;
   end;
 
-  procedure TPLPointerNodeList.reindexList;
-  var
-    plstnd: PPLHashNode;
-    ifridx, inxtidx, ilstidx: Integer;
-    ind: Integer;
-  begin
-    ilstidx := -1;
-    ind := 0;
-
-    repeat  //until ind = self.inextindex;
-      if self.arrnodes[ind] = nil then
-      begin
-        ifridx := ind;
-      end
-      else
-      begin
-        ilstidx := ind;
-        ifridx := -1;
-      end;
-
-      if (ifridx > -1)
-        and (ifridx < self.ilastindex) then
-      begin
-        plstnd := nil;
-        inxtidx := ifridx + 1;
-
-        repeat
-          plstnd := self.arrnodes[inxtidx];
-
-          inc(inxtidx);
-        until (plstnd <> nil)
-          or (inxtidx >= self.inextindex);
-
-        if plstnd <> nil then
-        begin
-          //Move the Node to the Free Index
-          self.arrnodes[plstnd^.inodeindex] := nil;
-          self.arrnodes[ifridx] := plstnd;
-
-          plstnd^.inodeindex := ifridx;
-        end
-        else  //There aren't any more Nodes
-        begin
-          self.inextindex := ifridx;
-          self.ilastindex := ifridx - 1;
-        end;  //if plstnd <> nil then
-      end; //if (ifridx > -1) and (ifridx < self.ilastindex) then
-
-      inc(ind);
-    until ind >= self.inextindex;
-
-    if (ilstidx > -1)
-      and (ifridx = -1) then
-    begin
-      self.ilastindex := ilstidx;
-      self.inextindex := ilstidx + 1;
-    end;  //if (ilstidx > -1) and (ifridx = -1) then
-  end;
-
   procedure TPLPointerNodeList.extendList;
   begin
     self.imaxcount := self.imaxcount + self.igrowfactor;
@@ -230,8 +171,8 @@ implementation
 
     Result := pnode;
 
-    inc(self.inodecount);
     inc(self.inextindex);
+    inc(self.inodecount);
   end;
 
   function TPLPointerNodeList.addNode(ihash: Cardinal; pskey: PAnsiString; ppointer: Pointer): PPLHashNode;
@@ -300,6 +241,68 @@ implementation
   function TPLPointerNodeList.removeNode(pskey: PAnsiString): Boolean;
   begin
     Result := self.removeNode(self.searchNode(pskey));
+  end;
+
+  procedure TPLPointerNodeList.reindexList;
+  var
+    plwnd, phgnd: PPLHashNode;
+    ifridx, ilstidx: Integer;
+    ind: Integer;
+  begin
+    plwnd := nil;
+    ilstidx := self.ilastindex;
+    ind := 0;
+
+    repeat  //until ind > ilstidx;
+      if self.arrnodes[ind] <> nil then
+      begin
+        //Keep track of the highest Node from the Beginning
+        plwnd := self.arrnodes[ind];
+        ifridx := -1;
+      end
+      else  //if self.arrnodes[ind] <> nil then
+        ifridx := ind;
+
+      if (ifridx > -1) then
+      begin
+        if (ifridx < ilstidx) then
+        begin
+          repeat
+            phgnd := self.arrnodes[ilstidx];
+
+            dec(ilstidx);
+          until (phgnd <> nil)
+            or (ilstidx <= ifridx);
+
+          if phgnd <> nil then
+          begin
+            //Move the Node to the Free Index
+            self.arrnodes[phgnd^.inodeindex] := nil;
+            self.arrnodes[ifridx] := phgnd;
+
+            phgnd^.inodeindex := ifridx;
+
+            //The highest Node from the End is the new highest Node from the Beginning
+            plwnd := phgnd;
+
+          end;  //if phgnd <> nil then
+        end; //if (ifridx < ilstidx) then
+      end; //if (ifridx > -1) then
+
+      inc(ind);
+    until ind > ilstidx;
+
+    if plwnd <> nil then
+    begin
+      //Set the Last Index according to the highest Node from the Beginning
+      self.ilastindex := plwnd^.inodeindex;
+      self.inextindex := plwnd^.inodeindex + 1;
+    end
+    else  //The List is empty
+    begin
+      self.inextindex := 0;
+      self.ilastindex := 0;
+    end;  //if plwnd <> nil then
   end;
 
   procedure TPLPointerNodeList.Clear;
@@ -508,24 +511,35 @@ implementation
       while (c = *str++) hash = c + (hash << 6) + (hash << 16) - hash;
       return hash;
   }
+
+  Both Algorithms create an Integer Overflow Error and Range Check Error
+  Enabling Overflow Check with crash the Programm
+  Thus the generated Hash is not guaranteed to be unique.
+
 *)
   function TPLPointerHashList.computeHash(pskey: PAnsiString): Cardinal;
   var
-    arrbts: TBytes;
-    ibt, ibtcnt: Integer;
+    pchr, pchrend: PChar;
   begin
+    {$Q-}{$R-}
+
     Result := 0;
 
     if pskey <> nil then
     begin
-      arrbts := BytesOf(pskey^);
-      ibtcnt := Length(arrbts);
+      pchr := PChar(pskey^);
+      pchrend := pchr + Length(pskey^);
 
-      for ibt := 0 to ibtcnt -1 do
+      while pchr < pchrend do
       begin
-        Result := arrbts[ibt] + (Result << 6) + (Result << 16) - Result;
-      end;
+        //Result := ((Result << 5) + Result) + ord(pchr^);
+        Result := ord(pchr^) + (Result << 6) + (Result << 16) - Result;
+
+        inc(pchr);
+      end;  //while pchr < pchrend do
     end;  //if pskey <> nil then
+
+    {$Q+}{$R+}
   end;
 
   procedure TPLPointerHashList.setValue(const skey: String; ppointer: Pointer);

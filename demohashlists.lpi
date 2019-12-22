@@ -9,7 +9,7 @@
       </Flags>
       <SessionStorage Value="InProjectDir"/>
       <MainUnit Value="0"/>
-      <Title Value="App Perl Hash"/>
+      <Title Value="Demo Hash Lists"/>
       <UseAppBundle Value="False"/>
       <ResourceType Value="res"/>
     </General>
@@ -20,11 +20,10 @@
         <CompilerOptions>
           <Version Value="11"/>
           <Target>
-            <Filename Value="hash-lists.run"/>
+            <Filename Value="demo_hash-lists.run"/>
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
-            <Libraries Value="src"/>
             <OtherUnitFiles Value="src"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
@@ -59,11 +58,12 @@
         <CompilerOptions>
           <Version Value="11"/>
           <Target>
-            <Filename Value="../string-hash.run"/>
+            <Filename Value="demo_hash-lists.run"/>
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
-            <UnitOutputDirectory Value="../lib/$(TargetCPU)-$(TargetOS)"/>
+            <OtherUnitFiles Value="src"/>
+            <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <CodeGeneration>
             <SmartLinkUnit Value="True"/>
@@ -90,7 +90,7 @@
     </RunParams>
     <Units Count="4">
       <Unit0>
-        <Filename Value="runhashlists.pas"/>
+        <Filename Value="demohashlists.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit0>
       <Unit1>
@@ -110,12 +110,12 @@
   <CompilerOptions>
     <Version Value="11"/>
     <Target>
-      <Filename Value="../string-hash.run"/>
+      <Filename Value="demo_hash-lists.run"/>
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
       <OtherUnitFiles Value="src"/>
-      <UnitOutputDirectory Value="../lib/$(TargetCPU)-$(TargetOS)"/>
+      <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <CodeGeneration>
       <Optimizations>
@@ -129,7 +129,7 @@
     </Linking>
   </CompilerOptions>
   <Debugging>
-    <Exceptions Count="3">
+    <Exceptions Count="5">
       <Item1>
         <Name Value="EAbort"/>
       </Item1>
@@ -139,6 +139,12 @@
       <Item3>
         <Name Value="EFOpenError"/>
       </Item3>
+      <Item4>
+        <Name Value="RunError(201)"/>
+      </Item4>
+      <Item5>
+        <Name Value="ERangeError"/>
+      </Item5>
     </Exceptions>
   </Debugging>
 </CONFIG>
