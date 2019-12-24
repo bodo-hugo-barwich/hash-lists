@@ -393,10 +393,13 @@ begin
   WriteLn('TestInsertCheck1000Elements: do ...');
 
   TS:=DateTimeToTimeStamp(Now);
-  Writeln ('Now in millisecs since midnight : ',TS.Time);
+  Writeln ('INS - Start - Now in millisecs since midnight : ',TS.Time);
 
 
   tmstrt := Now;
+
+  self.lsthshobjs.LoadFactor := 2;
+  self.lsthshobjs.Limit := 1000;
 
   for iky := 1 to 1000 do
   begin
@@ -415,7 +418,7 @@ begin
   WriteLn('INS Operation completed in ', chr(39), FloatToStr(tmins), chr(39), ' ms.');
 
   TS:=DateTimeToTimeStamp(Now);
-  WriteLn ('Now in millisecs since midnight : ',TS.Time);
+  WriteLn ('INS - End - Now in millisecs since midnight : ',TS.Time);
 
   Check(tmins < 105, 'INS Operation: Operation slower than 105 ms! It took: '
     + chr(39) + FloatToStr(tmins) + chr(39) + ' ms.');
@@ -433,14 +436,14 @@ begin
     if psvl <> nil then
     begin
       if psvl^ <> schk then
-        CheckEquals(schk, psvl^, 'key '  + chr(39) + sky + chr(39)
-          + ': value lookup failed! It is: ' + chr(39) + psvl^ + chr(39));
+        CheckEquals(schk, psvl^, 'LKP - key '  + chr(39) + sky + chr(39)
+          + ' failed! Value is: ' + chr(39) + psvl^ + chr(39));
 
     end
     else  //Key Lookup failed
     begin
-      Check(psvl <> nil, 'key '  + chr(39) + sky + chr(39)
-        + ': value lookup failed! It is: ' + chr(39) + 'nil' + chr(39));
+      Check(psvl <> nil, 'LKP - key '  + chr(39) + sky + chr(39)
+        + ' failed! Value is: ' + chr(39) + 'nil' + chr(39));
     end; //if psvl <> nil then
   end;  //for iky := 1 to 1000 do
 
@@ -450,7 +453,7 @@ begin
   WriteLn('LKP Operation completed in ', chr(39), FloatToStr(tmins), chr(39), ' ms.');
 
   TS:=DateTimeToTimeStamp(Now);
-  WriteLn ('Now in millisecs since midnight : ',TS.Time);
+  WriteLn ('LKP - Start - Now in millisecs since midnight : ',TS.Time);
 
   Check(tmins < 3, 'LKP Operation: Operation slower than 3 ms! It took: '
     + chr(39) + FloatToStr(tmins) + chr(39) + ' ms.');
@@ -476,7 +479,7 @@ begin
   WriteLn('TestMapInsertCheck5000Elements: do ...');
 
   TS:=DateTimeToTimeStamp(Now);
-  Writeln ('Now in millisecs since midnight : ',TS.Time);
+  Writeln ('INS - Start - Now in millisecs since midnight : ',TS.Time);
 
 
   tmstrt := Now;
@@ -497,7 +500,7 @@ begin
   WriteLn('INS Operation completed in ', chr(39), FloatToStr(tmins), chr(39), ' ms.');
 
   TS:=DateTimeToTimeStamp(Now);
-  WriteLn ('Now in millisecs since midnight : ',TS.Time);
+  WriteLn ('INS - End - Now in millisecs since midnight : ',TS.Time);
 
   Check(tmins < 106, 'INS Operation: Operation slower than 106 ms! It took: '
     + chr(39) + FloatToStr(tmins) + chr(39) + ' ms.');
@@ -542,7 +545,7 @@ begin
   WriteLn('LKP Operation completed in ', chr(39), FloatToStr(tmins), chr(39), ' ms.');
 
   TS:=DateTimeToTimeStamp(Now);
-  WriteLn ('Now in millisecs since midnight : ',TS.Time);
+  WriteLn ('LKP - End - Now in millisecs since midnight : ',TS.Time);
 
   Check(tmins < 800, 'LKP Operation: Operation slower than 3 ms! It took: '
     + chr(39) + FloatToStr(tmins) + chr(39) + ' ms.');
@@ -561,10 +564,13 @@ begin
   WriteLn('TestInsertCheck5000Elements: do ...');
 
   TS:=DateTimeToTimeStamp(Now);
-  Writeln ('Now in millisecs since midnight : ',TS.Time);
+  Writeln ('INS - Start - Now in millisecs since midnight : ',TS.Time);
 
 
   tmstrt := Now;
+
+  self.lsthshobjs.LoadFactor := 2;
+  self.lsthshobjs.Limit := 5000;
 
   for iky := 1 to 5000 do
   begin
@@ -582,7 +588,7 @@ begin
   WriteLn('INS Operation completed in ', chr(39), FloatToStr(tmins), chr(39), ' ms.');
 
   TS:=DateTimeToTimeStamp(Now);
-  WriteLn ('Now in millisecs since midnight : ',TS.Time);
+  WriteLn ('INS - End - Now in millisecs since midnight : ',TS.Time);
 
   Check(tmins < 800, 'INS Operation: Operation slower than 106 ms! It took: '
     + chr(39) + FloatToStr(tmins) + chr(39) + ' ms.');
@@ -617,7 +623,7 @@ begin
   WriteLn('LKP Operation completed in ', chr(39), FloatToStr(tmins), chr(39), ' ms.');
 
   TS:=DateTimeToTimeStamp(Now);
-  WriteLn ('Now in millisecs since midnight : ',TS.Time);
+  WriteLn ('LKP - End - Now in millisecs since midnight : ',TS.Time);
 
   Check(tmins < 3, 'LKP Operation: Operation slower than 3 ms! It took: '
     + chr(39) + FloatToStr(tmins) + chr(39) + ' ms.');

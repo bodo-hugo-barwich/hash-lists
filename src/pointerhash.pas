@@ -443,7 +443,7 @@ implementation
     self.ikeycount := 0;
     self.imaxkeycount := 0;
     self.ibucketcount := 0;
-    self.igrowfactor := 512;
+    self.igrowfactor := 3;
     self.iloadfactor := 3;
     self.pcurrentnode := nil;
 
