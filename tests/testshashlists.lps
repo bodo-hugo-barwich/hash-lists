@@ -2,22 +2,23 @@
 <CONFIG>
   <ProjectSession>
     <Version Value="11"/>
-    <BuildModes Active="Debug"/>
+    <BuildModes Active="Release"/>
     <Units Count="13">
       <Unit0>
         <Filename Value="testshashlists.lpr"/>
         <IsPartOfProject Value="True"/>
         <CursorPos X="40" Y="14"/>
-        <UsageCount Value="60"/>
+        <UsageCount Value="67"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
         <Filename Value="../src/pointerhash.pas"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="243"/>
-        <CursorPos Y="251"/>
-        <UsageCount Value="59"/>
+        <TopLine Value="623"/>
+        <CursorPos X="63" Y="637"/>
+        <UsageCount Value="66"/>
         <Loaded Value="True"/>
       </Unit1>
       <Unit2>
@@ -26,17 +27,16 @@
         <EditorIndex Value="3"/>
         <TopLine Value="7"/>
         <CursorPos X="32" Y="49"/>
-        <UsageCount Value="59"/>
+        <UsageCount Value="66"/>
         <Loaded Value="True"/>
       </Unit2>
       <Unit3>
         <Filename Value="src/tests_pointerhash.pas"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="502"/>
-        <CursorPos X="39" Y="522"/>
-        <UsageCount Value="59"/>
+        <TopLine Value="530"/>
+        <CursorPos X="40" Y="541"/>
+        <UsageCount Value="66"/>
         <Loaded Value="True"/>
       </Unit3>
       <Unit4>
@@ -46,13 +46,13 @@
         <WindowIndex Value="-1"/>
         <TopLine Value="-1"/>
         <CursorPos X="-1" Y="-1"/>
-        <UsageCount Value="50"/>
+        <UsageCount Value="57"/>
       </Unit4>
       <Unit5>
         <Filename Value="tests_objecthash.pas"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="22"/>
-        <UsageCount Value="17"/>
+        <UsageCount Value="16"/>
       </Unit5>
       <Unit6>
         <Filename Value="testcase1.pas"/>
@@ -60,170 +60,170 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="3"/>
         <CursorPos X="21" Y="15"/>
-        <UsageCount Value="16"/>
+        <UsageCount Value="15"/>
       </Unit6>
       <Unit7>
         <Filename Value="../../fptest/src/TestFramework.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="16"/>
         <CursorPos X="19" Y="36"/>
-        <UsageCount Value="6"/>
+        <UsageCount Value="5"/>
       </Unit7>
       <Unit8>
         <Filename Value="../../fptest/src/TextTestRunner.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="83"/>
         <CursorPos X="31" Y="99"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="9"/>
       </Unit8>
       <Unit9>
         <Filename Value="/usr/share/fpcsrc/3.0.4/rtl/objpas/sysutils/datih.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="165"/>
         <CursorPos X="14" Y="194"/>
-        <UsageCount Value="9"/>
+        <UsageCount Value="8"/>
       </Unit9>
       <Unit10>
         <Filename Value="/usr/share/fpcsrc/3.0.4/rtl/objpas/sysutils/dati.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="260"/>
         <CursorPos X="12" Y="270"/>
-        <UsageCount Value="9"/>
+        <UsageCount Value="8"/>
       </Unit10>
       <Unit11>
         <Filename Value="/usr/share/fpcsrc/3.0.4/rtl/unix/sysutils.pp"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="1201"/>
         <CursorPos X="11" Y="1207"/>
-        <UsageCount Value="9"/>
+        <UsageCount Value="8"/>
       </Unit11>
       <Unit12>
         <Filename Value="/usr/share/fpcsrc/3.0.4/rtl/linux/unxsysch.inc"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="10" Y="16"/>
-        <UsageCount Value="9"/>
+        <UsageCount Value="8"/>
       </Unit12>
     </Units>
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="../src/pointerhash.pas"/>
-        <Caret Line="271" TopLine="259"/>
+        <Caret Line="354" TopLine="334"/>
       </Position1>
       <Position2>
         <Filename Value="../src/pointerhash.pas"/>
-        <Caret Line="273" TopLine="259"/>
+        <Caret Line="344" TopLine="334"/>
       </Position2>
       <Position3>
         <Filename Value="../src/pointerhash.pas"/>
-        <Caret Line="274" TopLine="259"/>
+        <Caret Line="346" TopLine="334"/>
       </Position3>
       <Position4>
         <Filename Value="../src/pointerhash.pas"/>
-        <Caret Line="275" TopLine="259"/>
+        <Caret Line="352" TopLine="334"/>
       </Position4>
       <Position5>
         <Filename Value="../src/pointerhash.pas"/>
-        <Caret Line="271" TopLine="259"/>
+        <Caret Line="353" TopLine="334"/>
       </Position5>
       <Position6>
         <Filename Value="../src/pointerhash.pas"/>
-        <Caret Line="273" TopLine="259"/>
+        <Caret Line="354" TopLine="334"/>
       </Position6>
       <Position7>
         <Filename Value="../src/pointerhash.pas"/>
-        <Caret Line="274" TopLine="259"/>
+        <Caret Line="344" TopLine="334"/>
       </Position7>
       <Position8>
         <Filename Value="../src/pointerhash.pas"/>
-        <Caret Line="277" TopLine="259"/>
+        <Caret Line="346" TopLine="334"/>
       </Position8>
       <Position9>
         <Filename Value="../src/pointerhash.pas"/>
-        <Caret Line="280" TopLine="259"/>
+        <Caret Line="352" TopLine="334"/>
       </Position9>
       <Position10>
         <Filename Value="../src/pointerhash.pas"/>
-        <Caret Line="281" TopLine="259"/>
+        <Caret Line="353" TopLine="334"/>
       </Position10>
       <Position11>
         <Filename Value="../src/pointerhash.pas"/>
-        <Caret Line="283" TopLine="259"/>
+        <Caret Line="354" TopLine="334"/>
       </Position11>
       <Position12>
         <Filename Value="../src/pointerhash.pas"/>
-        <Caret Line="286" TopLine="259"/>
+        <Caret Line="344" TopLine="334"/>
       </Position12>
       <Position13>
         <Filename Value="../src/pointerhash.pas"/>
-        <Caret Line="292" TopLine="276"/>
+        <Caret Line="346" TopLine="334"/>
       </Position13>
       <Position14>
         <Filename Value="../src/pointerhash.pas"/>
-        <Caret Line="293" TopLine="276"/>
+        <Caret Line="347" TopLine="334"/>
       </Position14>
       <Position15>
         <Filename Value="../src/pointerhash.pas"/>
-        <Caret Line="257" TopLine="240"/>
+        <Caret Line="348" TopLine="334"/>
       </Position15>
       <Position16>
         <Filename Value="../src/pointerhash.pas"/>
-        <Caret Line="264" TopLine="240"/>
+        <Caret Line="352" TopLine="334"/>
       </Position16>
       <Position17>
         <Filename Value="../src/pointerhash.pas"/>
-        <Caret Line="266" TopLine="246"/>
+        <Caret Line="353" TopLine="334"/>
       </Position17>
       <Position18>
         <Filename Value="../src/pointerhash.pas"/>
-        <Caret Line="268" TopLine="246"/>
+        <Caret Line="356" TopLine="334"/>
       </Position18>
       <Position19>
         <Filename Value="../src/pointerhash.pas"/>
-        <Caret Line="271" TopLine="246"/>
+        <Caret Line="692" TopLine="676"/>
       </Position19>
       <Position20>
         <Filename Value="../src/pointerhash.pas"/>
-        <Caret Line="273" TopLine="246"/>
+        <Caret Line="693" TopLine="676"/>
       </Position20>
       <Position21>
         <Filename Value="../src/pointerhash.pas"/>
-        <Caret Line="274" TopLine="246"/>
+        <Caret Line="695" TopLine="676"/>
       </Position21>
       <Position22>
-        <Filename Value="../src/pointerhash.pas"/>
-        <Caret Line="275" TopLine="248"/>
+        <Filename Value="src/tests_pointerhash.pas"/>
+        <Caret Line="412" TopLine="395"/>
       </Position22>
       <Position23>
         <Filename Value="../src/pointerhash.pas"/>
-        <Caret Line="277" TopLine="259"/>
+        <Caret Line="476" Column="19" TopLine="451"/>
       </Position23>
       <Position24>
         <Filename Value="../src/pointerhash.pas"/>
-        <Caret Line="292" TopLine="276"/>
+        <Caret Line="66" Column="24" TopLine="62"/>
       </Position24>
       <Position25>
         <Filename Value="../src/pointerhash.pas"/>
-        <Caret Line="293" TopLine="276"/>
+        <Caret Line="634" Column="118" TopLine="575"/>
       </Position25>
       <Position26>
         <Filename Value="../src/pointerhash.pas"/>
-        <Caret Line="295" TopLine="276"/>
+        <Caret Line="31" Column="21" TopLine="22"/>
       </Position26>
       <Position27>
         <Filename Value="../src/pointerhash.pas"/>
-        <Caret Line="298" TopLine="276"/>
+        <Caret Line="94" Column="36" TopLine="82"/>
       </Position27>
       <Position28>
         <Filename Value="../src/pointerhash.pas"/>
-        <Caret Line="299" TopLine="276"/>
+        <Caret Line="69" Column="19" TopLine="46"/>
       </Position28>
       <Position29>
         <Filename Value="../src/pointerhash.pas"/>
-        <Caret Line="306" TopLine="270"/>
+        <Caret Line="476" Column="23" TopLine="465"/>
       </Position29>
       <Position30>
         <Filename Value="../src/pointerhash.pas"/>
-        <Caret Line="251" TopLine="243"/>
+        <Caret Line="66" Column="24" TopLine="50"/>
       </Position30>
     </JumpHistory>
     <RunParams>
@@ -231,25 +231,4 @@
       <Modes Count="0" ActiveMode=""/>
     </RunParams>
   </ProjectSession>
-  <Debugging>
-    <BreakPoints Count="2">
-      <Item1>
-        <Kind Value="bpkSource"/>
-        <WatchScope Value="wpsLocal"/>
-        <WatchKind Value="wpkWrite"/>
-        <Expression Value="sky = 'key154'"/>
-        <BreakHitCount Value="154"/>
-        <Source Value="src/tests_pointerhash.pas"/>
-        <Line Value="408"/>
-      </Item1>
-      <Item2>
-        <Kind Value="bpkSource"/>
-        <WatchScope Value="wpsLocal"/>
-        <WatchKind Value="wpkWrite"/>
-        <BreakHitCount Value="153"/>
-        <Source Value="src/tests_pointerhash.pas"/>
-        <Line Value="410"/>
-      </Item2>
-    </BreakPoints>
-  </Debugging>
 </CONFIG>

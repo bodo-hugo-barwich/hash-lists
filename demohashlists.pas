@@ -81,7 +81,7 @@ begin
 
   strmap.setValue('trying a somwhat very long key 1', 'inserting it''s somewhat very long value 1');
 
-  WriteLn('hsh map (cnt: ', chr(39), hshmap.getCount(), chr(39), '):');
+  WriteLn('hsh map (cnt: ', chr(39), hshmap.Count, chr(39), '):');
 
   if hshmap.moveFirst() then
   begin
@@ -89,7 +89,7 @@ begin
       strmap := TPLStringHashList(hshmap.getCurrentValue());
 
       WriteLn('str map ', chr(39), hshmap.getCurrentKey(), chr(39)
-        , ' (cnt: ', chr(39), strmap.getCount(), chr(39), '):');
+        , ' (cnt: ', chr(39), strmap.Count, chr(39), '):');
 
       if strmap.moveFirst() then
       begin

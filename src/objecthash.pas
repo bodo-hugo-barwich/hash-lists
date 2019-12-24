@@ -4,8 +4,11 @@ unit objecthash;
 
 interface
 
+
 uses
-  Classes, SysUtils, pointerhash;
+  Classes, pointerhash;
+
+
 
 type
   TPLObjectNodeList = class(TPLPointerNodeList)
@@ -20,7 +23,7 @@ type
     function removeNode(ihash: Cardinal; pskey: PAnsiString): Boolean; override; overload;
     function removeNode(pskey: PAnsiString): Boolean; override; overload;
     procedure Clear; override;
-    function isOwned(): Boolean;
+    property Owned: Boolean read bowned write setOwned;
   end;
 
   TPLObjectHashList = class(TPLPointerHashList)
@@ -28,11 +31,21 @@ type
     bowned: Boolean;
     procedure extendList(brebuild: Boolean = True); override;
   public
+    procedure setOwned(bisowned: Boolean);
+    procedure setLimitCount(ilimit: Integer); override;
     procedure setValue(const skey: String; value: TObject); overload;
+    property Owned: Boolean read bowned write setOwned;
   end;
 
 
 implementation
+
+
+  uses
+    SysUtils;
+
+
+
   (*==========================================================================*)
   (* Class TPLObjectNodeList *)
 
@@ -142,31 +155,86 @@ implementation
     inherited Clear;
   end;
 
-  function TPLObjectNodeList.isOwned(): Boolean;
-  begin
-    Result := self.bowned;
-  end;
-
 
 
   (*==========================================================================*)
   (* Class TPLObjectHashList *)
 
 
+  procedure TPLObjectHashList.setOwned(bisowned: Boolean);
+  var
+    ibkt: Integer;
+  begin
+    self.bowned := bisowned;
+
+    for ibkt := 0 to self.ibucketcount - 1 do
+    begin
+      TPLObjectNodeList(self.arrbuckets[ibkt]).Owned := self.bowned;
+    end;  //for ibkt := 0 to self.ibucketcount - 1 do
+  end;
+
+  procedure TPLObjectHashList.setLimitCount(ilimit: Integer);
+  var
+    ibkt: Integer;
+    brbld: Boolean = False;
+  begin
+    if ilimit > self.imaxkeycount then
+    begin
+      //Set ilimit as Max. Key Count
+      self.imaxkeycount := ilimit;
+
+      //Will the Bucket Count increase
+      if floor(self.imaxkeycount / self.iloadfactor) > self.ibucketcount then
+      begin
+        self.ibucketcount := ceil(self.imaxkeycount / self.iloadfactor);
+
+        //Forcing a uneven Bucket Count
+        if (self.ibucketcount mod 2) = 0 then
+          dec(self.ibucketcount);
+
+        SetLength(self.arrbuckets, self.ibucketcount);
+
+        for ibkt := 0 to self.ibucketcount - 1 do
+        begin
+          if self.arrbuckets[ibkt] = nil then
+          begin
+            self.arrbuckets[ibkt] := TPLPointerNodeList.Create(ibkt);
+
+            TPLObjectNodeList(self.arrbuckets[ibkt]).Owned := self.bowned;
+            TPLObjectNodeList(self.arrbuckets[ibkt]).GrowFactor := self.iloadfactor;
+
+            brbld := True;
+          end;  //if self.arrbuckets[ibkt] = nil then
+        end;  //for ibkt := 0 to self.ibucketcount - 1 do
+
+        if brbld then
+          //Reindex the Nodes
+          self.rebuildList();
+
+      end;  //if floor(self.imaxkeycount / self.iloadfactor) > self.ibucketcount then
+    end; //if ilimit > self.imaxkeycount then
+  end;
+
   procedure TPLObjectHashList.extendList(brebuild: Boolean = True);
   var
     ibkt: Integer;
   begin
     self.ibucketcount := self.ibucketcount + self.igrowfactor;
-    self.imaxkeycount := (self.ibucketcount * 3) - 1;
+    self.imaxkeycount := (self.ibucketcount * self.iloadfactor) - 1;
 
     SetLength(self.arrbuckets, self.ibucketcount);
 
     for ibkt := 0 to self.ibucketcount - 1 do
     begin
       //Create the Buckets as TPLObjectNodeList
-      if self.arrbuckets[ibkt] = nil then self.arrbuckets[ibkt] := TPLObjectNodeList.Create(ibkt);
-    end;
+      if self.arrbuckets[ibkt] = nil then
+      begin
+        self.arrbuckets[ibkt] := TPLObjectNodeList.Create(ibkt);
+
+        TPLObjectNodeList(self.arrbuckets[ibkt]).Owned := self.bowned;
+        TPLObjectNodeList(self.arrbuckets[ibkt]).GrowFactor := self.iloadfactor;
+      end;  //if self.arrbuckets[ibkt] = nil then
+    end;  //for ibkt := 0 to self.ibucketcount - 1 do
 
     if brebuild then
       //Reindex the Nodes

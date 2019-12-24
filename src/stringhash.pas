@@ -21,6 +21,7 @@ type
   protected
     procedure extendList(brebuild: Boolean = True); override;
   public
+    procedure setLimitCount(ilimit: Integer); override;
     procedure setValue(const skey: String; svalue: String); overload;
   end;
 
@@ -117,24 +118,72 @@ implementation
     inherited Clear;
   end;
 
+
+
   (*==========================================================================*)
   // Class TPLStringHashList
 
+
+  procedure TPLStringHashList.setLimitCount(ilimit: Integer);
+  var
+    ibkt: Integer;
+    brbld: Boolean = False;
+  begin
+    if ilimit > self.imaxkeycount then
+    begin
+      //Set ilimit as Max. Key Count
+      self.imaxkeycount := ilimit;
+
+      //Will the Bucket Count increase
+      if floor(self.imaxkeycount / self.iloadfactor) > self.ibucketcount then
+      begin
+        self.ibucketcount := ceil(self.imaxkeycount / self.iloadfactor);
+
+        //Forcing a uneven Bucket Count
+        if (self.ibucketcount mod 2) = 0 then
+          dec(self.ibucketcount);
+
+        SetLength(self.arrbuckets, self.ibucketcount);
+
+        for ibkt := 0 to self.ibucketcount - 1 do
+        begin
+          if self.arrbuckets[ibkt] = nil then
+          begin
+            self.arrbuckets[ibkt] := TPLPointerNodeList.Create(ibkt);
+
+            TPLStringNodeList(self.arrbuckets[ibkt]).GrowFactor := self.iloadfactor;
+
+            brbld := True;
+          end;  //if self.arrbuckets[ibkt] = nil then
+        end;  //for ibkt := 0 to self.ibucketcount - 1 do
+
+        if brbld then
+          //Reindex the Nodes
+          self.rebuildList();
+
+      end;  //if floor(self.imaxkeycount / self.iloadfactor) > self.ibucketcount then
+    end; //if ilimit > self.imaxkeycount then
+  end;
 
   procedure TPLStringHashList.extendList(brebuild: Boolean = True);
   var
     ibkt: Integer;
   begin
     self.ibucketcount := self.ibucketcount + self.igrowfactor;
-    self.imaxkeycount := (self.ibucketcount * 3) - 1;
+    self.imaxkeycount := (self.ibucketcount * self.iloadfactor) - 1;
 
     SetLength(self.arrbuckets, self.ibucketcount);
 
     for ibkt := 0 to self.ibucketcount - 1 do
     begin
       //Create the Buckets as TPLStringNodeList
-      if self.arrbuckets[ibkt] = nil then self.arrbuckets[ibkt] := TPLStringNodeList.Create(ibkt);
-    end;
+      if self.arrbuckets[ibkt] = nil then
+      begin
+        self.arrbuckets[ibkt] := TPLStringNodeList.Create(ibkt);
+
+        TPLStringNodeList(self.arrbuckets[ibkt]).GrowFactor := self.iloadfactor;
+      end;
+    end;  //for ibkt := 0 to self.ibucketcount - 1 do
 
     if brebuild then
       //Reindex the Nodes
