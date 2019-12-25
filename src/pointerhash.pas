@@ -85,7 +85,11 @@ type
     function moveNext(): Boolean;
     function getCurrentKey(): String;
     function getCurrentValue(): Pointer; virtual;
+<<<<<<< HEAD
     property KeyData[const skey: String]: Pointer read getValue write setValue; default;
+=======
+    property KeyData []: Pointer read getValue write setValue; default;
+>>>>>>> b95fcb123b5d5ac160f022825d71e2dc00b478da
     property LoadFactor: Integer read iloadfactor write setLoadFactor;
     property GrowFactor: Integer read igrowfactor write setGrowFactor;
     property Limit: Integer read imaxkeycount write setLimitCount;
@@ -335,6 +339,11 @@ implementation
   end;
 
   procedure TPLPointerNodeList.Pack;
+<<<<<<< HEAD
+=======
+  var
+     ind: Integer;
+>>>>>>> b95fcb123b5d5ac160f022825d71e2dc00b478da
   begin
     //Reorder the Nodes
     self.reindexList;
