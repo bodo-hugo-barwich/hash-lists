@@ -27,9 +27,15 @@ type
 
 
 implementation
+
+
+uses
+  math;
+
+
+
   (*==========================================================================*)
   // Class TPLStringNodeList
-
 
 
   destructor TPLStringNodeList.Destroy;
