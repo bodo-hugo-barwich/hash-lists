@@ -17,6 +17,7 @@ type
   public
     constructor Create; override; overload;
     constructor Create(iindex: Integer); override; overload;
+    constructor Create(iindex: Integer; ifactor: Integer); override; overload;
     destructor Destroy; override;
     procedure setOwned(bisowned: Boolean);
     function addNode(ihash: Cardinal; pskey: PAnsiString; value: TObject): PPLHashNode; overload;
@@ -41,8 +42,8 @@ type
 implementation
 
 
-  uses
-    SysUtils;
+uses
+  math;
 
 
 
@@ -60,6 +61,13 @@ implementation
   constructor TPLObjectNodeList.Create(iindex: Integer);
   begin
     inherited Create(iindex);
+
+    self.bowned := True;
+  end;
+
+  constructor TPLObjectNodeList.Create(iindex: Integer; ifactor: Integer);
+  begin
+    inherited Create(iindex, ifactor);
 
     self.bowned := True;
   end;

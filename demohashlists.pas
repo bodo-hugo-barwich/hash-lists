@@ -83,6 +83,12 @@ begin
 
   WriteLn('hsh map (cnt: ', chr(39), hshmap.Count, chr(39), '):');
 
+  WriteLn('Sleeping 30 s ...');
+
+  Sleep(30000);
+
+  WriteLn('Sleeping 30 s done.');
+
   if hshmap.moveFirst() then
   begin
     repeat  //until not hshmap.moveNext();

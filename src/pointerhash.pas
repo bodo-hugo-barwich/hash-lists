@@ -30,6 +30,7 @@ type
   public
     constructor Create; virtual; overload;
     constructor Create(iindex: Integer); virtual; overload;
+    constructor Create(iindex: Integer; ifactor: Integer); virtual; overload;
     destructor Destroy; override;
     procedure setGrowFactor(ifactor: Integer);
     function addNode(pnode: PPLHashNode = nil): PPLHashNode; overload;
@@ -41,6 +42,7 @@ type
     function removeNode(ihash: Cardinal; pskey: PAnsiString): Boolean; virtual; overload;
     function removeNode(pskey: PAnsiString): Boolean; virtual; overload;
     procedure reindexList;
+    procedure Pack;
     procedure Clear; virtual;
     function getNode(iindex: Integer): PPLHashNode; overload;
     function searchNode(ihash: Cardinal; pskey: PAnsiString): PPLHashNode; overload;
@@ -66,7 +68,7 @@ type
     iloadfactor: Integer;
     procedure extendList(brebuild: Boolean = True); virtual;
     procedure rebuildList();
-    function computeHash(pskey: PAnsiString): Cardinal;
+    class function computeHash(pskey: PAnsiString): Cardinal;
   public
     constructor Create;
     destructor Destroy; override;
@@ -75,6 +77,7 @@ type
     procedure setLimitCount(ilimit: Integer); virtual;
     procedure setValue(const skey: String; ppointer: Pointer); virtual;
     procedure removeKey(const skey: String); virtual;
+    procedure Pack(); virtual;
     procedure Clear(); virtual;
     function getValue(const skey: String): Pointer; virtual;
     function hasKey(const skey: String): Boolean;
@@ -82,6 +85,7 @@ type
     function moveNext(): Boolean;
     function getCurrentKey(): String;
     function getCurrentValue(): Pointer; virtual;
+    property KeyData[const skey: String]: Pointer read getValue write setValue; default;
     property LoadFactor: Integer read iloadfactor write setLoadFactor;
     property GrowFactor: Integer read igrowfactor write setGrowFactor;
     property Limit: Integer read imaxkeycount write setLimitCount;
@@ -119,6 +123,18 @@ implementation
     self.inodecount := 0;
     self.imaxcount := 3;
     self.igrowfactor := 2;
+
+    SetLength(self.arrnodes, self.imaxcount);
+  end;
+
+  constructor TPLPointerNodeList.Create(iindex: Integer; ifactor: Integer);
+  begin
+    self.ibucketindex := iindex;
+    self.ilastindex := 0;
+    self.inextindex := 0;
+    self.inodecount := 0;
+    self.imaxcount := ifactor;
+    self.igrowfactor := ifactor;
 
     SetLength(self.arrnodes, self.imaxcount);
   end;
@@ -318,6 +334,15 @@ implementation
     end;  //if plwnd <> nil then
   end;
 
+  procedure TPLPointerNodeList.Pack;
+  begin
+    //Reorder the Nodes
+    self.reindexList;
+
+    //Shrink the List to its needed Size
+    SetLength(self.arrnodes, self.inodecount);
+  end;
+
   procedure TPLPointerNodeList.Clear;
   var
      ind: Integer;
@@ -507,9 +532,7 @@ implementation
         begin
           if self.arrbuckets[ibkt] = nil then
           begin
-            self.arrbuckets[ibkt] := TPLPointerNodeList.Create(ibkt);
-
-            TPLPointerNodeList(self.arrbuckets[ibkt]).GrowFactor := self.iloadfactor;
+            self.arrbuckets[ibkt] := TPLPointerNodeList.Create(ibkt, self.iloadfactor);
 
             brbld := True;
           end;  //if self.arrbuckets[ibkt] = nil then
@@ -563,7 +586,7 @@ implementation
   Thus the generated Hash is not guaranteed to be unique.
 
 *)
-  function TPLPointerHashList.computeHash(pskey: PAnsiString): Cardinal;
+  class function TPLPointerHashList.computeHash(pskey: PAnsiString): Cardinal;
   var
     pchr, pchrend: PChar;
   begin
@@ -678,7 +701,7 @@ implementation
 
     self.imaxkeycount := self.ibucketcount * self.iloadfactor;
 
-    //Increase the Bucket Count
+    //Extend the Bucket List
     SetLength(self.arrbuckets, self.ibucketcount);
 
     for ibkt := 0 to self.ibucketcount - 1 do
@@ -686,10 +709,8 @@ implementation
       //Create missing Node Lists
       if self.arrbuckets[ibkt] = nil then
       begin
-        self.arrbuckets[ibkt] := TPLPointerNodeList.Create(ibkt);
-
-        TPLPointerNodeList(self.arrbuckets[ibkt]).GrowFactor := self.iloadfactor;
-      end;
+        self.arrbuckets[ibkt] := TPLPointerNodeList.Create(ibkt, self.iloadfactor);
+      end;  //if self.arrbuckets[ibkt] = nil then
     end;  //for ibkt := 0 to self.ibucketcount - 1 do
 
     if brebuild then
@@ -725,6 +746,50 @@ implementation
         end;  //if (ibktnwidx > -1) and (ibktnwidx <> ibktidx) then
       end; //for indidx := 0 to indlstidx do
     end;  //for ibktidx := 0 to self.ibucketcount -1 do
+  end;
+
+  procedure TPLPointerHashList.Pack();
+  var
+    ibkt, ibktnwcnt: Integer;
+    brbld: Boolean = False;
+  begin
+    ibktnwcnt := ceil(self.ikeycount / self.iloadfactor);
+
+    //Forcing a uneven Bucket Count
+    if (ibktnwcnt mod 2) = 0 then
+      dec(ibktnwcnt);
+
+    if ibktnwcnt < self.ibucketcount then
+    begin
+
+
+
+
+
+
+
+      for ibkt := ibktnwcnt to self.ibucketcount - 1 do
+      begin
+        if self.arrbuckets[ibkt] = nil then
+        begin
+          self.arrbuckets[ibkt] := TPLPointerNodeList.Create(ibkt, self.iloadfactor);
+
+          brbld := True;
+        end;  //if self.arrbuckets[ibkt] = nil then
+      end;  //for ibkt := 0 to self.ibucketcount - 1 do
+
+
+      SetLength(self.arrbuckets, self.ibucketcount);
+
+
+      //Calculate the Max. Key Count
+      self.imaxkeycount := self.ibucketcount * self.iloadfactor;
+
+      if brbld then
+        //Reindex the Nodes
+        self.rebuildList();
+
+    end; //if ibktnwcnt < self.ibucketcount then
   end;
 
   procedure TPLPointerHashList.Clear();

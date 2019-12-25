@@ -301,8 +301,8 @@ begin
   WriteLn('TestMapInsertCheck1000Elements: do ...');
 
   TS:=DateTimeToTimeStamp(Now);
-  Writeln ('Now in days since 1/1/0001      : ',TS.Date);
-  Writeln ('Now in millisecs since midnight : ',TS.Time);
+  Writeln ('INS - Start - Now in days since 1/1/0001      : ',TS.Date);
+  Writeln ('INS - Start - Now in millisecs since midnight : ',TS.Time);
   MS:=TimeStampToMSecs(TS);
   Writeln ('Now in millisecs since 1/1/0001 : ',MS);
   MS:=MS-1000*3600*2;
@@ -326,12 +326,12 @@ begin
   tmend := Now;
   tmins := MilliSecondSpan(tmend, tmstrt);
 
+  TS:=DateTimeToTimeStamp(Now);
+  WriteLn ('INS - End - Now in millisecs since midnight : ',TS.Time);
+
   WriteLn('INS Operation completed in ', chr(39), FloatToStr(tmins), chr(39), ' ms.');
 
-  TS:=DateTimeToTimeStamp(Now);
-  WriteLn ('Now in millisecs since midnight : ',TS.Time);
-
-  Check(tmins < 106, 'INS Operation: Operation slower than 106 ms! It took: '
+  Check(tmins < 2, 'INS Operation: Operation slower than 2 ms! It took: '
     + chr(39) + FloatToStr(tmins) + chr(39) + ' ms.');
 
 
@@ -371,12 +371,12 @@ begin
   tmend := Now;
   tmins := MilliSecondSpan(tmend, tmstrt);
 
+  TS:=DateTimeToTimeStamp(Now);
+  WriteLn ('LKP - Start - Now in millisecs since midnight : ',TS.Time);
+
   WriteLn('LKP Operation completed in ', chr(39), FloatToStr(tmins), chr(39), ' ms.');
 
-  TS:=DateTimeToTimeStamp(Now);
-  WriteLn ('Now in millisecs since midnight : ',TS.Time);
-
-  Check(tmins < 3, 'LKP Operation: Operation slower than 3 ms! It took: '
+  Check(tmins < 2, 'LKP Operation: Operation slower than 2 ms! It took: '
     + chr(39) + FloatToStr(tmins) + chr(39) + ' ms.');
 
 end;
@@ -415,12 +415,12 @@ begin
   tmend := Now;
   tmins := MilliSecondSpan(tmend, tmstrt);
 
-  WriteLn('INS Operation completed in ', chr(39), FloatToStr(tmins), chr(39), ' ms.');
-
   TS:=DateTimeToTimeStamp(Now);
   WriteLn ('INS - End - Now in millisecs since midnight : ',TS.Time);
 
-  Check(tmins < 105, 'INS Operation: Operation slower than 105 ms! It took: '
+  WriteLn('INS Operation completed in ', chr(39), FloatToStr(tmins), chr(39), ' ms.');
+
+  Check(tmins < 2, 'INS Operation: Operation slower than 2 ms! It took: '
     + chr(39) + FloatToStr(tmins) + chr(39) + ' ms.');
 
 
@@ -450,12 +450,12 @@ begin
   tmend := Now;
   tmins := MilliSecondSpan(tmend, tmstrt);
 
-  WriteLn('LKP Operation completed in ', chr(39), FloatToStr(tmins), chr(39), ' ms.');
-
   TS:=DateTimeToTimeStamp(Now);
   WriteLn ('LKP - Start - Now in millisecs since midnight : ',TS.Time);
 
-  Check(tmins < 3, 'LKP Operation: Operation slower than 3 ms! It took: '
+  WriteLn('LKP Operation completed in ', chr(39), FloatToStr(tmins), chr(39), ' ms.');
+
+  Check(tmins < 2, 'LKP Operation: Operation slower than 2 ms! It took: '
     + chr(39) + FloatToStr(tmins) + chr(39) + ' ms.');
 
 end;
@@ -497,12 +497,12 @@ begin
   tmend := Now;
   tmins := MilliSecondSpan(tmend, tmstrt);
 
-  WriteLn('INS Operation completed in ', chr(39), FloatToStr(tmins), chr(39), ' ms.');
-
   TS:=DateTimeToTimeStamp(Now);
   WriteLn ('INS - End - Now in millisecs since midnight : ',TS.Time);
 
-  Check(tmins < 106, 'INS Operation: Operation slower than 106 ms! It took: '
+  WriteLn('INS Operation completed in ', chr(39), FloatToStr(tmins), chr(39), ' ms.');
+
+  Check(tmins < 7, 'INS Operation: Operation slower than 7 ms! It took: '
     + chr(39) + FloatToStr(tmins) + chr(39) + ' ms.');
 
 
@@ -542,12 +542,12 @@ begin
   tmend := Now;
   tmins := MilliSecondSpan(tmend, tmstrt);
 
-  WriteLn('LKP Operation completed in ', chr(39), FloatToStr(tmins), chr(39), ' ms.');
-
   TS:=DateTimeToTimeStamp(Now);
   WriteLn ('LKP - End - Now in millisecs since midnight : ',TS.Time);
 
-  Check(tmins < 800, 'LKP Operation: Operation slower than 3 ms! It took: '
+  WriteLn('LKP Operation completed in ', chr(39), FloatToStr(tmins), chr(39), ' ms.');
+
+  Check(tmins < 4, 'LKP Operation: Operation slower than 4 ms! It took: '
     + chr(39) + FloatToStr(tmins) + chr(39) + ' ms.');
 
 end;
@@ -585,12 +585,12 @@ begin
   tmend := Now;
   tmins := MilliSecondSpan(tmend, tmstrt);
 
-  WriteLn('INS Operation completed in ', chr(39), FloatToStr(tmins), chr(39), ' ms.');
-
   TS:=DateTimeToTimeStamp(Now);
   WriteLn ('INS - End - Now in millisecs since midnight : ',TS.Time);
 
-  Check(tmins < 800, 'INS Operation: Operation slower than 106 ms! It took: '
+  WriteLn('INS Operation completed in ', chr(39), FloatToStr(tmins), chr(39), ' ms.');
+
+  Check(tmins < 7, 'INS Operation: Operation slower than 7 ms! It took: '
     + chr(39) + FloatToStr(tmins) + chr(39) + ' ms.');
 
 
@@ -620,12 +620,12 @@ begin
   tmend := Now;
   tmins := MilliSecondSpan(tmend, tmstrt);
 
-  WriteLn('LKP Operation completed in ', chr(39), FloatToStr(tmins), chr(39), ' ms.');
-
   TS:=DateTimeToTimeStamp(Now);
   WriteLn ('LKP - End - Now in millisecs since midnight : ',TS.Time);
 
-  Check(tmins < 3, 'LKP Operation: Operation slower than 3 ms! It took: '
+  WriteLn('LKP Operation completed in ', chr(39), FloatToStr(tmins), chr(39), ' ms.');
+
+  Check(tmins < 4, 'LKP Operation: Operation slower than 4 ms! It took: '
     + chr(39) + FloatToStr(tmins) + chr(39) + ' ms.');
 
 end;
