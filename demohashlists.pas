@@ -47,8 +47,8 @@ begin
   end;
 
 (*   *)
-  hshmap := TPLPointerHashList.Create;
-  strmap := TPLStringHashList.Create;
+  hshmap := TPLPointerHashList.Create(2, 2);
+  strmap := TPLStringHashList.Create(3, 2);
 
   hshmap.setValue('en', strmap);
 
@@ -56,7 +56,7 @@ begin
   strmap.setValue('ef', 'gh');
   strmap.setValue('ij', 'kl');
 
-  strmap := TPLStringHashList.Create;
+  strmap := TPLStringHashList.Create(2, 2);
 
   hshmap.setValue('es', strmap);
 

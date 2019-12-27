@@ -70,7 +70,9 @@ type
     procedure rebuildList();
     class function computeHash(pskey: PAnsiString): Cardinal;
   public
-    constructor Create;
+    constructor Create; overload;
+    constructor Create(ilimit: Integer); overload;
+    constructor Create(ilimit: Integer; ifactor: Integer); overload;
     destructor Destroy; override;
     procedure setLoadFactor(ifactor: Integer);
     procedure setGrowFactor(ifactor: Integer);
@@ -471,6 +473,41 @@ implementation
     self.igrowfactor := 3;
     self.iloadfactor := 3;
     self.pcurrentnode := nil;
+    self.psearchednode := nil;
+
+    //Create the Buckets
+    self.extendList(False);
+  end;
+
+  constructor TPLPointerHashList.Create(ilimit: Integer);
+  begin
+    self.ikeycount := 0;
+    self.imaxkeycount := 0;
+    self.igrowfactor := 3;
+    self.iloadfactor := 3;
+    self.ibucketcount := ceil(ilimit / self.iloadfactor) - self.igrowfactor;
+    self.pcurrentnode := nil;
+    self.psearchednode := nil;
+
+    if self.ibucketcount < 0 then
+      self.ibucketcount := 0;
+
+    //Create the Buckets
+    self.extendList(False);
+  end;
+
+  constructor TPLPointerHashList.Create(ilimit: Integer; ifactor: Integer);
+  begin
+    self.ikeycount := 0;
+    self.imaxkeycount := 0;
+    self.igrowfactor := 3;
+    self.iloadfactor := ifactor;
+    self.ibucketcount := ceil(ilimit / self.iloadfactor) - self.igrowfactor;
+    self.pcurrentnode := nil;
+    self.psearchednode := nil;
+
+    if self.ibucketcount < 0 then
+      self.ibucketcount := 0;
 
     //Create the Buckets
     self.extendList(False);
