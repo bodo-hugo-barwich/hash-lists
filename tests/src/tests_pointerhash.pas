@@ -5,10 +5,10 @@ unit tests_pointerhash;
 interface
 
 uses
-  TestFramework, fgl, pointerhash;
+  TestFramework, Generics.Collections, pointerhash;
 
 type
-  TPMap = Specialize TFPGMap<String, Pointer>;
+  TPMap = Specialize TFastHashMap<String, Pointer>;
   TTestsPointerHashList = class(TTestCase)
   protected
     mpobjs: TPMap;
@@ -53,17 +53,17 @@ end;
 
 procedure TTestsPointerHashList.Teardown;
 var
+  sky: String;
   psvl: PAnsiString;
-  imp, impcnt: Integer;
 begin
-  impcnt := self.mpobjs.Count;
-
-  for imp := 0 to impcnt - 1 do
+  for sky in self.mpobjs.Keys do
   begin
-    psvl := self.mpobjs.Data[imp];
+    psvl := self.mpobjs[sky];
 
-    if psvl <> nil then Dispose(psvl);
-  end;  //for imp := 0 to impcnt - 1 do
+    if psvl <> nil then
+      Dispose(psvl);
+
+  end;  //for sky in self.mpobjs.Keys do
 
   self.mpobjs.Free;
 
@@ -296,7 +296,8 @@ var
   DT : TDateTime;
   TS: TTimeStamp;
   MS : Comp;
-  iky, ikyidx: Integer;
+  ilkplmt, iinslmt: Integer;
+  iky: Integer;
 begin
   WriteLn('TestMapInsertCheck1000Elements: do ...');
 
@@ -310,6 +311,8 @@ begin
   DT:=TimeStampToDateTime(TS);
   Writeln ('Now minus 1 day : ',DateTimeToStr(DT));
 
+
+  iinslmt := 2;
 
   tmstrt := Now;
 
@@ -331,52 +334,48 @@ begin
 
   WriteLn('INS Operation completed in ', chr(39), FloatToStr(tmins), chr(39), ' ms.');
 
-  Check(tmins < 2, 'INS Operation: Operation slower than 2 ms! It took: '
+  Check(tmins < iinslmt, 'INS Operation: Operation slower than '
+    + chr(39) + IntToStr(iinslmt) + chr(39) +' ms! It took: '
     + chr(39) + FloatToStr(tmins) + chr(39) + ' ms.');
 
 
+  ilkplmt := 2;
+
   tmstrt := Now;
+
+  self.mpobjs.Capacity := 1000;
 
   for iky := 1 to 1000 do
   begin
     sky := 'key' + IntToStr(iky);
     schk := 'value' + IntToStr(iky);
 
-    ikyidx := self.mpobjs.IndexOf(sky);
+    psvl := self.mpobjs[sky];
 
-    if ikyidx > -1 then
+    if psvl <> nil then
     begin
-      psvl := self.mpobjs.Data[ikyidx];
+      if psvl^ <> schk then
+        CheckEquals(schk, psvl^, 'LKP - key '  + chr(39) + sky + chr(39)
+          + ' failed! Value is: ' + chr(39) + psvl^ + chr(39));
 
-      if psvl <> nil then
-      begin
-        if psvl^ <> schk then
-          CheckEquals(schk, psvl^, 'key '  + chr(39) + sky + chr(39)
-            + ': value lookup failed! It is: ' + chr(39) + psvl^ + chr(39));
-
-      end
-      else  //Value is nil
-      begin
-        Check(ikyidx > -1, 'key '  + chr(39) + sky + chr(39)
-          + ': value lookup failed! Value is: ' + chr(39) + 'nil' + chr(39));
-      end;  //if psvl <> nil then
     end
-    else  //Key Lookup failed
+    else  //Value is nil
     begin
-      Check(ikyidx > -1, 'key '  + chr(39) + sky + chr(39)
-        + ': value lookup failed! Index is: ' + chr(39) + IntToStr(ikyidx) + chr(39));
-    end; //if ikyidx > -1 then
+      Check(psvl <> nil, 'LKP - key '  + chr(39) + sky + chr(39)
+        + ' failed! Value is: ' + chr(39) + 'nil' + chr(39));
+    end;  //if psvl <> nil then
   end;  //for iky := 1 to 1000 do
 
   tmend := Now;
   tmins := MilliSecondSpan(tmend, tmstrt);
 
   TS:=DateTimeToTimeStamp(Now);
-  WriteLn ('LKP - Start - Now in millisecs since midnight : ',TS.Time);
+  WriteLn ('LKP - End - Now in millisecs since midnight : ',TS.Time);
 
   WriteLn('LKP Operation completed in ', chr(39), FloatToStr(tmins), chr(39), ' ms.');
 
-  Check(tmins < 2, 'LKP Operation: Operation slower than 2 ms! It took: '
+  Check(tmins < ilkplmt, 'LKP Operation: Operation slower than '
+    + chr(39) + IntToStr(ilkplmt) + chr(39) + ' ms! It took: '
     + chr(39) + FloatToStr(tmins) + chr(39) + ' ms.');
 
 end;
@@ -451,7 +450,7 @@ begin
   tmins := MilliSecondSpan(tmend, tmstrt);
 
   TS:=DateTimeToTimeStamp(Now);
-  WriteLn ('LKP - Start - Now in millisecs since midnight : ',TS.Time);
+  WriteLn ('LKP - End - Now in millisecs since midnight : ',TS.Time);
 
   WriteLn('LKP Operation completed in ', chr(39), FloatToStr(tmins), chr(39), ' ms.');
 
@@ -474,7 +473,7 @@ var
   tmstrt, tmend : TDateTime;
   tmins: Double;
   TS: TTimeStamp;
-  iky, ikyidx: Integer;
+  iky: Integer;
 begin
   WriteLn('TestMapInsertCheck5000Elements: do ...');
 
@@ -483,6 +482,8 @@ begin
 
 
   tmstrt := Now;
+
+  self.mpobjs.Capacity := 5000;
 
   for iky := 1 to 5000 do
   begin
@@ -513,30 +514,20 @@ begin
     sky := 'key' + IntToStr(iky);
     schk := 'value' + IntToStr(iky);
 
-    ikyidx := self.mpobjs.IndexOf(sky);
+    psvl := self.mpobjs[sky];
 
-    if ikyidx > -1 then
+    if psvl <> nil then
     begin
-      psvl := self.mpobjs.Data[ikyidx];
+      if psvl^ <> schk then
+        CheckEquals(schk, psvl^, 'LKP - key '  + chr(39) + sky + chr(39)
+          + ' failed! Value is: ' + chr(39) + psvl^ + chr(39));
 
-      if psvl <> nil then
-      begin
-        if psvl^ <> schk then
-          CheckEquals(schk, psvl^, 'key '  + chr(39) + sky + chr(39)
-            + ': value lookup failed! It is: ' + chr(39) + psvl^ + chr(39));
-
-      end
-      else  //Value is nil
-      begin
-        Check(ikyidx > -1, 'key '  + chr(39) + sky + chr(39)
-          + ': value lookup failed! Value is: ' + chr(39) + 'nil' + chr(39));
-      end;  //if psvl <> nil then
     end
-    else  //Key Lookup failed
+    else  //Value is nil
     begin
-      Check(ikyidx > -1, 'key '  + chr(39) + sky + chr(39)
-        + ': value lookup failed! Index is: ' + chr(39) + IntToStr(ikyidx) + chr(39));
-    end; //if ikyidx > -1 then
+      Check(psvl <> nil, 'LKP - key '  + chr(39) + sky + chr(39)
+        + ' failed! Value is: ' + chr(39) + 'nil' + chr(39));
+    end;  //if psvl <> nil then
   end;  //for iky := 1 to 1000 do
 
   tmend := Now;
@@ -606,14 +597,14 @@ begin
     if psvl <> nil then
     begin
       if psvl^ <> schk then
-        CheckEquals(schk, psvl^, 'key '  + chr(39) + sky + chr(39)
-          + ': value lookup failed! It is: ' + chr(39) + psvl^ + chr(39));
+        CheckEquals(schk, psvl^, 'LKP - key '  + chr(39) + sky + chr(39)
+          + ' failed! Value is: ' + chr(39) + psvl^ + chr(39));
 
     end
     else  //Key Lookup failed
     begin
-      Check(psvl <> nil, 'key '  + chr(39) + sky + chr(39)
-        + ': value lookup failed! It is: ' + chr(39) + 'nil' + chr(39));
+      Check(psvl <> nil, 'LKP - key '  + chr(39) + sky + chr(39)
+        + ' failed! Value is: ' + chr(39) + 'nil' + chr(39));
     end; //if psvl <> nil then
   end;  //for iky := 1 to 1000 do
 

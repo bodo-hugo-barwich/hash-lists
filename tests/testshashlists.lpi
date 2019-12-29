@@ -59,7 +59,7 @@
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
             <Libraries Value="../../fptest/src;../src"/>
-            <OtherUnitFiles Value="../src;src"/>
+            <OtherUnitFiles Value="../src;src;../../generics.collections/src"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <CodeGeneration>

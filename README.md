@@ -12,7 +12,7 @@ that determine all over Usage Performance are adjustable by the User according t
 The Performance of the Hash List depends heavily on the `GrowFactor` and `LoadFactor`.\
 Adjusted correctly it achieves an Insertion and Lookup Speed like the similiar Structure for the `Rust` Programming Language,
 the Rust `std::collections::HashMap`.\
-For Lookups it is more than 100 times faster than the `TFPGMap` Structure as the List grows.\
+For Insertions it is more than 10 times faster than the `Generics.Collections.TFastHashMap` Class.\
 It also beats the speed of its reference the Perl `%hash` on the Insert Operation on larger data sets.
 
 If you expect a fix amount of elements to be inserted. (Perhaps comming from a SQL Query with fix `Limit`)
@@ -25,7 +25,7 @@ The Documentation of the Data Structures was generated with the `fpdoc` tool and
 # Motivation
 Using the FCL Data Types `TFPObjectHashTable` and `TFPStringHashTable` the performance of the Application dropped drastically.
 Inserting 9 Keys in 4 Objects took 20ms while the Perl-Script doing the same task finished the Job already in 15 ms.\
-Learning about highly performant Perl Data Structure inspired me to try to implement a Library that could achieve the same Tasks in much less time.\
+Learning about highly performant Perl Data Structure was the inspiration to try to implement a Library that could achieve the same Tasks in much less time.\
 It also implements the missing Features for the Perl `%hash` as to know the Element Count and Iterating over the Data Structure without the need to copy the Keys.
 
 # Disclaimer
