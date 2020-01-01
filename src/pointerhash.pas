@@ -67,7 +67,7 @@ type
     igrowfactor: Integer;
     iloadfactor: Integer;
     procedure extendList(brebuild: Boolean = True); virtual;
-    //procedure reduceList(isize: Integer); virtual;
+    procedure reduceList(isize: Integer); virtual;
     procedure rebuildList(istartindex, iendindex, icount: Integer);
     class function computeHash(pskey: PAnsiString): Cardinal;
   public
@@ -80,7 +80,7 @@ type
     procedure setCapacity(icapacity: Integer); virtual;
     procedure setValue(const skey: String; ppointer: Pointer); virtual;
     procedure removeKey(const skey: String); virtual;
-    //procedure Pack(); virtual;
+    procedure Pack(); virtual;
     procedure Clear(); virtual;
     function getValue(const skey: String): Pointer; virtual;
     function hasKey(const skey: String): Boolean;
@@ -757,12 +757,10 @@ implementation
 
   end;
 
-(*
   procedure TPLPointerHashList.reduceList(isize: Integer);
   begin
 
   end;
-  *)
 
   procedure TPLPointerHashList.rebuildList(istartindex, iendindex, icount: Integer);
   var
@@ -792,7 +790,7 @@ implementation
       end; //for indidx := 0 to indlstidx do
     end;  //for ibktidx := istartindex to iendindex do
   end;
-(*
+
   procedure TPLPointerHashList.Pack();
   var
     ibkt, ibktnwcnt: Integer;
@@ -836,7 +834,7 @@ implementation
 
     end; //if ibktnwcnt < self.ibucketcount then
   end;
-  *)
+
 
   procedure TPLPointerHashList.Clear();
   var
