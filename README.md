@@ -16,7 +16,7 @@ For Insertions it is more than 10 times faster than the `Generics.Collections.TF
 It also beats the speed of its reference the Perl `%hash` on the Insert Operation on larger data sets.
 
 If you expect a fix amount of elements to be inserted. (Perhaps comming from a SQL Query with fix `Limit`)
-it is beneficial to set the List size beforehand with the `Limit` Property
+it is beneficial to set the List size beforehand with the `Capacity` Property
 
 # Documentation
 The Documentation of the Data Structures was generated with the `fpdoc` tool and be found in:\

@@ -71,12 +71,12 @@ type
     class function computeHash(pskey: PAnsiString): Cardinal;
   public
     constructor Create; overload;
-    constructor Create(ilimit: Integer); overload;
-    constructor Create(ilimit: Integer; ifactor: Integer); overload;
+    constructor Create(icapacity: Integer); overload;
+    constructor Create(icapacity: Integer; ifactor: Integer); overload;
     destructor Destroy; override;
     procedure setLoadFactor(ifactor: Integer);
     procedure setGrowFactor(ifactor: Integer);
-    procedure setLimitCount(ilimit: Integer); virtual;
+    procedure setCapacity(icapacity: Integer); virtual;
     procedure setValue(const skey: String; ppointer: Pointer); virtual;
     procedure removeKey(const skey: String); virtual;
     procedure Pack(); virtual;
@@ -90,7 +90,7 @@ type
     property KeyData[const skey: String]: Pointer read getValue write setValue; default;
     property LoadFactor: Integer read iloadfactor write setLoadFactor;
     property GrowFactor: Integer read igrowfactor write setGrowFactor;
-    property Limit: Integer read imaxkeycount write setLimitCount;
+    property Capacity: Integer read imaxkeycount write setCapacity;
     property Count: Integer read ikeycount;
   end;
 
@@ -479,13 +479,13 @@ implementation
     self.extendList(False);
   end;
 
-  constructor TPLPointerHashList.Create(ilimit: Integer);
+  constructor TPLPointerHashList.Create(icapacity: Integer);
   begin
     self.ikeycount := 0;
     self.imaxkeycount := 0;
     self.igrowfactor := 3;
     self.iloadfactor := 3;
-    self.ibucketcount := ceil(ilimit / self.iloadfactor) - self.igrowfactor;
+    self.ibucketcount := ceil(icapacity / self.iloadfactor) - self.igrowfactor;
     self.pcurrentnode := nil;
     self.psearchednode := nil;
 
@@ -496,13 +496,13 @@ implementation
     self.extendList(False);
   end;
 
-  constructor TPLPointerHashList.Create(ilimit: Integer; ifactor: Integer);
+  constructor TPLPointerHashList.Create(icapacity: Integer; ifactor: Integer);
   begin
     self.ikeycount := 0;
     self.imaxkeycount := 0;
     self.igrowfactor := 3;
     self.iloadfactor := ifactor;
-    self.ibucketcount := ceil(ilimit / self.iloadfactor) - self.igrowfactor;
+    self.ibucketcount := ceil(icapacity / self.iloadfactor) - self.igrowfactor;
     self.pcurrentnode := nil;
     self.psearchednode := nil;
 
@@ -544,15 +544,15 @@ implementation
     self.igrowfactor := ifactor;
   end;
 
-  procedure TPLPointerHashList.setLimitCount(ilimit: Integer);
+  procedure TPLPointerHashList.setCapacity(icapacity: Integer);
   var
     ibkt: Integer;
     brbld: Boolean = False;
   begin
-    if ilimit > self.imaxkeycount then
+    if icapacity > self.imaxkeycount then
     begin
-      //Set ilimit as Max. Key Count
-      self.imaxkeycount := ilimit;
+      //Set icapacity as Max. Key Count
+      self.imaxkeycount := icapacity;
 
       //Will the Bucket Count increase
       if floor(self.imaxkeycount / self.iloadfactor) > self.ibucketcount then
@@ -580,7 +580,7 @@ implementation
           self.rebuildList();
 
       end;  //if floor(self.imaxkeycount / self.iloadfactor) > self.ibucketcount then
-    end; //if ilimit > self.imaxkeycount then
+    end; //if icapacity > self.imaxkeycount then
   end;
 
 (*

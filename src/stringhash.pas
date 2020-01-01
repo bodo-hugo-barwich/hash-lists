@@ -21,7 +21,7 @@ type
   protected
     procedure extendList(brebuild: Boolean = True); override;
   public
-    procedure setLimitCount(ilimit: Integer); override;
+    procedure setCapacity(icapacity: Integer); override;
     procedure setValue(const skey: String; svalue: String); overload;
   end;
 
@@ -130,15 +130,15 @@ uses
   // Class TPLStringHashList
 
 
-  procedure TPLStringHashList.setLimitCount(ilimit: Integer);
+  procedure TPLStringHashList.setCapacity(icapacity: Integer);
   var
     ibkt: Integer;
     brbld: Boolean = False;
   begin
-    if ilimit > self.imaxkeycount then
+    if icapacity > self.imaxkeycount then
     begin
-      //Set ilimit as Max. Key Count
-      self.imaxkeycount := ilimit;
+      //Set icapacity as Max. Key Count
+      self.imaxkeycount := icapacity;
 
       //Will the Bucket Count increase
       if floor(self.imaxkeycount / self.iloadfactor) > self.ibucketcount then
@@ -168,7 +168,7 @@ uses
           self.rebuildList();
 
       end;  //if floor(self.imaxkeycount / self.iloadfactor) > self.ibucketcount then
-    end; //if ilimit > self.imaxkeycount then
+    end; //if icapacity > self.imaxkeycount then
   end;
 
   procedure TPLStringHashList.extendList(brebuild: Boolean = True);

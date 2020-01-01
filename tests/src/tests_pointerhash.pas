@@ -70,6 +70,9 @@ begin
   Self.flookuplimit5000 := 4.1;
 end;
 
+{
+  Free used Memory
+}
 procedure TTestsPointerHashList.Teardown;
 var
   sky: String;
@@ -408,22 +411,13 @@ var
   psvl: PAnsiString;
   tmstrt, tmend : TDateTime;
   tmins: Double;
-  DT : TDateTime;
   TS: TTimeStamp;
-  MS : Comp;
   iky: Integer;
 begin
   WriteLn('TestMapLookup1000Elements: do ...');
 
   TS:=DateTimeToTimeStamp(Now);
-  Writeln ('INS - Start - Now in days since 1/1/0001      : ',TS.Date);
   Writeln ('INS - Start - Now in millisecs since midnight : ',TS.Time);
-  MS:=TimeStampToMSecs(TS);
-  Writeln ('Now in millisecs since 1/1/0001 : ',MS);
-  MS:=MS-1000*3600*2;
-  TS:=MSecsToTimeStamp(MS);
-  DT:=TimeStampToDateTime(TS);
-  Writeln ('Now minus 1 day : ',DateTimeToStr(DT));
 
 
   tmstrt := Now;
@@ -511,7 +505,7 @@ begin
   tmstrt := Now;
 
   self.lsthshobjs.LoadFactor := 2;
-  self.lsthshobjs.Limit := 1000;
+  self.lsthshobjs.Capacity := 1000;
 
   for iky := 1 to 1000 do
   begin
@@ -594,7 +588,7 @@ begin
   tmstrt := Now;
 
   self.lsthshobjs.LoadFactor := 2;
-  self.lsthshobjs.Limit := 1000;
+  self.lsthshobjs.Capacity := 1000;
 
   for iky := 1 to 1000 do
   begin
@@ -855,7 +849,7 @@ begin
   tmstrt := Now;
 
   self.lsthshobjs.LoadFactor := 2;
-  self.lsthshobjs.Limit := 5000;
+  self.lsthshobjs.Capacity := 5000;
 
   for iky := 1 to 5000 do
   begin
@@ -938,7 +932,7 @@ begin
   tmstrt := Now;
 
   self.lsthshobjs.LoadFactor := 2;
-  self.lsthshobjs.Limit := 5000;
+  self.lsthshobjs.Capacity := 5000;
 
   for iky := 1 to 5000 do
   begin
