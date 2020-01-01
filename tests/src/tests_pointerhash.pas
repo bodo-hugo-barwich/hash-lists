@@ -13,16 +13,28 @@ type
   protected
     mpobjs: TPMap;
     lsthshobjs: TPLPointerHashList;
+    //Allover defined Execution Time Limit for 1000 Insertions
+    finsertlimit1000: Single;
+    //Allover defined Execution Time Limit for 1000 Lookups
+    flookuplimit1000: Single;
+    //Allover defined Execution Time Limit for 5000 Insertions
+    finsertlimit5000: Single;
+    //Allover defined Execution Time Limit for 5000 Lookups
+    flookuplimit5000: Single;
     procedure SetUp; override;
     procedure Teardown; override;
   published
     procedure TestInsertCheckElements;
     procedure TestCheckFirstElement;
     procedure TestCheckNextElement;
-    procedure TestMapInsertCheck1000Elements;
-    procedure TestInsertCheck1000Elements;
-    procedure TestMapInsertCheck5000Elements;
-    procedure TestInsertCheck5000Elements;
+    procedure TestMapInsert1000Elements;
+    procedure TestMapLookup1000Elements;
+    procedure TestInsert1000Elements;
+    procedure TestLookup1000Elements;
+    procedure TestMapInsert5000Elements;
+    procedure TestMapLookup5000Elements;
+    procedure TestInsert5000Elements;
+    procedure TestLookup5000Elements;
   end;
 
  procedure RegisterTests;
@@ -44,11 +56,18 @@ begin
   TestFramework.RegisterTest(TTestsPointerHashList.Suite);
 end;
 
-
+{
+  Allover Test Limits are configured
+}
 procedure TTestsPointerHashList.SetUp;
 begin
-  self.mpobjs:= TPMap.Create;
-  self.lsthshobjs := TPLPointerHashList.Create();
+  Self.mpobjs:= TPMap.Create;
+  Self.lsthshobjs := TPLPointerHashList.Create();
+
+  Self.finsertlimit1000 := 1.1;
+  Self.flookuplimit1000 := 1.1;
+  Self.finsertlimit5000 := 6.0;
+  Self.flookuplimit5000 := 4.1;
 end;
 
 procedure TTestsPointerHashList.Teardown;
@@ -282,12 +301,12 @@ begin
 end;
 
 (*
-Reference Performance Test against the Standard TFPGMap
+Reference Performance Test against the Generics.Collections.TFastHashMap
 Adding 1000 Keys and their Values
 Looking Up all their Values
 It should return the defined Keys and their Values
 *)
-procedure TTestsPointerHashList.TestMapInsertCheck1000Elements;
+procedure TTestsPointerHashList.TestMapInsert1000Elements;
 var
   sky, schk: String;
   psvl: PAnsiString;
@@ -296,10 +315,9 @@ var
   DT : TDateTime;
   TS: TTimeStamp;
   MS : Comp;
-  ilkplmt, iinslmt: Integer;
   iky: Integer;
 begin
-  WriteLn('TestMapInsertCheck1000Elements: do ...');
+  WriteLn('TestMapInsert1000Elements: do ...');
 
   TS:=DateTimeToTimeStamp(Now);
   Writeln ('INS - Start - Now in days since 1/1/0001      : ',TS.Date);
@@ -312,7 +330,101 @@ begin
   Writeln ('Now minus 1 day : ',DateTimeToStr(DT));
 
 
-  iinslmt := 2;
+  tmstrt := Now;
+
+  self.mpobjs.Capacity := 1000;
+
+  for iky := 1 to 1000 do
+  begin
+    sky := 'key' + IntToStr(iky);
+
+    New(psvl);
+    psvl^ := 'value' + IntToStr(iky);
+
+    self.mpobjs.Add(sky, psvl);
+  end;  //for iky := 1 to 1000 do
+
+  tmend := Now;
+  tmins := MilliSecondSpan(tmend, tmstrt);
+
+  TS:=DateTimeToTimeStamp(Now);
+  WriteLn ('INS - End - Now in millisecs since midnight : ',TS.Time);
+
+  WriteLn('INS Operation completed in ', chr(39), FloatToStr(tmins), chr(39), ' ms.');
+
+  Check(tmins < Self.finsertlimit1000, 'INS Operation: Operation slower than '
+    + chr(39) + FloatToStr(Self.finsertlimit1000) + chr(39) + ' ms! It took: '
+    + chr(39) + FloatToStr(tmins) + chr(39) + ' ms.');
+
+
+  tmstrt := Now;
+
+  for iky := 1 to 1000 do
+  begin
+    sky := 'key' + IntToStr(iky);
+    schk := 'value' + IntToStr(iky);
+
+    psvl := self.mpobjs[sky];
+
+    if psvl <> nil then
+    begin
+      if psvl^ <> schk then
+        CheckEquals(schk, psvl^, 'LKP - key '  + chr(39) + sky + chr(39)
+          + ' failed! Value is: ' + chr(39) + psvl^ + chr(39));
+
+    end
+    else  //Value is nil
+    begin
+      Check(psvl <> nil, 'LKP - key '  + chr(39) + sky + chr(39)
+        + ' failed! Value is: ' + chr(39) + 'nil' + chr(39));
+    end;  //if psvl <> nil then
+  end;  //for iky := 1 to 1000 do
+
+  tmend := Now;
+  tmins := MilliSecondSpan(tmend, tmstrt);
+
+  TS:=DateTimeToTimeStamp(Now);
+  WriteLn ('LKP - End - Now in millisecs since midnight : ',TS.Time);
+
+  WriteLn('LKP Operation completed in ', chr(39), FloatToStr(tmins), chr(39), ' ms.');
+
+  {
+  If the Insert Limit fails this check will not be reached
+  Check(tmins < Self.flookuplimit1000, 'LKP Operation: Operation slower than '
+    + chr(39) + FloatToStr(Self.flookuplimit1000) + chr(39) + ' ms! It took: '
+    + chr(39) + FloatToStr(tmins) + chr(39) + ' ms.');
+    }
+end;
+
+(*
+Reference Performance Test against the Generics.Collections.TFastHashMap
+Adding 1000 Keys and their Values
+Looking Up all their Values
+It should return the defined Keys and their Values
+*)
+procedure TTestsPointerHashList.TestMapLookup1000Elements;
+var
+  sky, schk: String;
+  psvl: PAnsiString;
+  tmstrt, tmend : TDateTime;
+  tmins: Double;
+  DT : TDateTime;
+  TS: TTimeStamp;
+  MS : Comp;
+  iky: Integer;
+begin
+  WriteLn('TestMapLookup1000Elements: do ...');
+
+  TS:=DateTimeToTimeStamp(Now);
+  Writeln ('INS - Start - Now in days since 1/1/0001      : ',TS.Date);
+  Writeln ('INS - Start - Now in millisecs since midnight : ',TS.Time);
+  MS:=TimeStampToMSecs(TS);
+  Writeln ('Now in millisecs since 1/1/0001 : ',MS);
+  MS:=MS-1000*3600*2;
+  TS:=MSecsToTimeStamp(MS);
+  DT:=TimeStampToDateTime(TS);
+  Writeln ('Now minus 1 day : ',DateTimeToStr(DT));
+
 
   tmstrt := Now;
 
@@ -334,12 +446,13 @@ begin
 
   WriteLn('INS Operation completed in ', chr(39), FloatToStr(tmins), chr(39), ' ms.');
 
-  Check(tmins < iinslmt, 'INS Operation: Operation slower than '
-    + chr(39) + IntToStr(iinslmt) + chr(39) +' ms! It took: '
+  {
+  If this Check fails the second Check will not be executed
+  Check(tmins < Self.finsertlimit1000, 'INS Operation: Operation slower than '
+    + chr(39) + FloatToStr(Self.finsertlimit1000) + chr(39) +' ms! It took: '
     + chr(39) + FloatToStr(tmins) + chr(39) + ' ms.');
+    }
 
-
-  ilkplmt := 2;
 
   tmstrt := Now;
 
@@ -374,13 +487,13 @@ begin
 
   WriteLn('LKP Operation completed in ', chr(39), FloatToStr(tmins), chr(39), ' ms.');
 
-  Check(tmins < ilkplmt, 'LKP Operation: Operation slower than '
-    + chr(39) + IntToStr(ilkplmt) + chr(39) + ' ms! It took: '
+  Check(tmins < Self.flookuplimit1000, 'LKP Operation: Operation slower than '
+    + chr(39) + FloatToStr(Self.flookuplimit1000) + chr(39) + ' ms! It took: '
     + chr(39) + FloatToStr(tmins) + chr(39) + ' ms.');
 
 end;
 
-procedure TTestsPointerHashList.TestInsertCheck1000Elements;
+procedure TTestsPointerHashList.TestInsert1000Elements;
 var
   sky, schk: String;
   psvl: PAnsiString;
@@ -389,7 +502,7 @@ var
   TS: TTimeStamp;
   iky: Integer;
 begin
-  WriteLn('TestInsertCheck1000Elements: do ...');
+  WriteLn('TestInsert1000Elements: do ...');
 
   TS:=DateTimeToTimeStamp(Now);
   Writeln ('INS - Start - Now in millisecs since midnight : ',TS.Time);
@@ -419,7 +532,8 @@ begin
 
   WriteLn('INS Operation completed in ', chr(39), FloatToStr(tmins), chr(39), ' ms.');
 
-  Check(tmins < 2, 'INS Operation: Operation slower than 2 ms! It took: '
+  Check(tmins < Self.finsertlimit1000, 'INS Operation: Operation slower than '
+    + chr(39) + FloatToStr(Self.finsertlimit1000) + chr(39) + ' ms! It took: '
     + chr(39) + FloatToStr(tmins) + chr(39) + ' ms.');
 
 
@@ -454,19 +568,15 @@ begin
 
   WriteLn('LKP Operation completed in ', chr(39), FloatToStr(tmins), chr(39), ' ms.');
 
-  Check(tmins < 2, 'LKP Operation: Operation slower than 2 ms! It took: '
+  {
+  If the Insert Check fails this Check will not be executed
+  Check(tmins < Self.flookuplimit1000, 'LKP Operation: Operation slower than '
+    + chr(39) + FloatToStr(Self.flookuplimit1000) + chr(39) + ' ms! It took: '
     + chr(39) + FloatToStr(tmins) + chr(39) + ' ms.');
-
+  }
 end;
 
-
-(*
-Reference Performance Test against the Standard TFPGMap
-Adding 5000 Keys and their Values
-Looking Up all their Values
-It should return the defined Keys and their Values
-*)
-procedure TTestsPointerHashList.TestMapInsertCheck5000Elements;
+procedure TTestsPointerHashList.TestLookup1000Elements;
 var
   sky, schk: String;
   psvl: PAnsiString;
@@ -475,7 +585,98 @@ var
   TS: TTimeStamp;
   iky: Integer;
 begin
-  WriteLn('TestMapInsertCheck5000Elements: do ...');
+  WriteLn('TestLookup1000Elements: do ...');
+
+  TS:=DateTimeToTimeStamp(Now);
+  Writeln ('INS - Start - Now in millisecs since midnight : ',TS.Time);
+
+
+  tmstrt := Now;
+
+  self.lsthshobjs.LoadFactor := 2;
+  self.lsthshobjs.Limit := 1000;
+
+  for iky := 1 to 1000 do
+  begin
+    sky := 'key' + IntToStr(iky);
+
+    New(psvl);
+    psvl^ := 'value' + IntToStr(iky);
+
+    self.lsthshobjs.setValue(sky, psvl);
+
+  end;  //for iky := 1 to 1000 do
+
+  tmend := Now;
+  tmins := MilliSecondSpan(tmend, tmstrt);
+
+  TS:=DateTimeToTimeStamp(Now);
+  WriteLn ('INS - End - Now in millisecs since midnight : ',TS.Time);
+
+  WriteLn('INS Operation completed in ', chr(39), FloatToStr(tmins), chr(39), ' ms.');
+
+  {
+  If this Check fails the second Check will not be reached
+  Check(tmins < Self.finsertlimit1000, 'INS Operation: Operation slower than '
+    + chr(39) + FloatToStr(Self.finsertlimit1000) + chr(39) + ' ms! It took: '
+    + chr(39) + FloatToStr(tmins) + chr(39) + ' ms.');
+    }
+
+
+  tmstrt := Now;
+
+  for iky := 1 to 1000 do
+  begin
+    sky := 'key' + IntToStr(iky);
+    schk := 'value' + IntToStr(iky);
+
+    psvl := self.lsthshobjs.getValue(sky);
+
+    if psvl <> nil then
+    begin
+      if psvl^ <> schk then
+        CheckEquals(schk, psvl^, 'LKP - key '  + chr(39) + sky + chr(39)
+          + ' failed! Value is: ' + chr(39) + psvl^ + chr(39));
+
+    end
+    else  //Key Lookup failed
+    begin
+      Check(psvl <> nil, 'LKP - key '  + chr(39) + sky + chr(39)
+        + ' failed! Value is: ' + chr(39) + 'nil' + chr(39));
+    end; //if psvl <> nil then
+  end;  //for iky := 1 to 1000 do
+
+  tmend := Now;
+  tmins := MilliSecondSpan(tmend, tmstrt);
+
+  TS:=DateTimeToTimeStamp(Now);
+  WriteLn ('LKP - End - Now in millisecs since midnight : ',TS.Time);
+
+  WriteLn('LKP Operation completed in ', chr(39), FloatToStr(tmins), chr(39), ' ms.');
+
+  Check(tmins < Self.flookuplimit1000, 'LKP Operation: Operation slower than '
+    + chr(39) + FloatToStr(Self.flookuplimit1000) + chr(39) + ' ms! It took: '
+    + chr(39) + FloatToStr(tmins) + chr(39) + ' ms.');
+
+end;
+
+
+(*
+Reference Performance Test against the Generics.Collections.TFastHashMap
+Adding 5000 Keys and their Values
+Looking Up all their Values
+It should return the defined Keys and their Values
+*)
+procedure TTestsPointerHashList.TestMapInsert5000Elements;
+var
+  sky, schk: String;
+  psvl: PAnsiString;
+  tmstrt, tmend : TDateTime;
+  tmins: Double;
+  TS: TTimeStamp;
+  iky: Integer;
+begin
+  WriteLn('TestMapInsert5000Elements: do ...');
 
   TS:=DateTimeToTimeStamp(Now);
   Writeln ('INS - Start - Now in millisecs since midnight : ',TS.Time);
@@ -503,7 +704,8 @@ begin
 
   WriteLn('INS Operation completed in ', chr(39), FloatToStr(tmins), chr(39), ' ms.');
 
-  Check(tmins < 7, 'INS Operation: Operation slower than 7 ms! It took: '
+  Check(tmins < Self.finsertlimit5000, 'INS Operation: Operation slower than '
+    + chr(39) + FloatToStr(Self.finsertlimit5000) + chr(39) + ' ms! It took: '
     + chr(39) + FloatToStr(tmins) + chr(39) + ' ms.');
 
 
@@ -538,12 +740,22 @@ begin
 
   WriteLn('LKP Operation completed in ', chr(39), FloatToStr(tmins), chr(39), ' ms.');
 
-  Check(tmins < 4, 'LKP Operation: Operation slower than 4 ms! It took: '
+  {
+  If the first Check fails this Check will not be executed
+  Check(tmins < Self.flookuplimit5000, 'LKP Operation: Operation slower than '
+    + chr(39) + FloatToStr(Self.flookuplimit5000) + chr(39) + '4 ms! It took: '
     + chr(39) + FloatToStr(tmins) + chr(39) + ' ms.');
+    }
 
 end;
 
-procedure TTestsPointerHashList.TestInsertCheck5000Elements;
+(*
+Reference Performance Test against the Generics.Collections.TFastHashMap
+Adding 5000 Keys and their Values
+Looking Up all their Values
+It should return the defined Keys and their Values
+*)
+procedure TTestsPointerHashList.TestMapLookup5000Elements;
 var
   sky, schk: String;
   psvl: PAnsiString;
@@ -552,7 +764,89 @@ var
   TS: TTimeStamp;
   iky: Integer;
 begin
-  WriteLn('TestInsertCheck5000Elements: do ...');
+  WriteLn('TestMapLookup5000Elements: do ...');
+
+  TS:=DateTimeToTimeStamp(Now);
+  Writeln ('INS - Start - Now in millisecs since midnight : ',TS.Time);
+
+
+  tmstrt := Now;
+
+  self.mpobjs.Capacity := 5000;
+
+  for iky := 1 to 5000 do
+  begin
+    sky := 'key' + IntToStr(iky);
+
+    New(psvl);
+    psvl^ := 'value' + IntToStr(iky);
+
+    self.mpobjs.Add(sky, psvl);
+  end;  //for iky := 1 to 5000 do
+
+  tmend := Now;
+  tmins := MilliSecondSpan(tmend, tmstrt);
+
+  TS:=DateTimeToTimeStamp(Now);
+  WriteLn ('INS - End - Now in millisecs since midnight : ',TS.Time);
+
+  WriteLn('INS Operation completed in ', chr(39), FloatToStr(tmins), chr(39), ' ms.');
+
+  {
+  If this Check fails the second will not be reached
+  Check(tmins < Self.finsertlimit5000, 'INS Operation: Operation slower than '
+    + chr(39) + FloatToStr(Self.finsertlimit5000) + chr(39) + ' ms! It took: '
+    + chr(39) + FloatToStr(tmins) + chr(39) + ' ms.');
+    }
+
+
+  tmstrt := Now;
+
+  for iky := 1 to 5000 do
+  begin
+    sky := 'key' + IntToStr(iky);
+    schk := 'value' + IntToStr(iky);
+
+    psvl := self.mpobjs[sky];
+
+    if psvl <> nil then
+    begin
+      if psvl^ <> schk then
+        CheckEquals(schk, psvl^, 'LKP - key '  + chr(39) + sky + chr(39)
+          + ' failed! Value is: ' + chr(39) + psvl^ + chr(39));
+
+    end
+    else  //Value is nil
+    begin
+      Check(psvl <> nil, 'LKP - key '  + chr(39) + sky + chr(39)
+        + ' failed! Value is: ' + chr(39) + 'nil' + chr(39));
+    end;  //if psvl <> nil then
+  end;  //for iky := 1 to 5000 do
+
+  tmend := Now;
+  tmins := MilliSecondSpan(tmend, tmstrt);
+
+  TS:=DateTimeToTimeStamp(Now);
+  WriteLn ('LKP - End - Now in millisecs since midnight : ',TS.Time);
+
+  WriteLn('LKP Operation completed in ', chr(39), FloatToStr(tmins), chr(39), ' ms.');
+
+  Check(tmins < Self.flookuplimit5000, 'LKP Operation: Operation slower than '
+    + chr(39) + FloatToStr(Self.flookuplimit5000) + chr(39) + ' ms! It took: '
+    + chr(39) + FloatToStr(tmins) + chr(39) + ' ms.');
+
+end;
+
+procedure TTestsPointerHashList.TestInsert5000Elements;
+var
+  sky, schk: String;
+  psvl: PAnsiString;
+  tmstrt, tmend : TDateTime;
+  tmins: Double;
+  TS: TTimeStamp;
+  iky: Integer;
+begin
+  WriteLn('TestInsert5000Elements: do ...');
 
   TS:=DateTimeToTimeStamp(Now);
   Writeln ('INS - Start - Now in millisecs since midnight : ',TS.Time);
@@ -581,7 +875,8 @@ begin
 
   WriteLn('INS Operation completed in ', chr(39), FloatToStr(tmins), chr(39), ' ms.');
 
-  Check(tmins < 7, 'INS Operation: Operation slower than 7 ms! It took: '
+  Check(tmins < Self.finsertlimit5000, 'INS Operation: Operation slower than '
+    + chr(39) + FloatToStr(Self.finsertlimit5000) + chr(39) + ' ms! It took: '
     + chr(39) + FloatToStr(tmins) + chr(39) + ' ms.');
 
 
@@ -616,8 +911,95 @@ begin
 
   WriteLn('LKP Operation completed in ', chr(39), FloatToStr(tmins), chr(39), ' ms.');
 
-  Check(tmins < 4, 'LKP Operation: Operation slower than 4 ms! It took: '
+  {
+  If the Insert Check fails this Check will not be executed
+  Check(tmins < Self.flookuplimit5000, 'LKP Operation: Operation slower than '
+    + chr(39) + FloatToStr(Self.flookuplimit5000) + chr(39) + ' ms! It took: '
     + chr(39) + FloatToStr(tmins) + chr(39) + ' ms.');
+    }
+
+end;
+
+procedure TTestsPointerHashList.TestLookup5000Elements;
+var
+  sky, schk: String;
+  psvl: PAnsiString;
+  tmstrt, tmend : TDateTime;
+  tmins: Double;
+  TS: TTimeStamp;
+  iky: Integer;
+begin
+  WriteLn('TestLookup5000Elements: do ...');
+
+  TS:=DateTimeToTimeStamp(Now);
+  Writeln ('INS - Start - Now in millisecs since midnight : ',TS.Time);
+
+
+  tmstrt := Now;
+
+  self.lsthshobjs.LoadFactor := 2;
+  self.lsthshobjs.Limit := 5000;
+
+  for iky := 1 to 5000 do
+  begin
+    sky := 'key' + IntToStr(iky);
+
+    New(psvl);
+    psvl^ := 'value' + IntToStr(iky);
+
+    self.lsthshobjs.setValue(sky, psvl);
+  end;  //for iky := 1 to 1000 do
+
+  tmend := Now;
+  tmins := MilliSecondSpan(tmend, tmstrt);
+
+  TS:=DateTimeToTimeStamp(Now);
+  WriteLn ('INS - End - Now in millisecs since midnight : ',TS.Time);
+
+  WriteLn('INS Operation completed in ', chr(39), FloatToStr(tmins), chr(39), ' ms.');
+
+  {
+  If this Check fails the second will not be reached
+  Check(tmins < Self.finsertlimit5000, 'INS Operation: Operation slower than '
+    + chr(39) + FloatToStr(Self.finsertlimit5000) + chr(39) + ' ms! It took: '
+    + chr(39) + FloatToStr(tmins) + chr(39) + ' ms.');
+   }
+
+  tmstrt := Now;
+
+  for iky := 1 to 5000 do
+  begin
+    sky := 'key' + IntToStr(iky);
+    schk := 'value' + IntToStr(iky);
+
+    psvl := self.lsthshobjs.getValue(sky);
+
+    if psvl <> nil then
+    begin
+      if psvl^ <> schk then
+        CheckEquals(schk, psvl^, 'LKP - key '  + chr(39) + sky + chr(39)
+          + ' failed! Value is: ' + chr(39) + psvl^ + chr(39));
+
+    end
+    else  //Key Lookup failed
+    begin
+      Check(psvl <> nil, 'LKP - key '  + chr(39) + sky + chr(39)
+        + ' failed! Value is: ' + chr(39) + 'nil' + chr(39));
+    end; //if psvl <> nil then
+  end;  //for iky := 1 to 1000 do
+
+  tmend := Now;
+  tmins := MilliSecondSpan(tmend, tmstrt);
+
+  TS:=DateTimeToTimeStamp(Now);
+  WriteLn ('LKP - End - Now in millisecs since midnight : ',TS.Time);
+
+  WriteLn('LKP Operation completed in ', chr(39), FloatToStr(tmins), chr(39), ' ms.');
+
+  Check(tmins < Self.flookuplimit5000, 'LKP Operation: Operation slower than '
+    + chr(39) + FloatToStr(Self.flookuplimit5000) + chr(39) + ' ms! It took: '
+    + chr(39) + FloatToStr(tmins) + chr(39) + ' ms.');
+
 
 end;
 
