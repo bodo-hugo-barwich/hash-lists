@@ -67,7 +67,8 @@ type
     igrowfactor: Integer;
     iloadfactor: Integer;
     procedure extendList(brebuild: Boolean = True); virtual;
-    procedure rebuildList();
+    //procedure reduceList(isize: Integer); virtual;
+    procedure rebuildList(istartindex, iendindex, icount: Integer);
     class function computeHash(pskey: PAnsiString): Cardinal;
   public
     constructor Create; overload;
@@ -79,7 +80,7 @@ type
     procedure setCapacity(icapacity: Integer); virtual;
     procedure setValue(const skey: String; ppointer: Pointer); virtual;
     procedure removeKey(const skey: String); virtual;
-    procedure Pack(); virtual;
+    //procedure Pack(); virtual;
     procedure Clear(); virtual;
     function getValue(const skey: String): Pointer; virtual;
     function hasKey(const skey: String): Boolean;
@@ -565,7 +566,7 @@ implementation
 
         SetLength(self.arrbuckets, self.ibucketcount);
 
-        for ibkt := 0 to self.ibucketcount - 1 do
+        for ibkt := 0 to Self.ibucketcount - 1 do
         begin
           if self.arrbuckets[ibkt] = nil then
           begin
@@ -577,7 +578,7 @@ implementation
 
         if brbld then
           //Reindex the Nodes
-          self.rebuildList();
+          self.rebuildList(0, Self.ibucketcount - 1, Self.ibucketcount);
 
       end;  //if floor(self.imaxkeycount / self.iloadfactor) > self.ibucketcount then
     end; //if icapacity > self.imaxkeycount then
@@ -752,16 +753,23 @@ implementation
 
     if brebuild then
       //Reindex the Nodes
-      self.rebuildList();
+      self.rebuildList(0, Self.ibucketcount - 1, Self.ibucketcount);
 
   end;
 
-  procedure TPLPointerHashList.rebuildList();
+(*
+  procedure TPLPointerHashList.reduceList(isize: Integer);
+  begin
+
+  end;
+  *)
+
+  procedure TPLPointerHashList.rebuildList(istartindex, iendindex, icount: Integer);
   var
     plstnd: PPLHashNode;
     ibktnwidx, ibktidx, indidx, indlstidx: Integer;
   begin
-    for ibktidx := 0 to self.ibucketcount -1 do
+    for ibktidx := istartindex to iendindex do
     begin
       indlstidx := TPLPointerNodeList(self.arrbuckets[ibktidx]).getLastIndex();
 
@@ -772,7 +780,7 @@ implementation
 
         if plstnd <> nil then
         begin
-          ibktnwidx := plstnd^.ihash mod self.ibucketcount;
+          ibktnwidx := plstnd^.ihash mod icount;
         end;
 
         if (ibktnwidx > -1)
@@ -782,9 +790,9 @@ implementation
           TPLPointerNodeList(self.arrbuckets[ibktnwidx]).addNode(plstnd);
         end;  //if (ibktnwidx > -1) and (ibktnwidx <> ibktidx) then
       end; //for indidx := 0 to indlstidx do
-    end;  //for ibktidx := 0 to self.ibucketcount -1 do
+    end;  //for ibktidx := istartindex to iendindex do
   end;
-
+(*
   procedure TPLPointerHashList.Pack();
   var
     ibkt, ibktnwcnt: Integer;
@@ -824,10 +832,11 @@ implementation
 
       if brbld then
         //Reindex the Nodes
-        self.rebuildList();
+        self.rebuildList(0, self.ibucketcount - 1, self.ibucketcount);
 
     end; //if ibktnwcnt < self.ibucketcount then
   end;
+  *)
 
   procedure TPLPointerHashList.Clear();
   var

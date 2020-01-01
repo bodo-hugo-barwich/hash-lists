@@ -217,7 +217,7 @@ uses
 
         if brbld then
           //Reindex the Nodes
-          self.rebuildList();
+          self.rebuildList(0, Self.ibucketcount - 1, Self.ibucketcount);
 
       end;  //if floor(self.imaxkeycount / self.iloadfactor) > self.ibucketcount then
     end; //if icapacity > self.imaxkeycount then
