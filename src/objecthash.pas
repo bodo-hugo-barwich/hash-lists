@@ -34,6 +34,7 @@ type
   public
     procedure setOwned(bisowned: Boolean);
     procedure setCapacity(icapacity: Integer); override;
+    procedure Add(const skey: String; value: TObject); overload;
     procedure setValue(const skey: String; value: TObject); overload;
     property Owned: Boolean read bowned write setOwned;
   end;
@@ -250,6 +251,53 @@ uses
 
   end;
 
+procedure TPLObjectHashList.Add(const skey: String; value: TObject);
+var
+  ihsh: Cardinal;
+  ibktidx: Integer;
+begin
+  //Build the Hash Index
+  ihsh := computeHash(@skey);
+  ibktidx := ihsh mod self.ibucketcount;
+
+  if self.psearchednode <> nil then
+  begin
+    if not ((self.psearchednode^.ihash = ihsh)
+      and (self.psearchednode^.skey = skey)) then
+      self.psearchednode := nil;
+
+  end;  //if self.psearchednode <> nil then
+
+
+  if self.psearchednode = nil then
+    self.psearchednode := TPLObjectNodeList(self.arrbuckets[ibktidx]).searchNode(ihsh, @skey);
+
+  if self.psearchednode = nil then
+  begin
+    //Add a New Node
+
+    if self.ikeycount = self.imaxkeycount then
+    begin
+      self.extendList();
+
+      //Recompute Bucket Index
+      ibktidx := ihsh mod self.ibucketcount;
+    end;  //if self.ikeycount = self.imaxkeycount then
+
+    self.psearchednode := TPLObjectNodeList(self.arrbuckets[ibktidx]).addNode(ihsh, @skey, TObject(value));
+
+    inc(self.ikeycount);
+  end
+  else  //The Key is already in the List
+  begin
+    case Self.eduplicatekeys of
+      //Update the Node Value
+      dupAccept: TObject(self.psearchednode^.pvalue) := value;
+      dupError: RaiseListException('Key ' + chr(39) + skey + chr(39) + ': key does already exist!');
+      dupIgnore: ;
+    end;  //case Self.eduplicatekeys of
+  end;  //if self.psearchednode = nil then
+end;
 
   procedure TPLObjectHashList.setValue(const skey: String; value: TObject);
   var

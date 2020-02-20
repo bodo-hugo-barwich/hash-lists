@@ -22,6 +22,7 @@ type
     procedure extendList(brebuild: Boolean = True); override;
   public
     procedure setCapacity(icapacity: Integer); override;
+    procedure Add(const skey: String; svalue: String); overload;
     procedure setValue(const skey: String; svalue: String); overload;
   end;
 
@@ -196,6 +197,53 @@ uses
       Self.rebuildList(0, Self.ibucketcount - 1, Self.ibucketcount);
 
   end;
+
+procedure TPLStringHashList.Add(const skey: String; svalue: String);
+var
+  ihsh: Cardinal;
+  ibktidx: Integer;
+begin
+  //Build the Hash Index
+  ihsh := computeHash(@skey);
+  ibktidx := ihsh mod self.ibucketcount;
+
+  if self.psearchednode <> nil then
+  begin
+    if not ((self.psearchednode^.ihash = ihsh)
+      and (self.psearchednode^.skey = skey)) then
+      self.psearchednode := nil;
+
+  end;  //if self.psearchednode <> nil then
+
+  if self.psearchednode = nil then
+    self.psearchednode := TPLStringNodeList(self.arrbuckets[ibktidx]).searchNode(ihsh, @skey);
+
+  if self.psearchednode = nil then
+  begin
+    //Add a New Node
+
+    if self.ikeycount = self.imaxkeycount then
+    begin
+      self.extendList();
+
+      //Recompute Bucket Index
+      ibktidx := ihsh mod self.ibucketcount;
+    end;  //if self.ikeycount = self.imaxkeycount then
+
+    self.psearchednode := TPLStringNodeList(self.arrbuckets[ibktidx]).addNode(ihsh, @skey, PAnsiString(@svalue));
+
+    inc(self.ikeycount);
+  end
+  else  //The Key is already in the List
+  begin
+    case Self.eduplicatekeys of
+      //Update the Node Value
+      dupAccept: PAnsiString(self.psearchednode^.pvalue)^ := svalue;
+      dupError: RaiseListException('Key ' + chr(39) + skey + chr(39) + ': key does already exist!');
+      dupIgnore: ;
+    end;  //case Self.eduplicatekeys of
+  end;  //if self.psearchednode = nil then
+end;
 
 
   procedure TPLStringHashList.setValue(const skey: String; svalue: String);
