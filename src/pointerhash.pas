@@ -79,7 +79,7 @@ type
     procedure setLoadFactor(ifactor: Integer);
     procedure setGrowFactor(ifactor: Integer);
     procedure setCapacity(icapacity: Integer); virtual;
-    procedure Add(const skey: String; ppointer: Pointer); virtual;
+    function Add(const skey: String; ppointer: Pointer): Boolean; virtual;
     procedure setValue(const skey: String; ppointer: Pointer); virtual;
     procedure removeKey(const skey: String); virtual;
     procedure Clear(); virtual;
@@ -478,6 +478,8 @@ implementation
     self.pcurrentnode := nil;
     self.psearchednode := nil;
 
+    Self.eduplicatekeys := dupAccept;
+
     //Create the Buckets
     self.extendList(False);
   end;
@@ -491,6 +493,8 @@ implementation
     self.ibucketcount := ceil(icapacity / self.iloadfactor) - self.igrowfactor;
     self.pcurrentnode := nil;
     self.psearchednode := nil;
+
+    Self.eduplicatekeys := dupAccept;
 
     if self.ibucketcount < 0 then
       self.ibucketcount := 0;
@@ -508,6 +512,8 @@ implementation
     self.ibucketcount := ceil(icapacity / self.iloadfactor) - self.igrowfactor;
     self.pcurrentnode := nil;
     self.psearchednode := nil;
+
+    Self.eduplicatekeys := dupAccept;
 
     if self.ibucketcount < 0 then
       self.ibucketcount := 0;
@@ -656,11 +662,13 @@ begin
   raise EStringListError.Create(serrormessage);
 end;
 
-procedure TPLPointerHashList.Add(const skey: String; ppointer: Pointer);
+function TPLPointerHashList.Add(const skey: String; ppointer: Pointer): Boolean;
 var
   ihsh: Cardinal;
   ibktidx: Integer;
 begin
+  Result := False;
+
   //Build the Hash Index
   ihsh := computeHash(@skey);
   ibktidx := ihsh mod self.ibucketcount;
@@ -691,12 +699,21 @@ begin
     self.psearchednode := TPLPointerNodeList(self.arrbuckets[ibktidx]).addNode(ihsh, @skey, ppointer);
 
     inc(self.ikeycount);
+
+    //The Value was successfully added
+    Result := True;
   end
   else  //The Key is already in the List
   begin
     case Self.eduplicatekeys of
       //Update the Node Value
-      dupAccept: self.psearchednode^.pvalue := ppointer;
+      dupAccept:
+      begin
+        self.psearchednode^.pvalue := ppointer;
+
+        //The Value was successfully added
+        Result := True;
+      end;
       dupError: RaiseListException('Key ' + chr(39) + skey + chr(39) + ': key does already exist!');
       dupIgnore: ;
     end;  //case Self.eduplicatekeys of

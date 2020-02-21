@@ -1,6 +1,12 @@
 unit tests_pointerhash;
 
 {$mode objfpc}{$H+}
+{$IFOPT D+}
+  {$NOTE debug mode is active}
+{$ELSE}
+  {$DEFINE speedtests}
+{$ENDIF}
+
 
 interface
 
@@ -24,9 +30,15 @@ type
     procedure SetUp; override;
     procedure Teardown; override;
   published
+    procedure TestAddCheckElements;
+    procedure TestAddDuplicateAccept;
+    procedure TestAddDuplicateIgnore;
+    procedure TestAddDuplicateError;
     procedure TestInsertCheckElements;
     procedure TestCheckFirstElement;
     procedure TestCheckNextElement;
+    {$IFDEF speedtests}
+    {$NOTE Speed Tests will be run}
     procedure TestMapInsert1000Elements;
     procedure TestMapLookup1000Elements;
     procedure TestInsert1000Elements;
@@ -35,6 +47,7 @@ type
     procedure TestMapLookup5000Elements;
     procedure TestInsert5000Elements;
     procedure TestLookup5000Elements;
+    {$ENDIF}
   end;
 
  procedure RegisterTests;
@@ -47,7 +60,7 @@ type
 implementation
 
 uses
-  SysUtils, DateUtils;
+  Classes, SysUtils, DateUtils;
 
 
 { here we register all our test classes }
@@ -66,7 +79,7 @@ begin
 
   Self.finsertlimit1000 := 1.1;
   Self.flookuplimit1000 := 1.1;
-  Self.finsertlimit5000 := 6.0;
+  Self.finsertlimit5000 := 6.1;
   Self.flookuplimit5000 := 4.1;
 end;
 
@@ -103,7 +116,303 @@ begin
 end;
 
 (*
-Test Adding 10 Keys and their Values (which should grow the List at least once)
+Test Adding 10 Keys and their Values with the Add()-Method (which should grow the List at least once)
+And Looking up their Values (they must match their inserted Values)
+*)
+procedure TTestsPointerHashList.TestAddCheckElements;
+var
+  psvl: PAnsiString;
+begin
+  New(psvl);
+  psvl^ := 'value1';
+
+  self.lsthshobjs.Add('key1', psvl);
+
+  New(psvl);
+  psvl^ := 'value2';
+
+  self.lsthshobjs.Add('key2', psvl);
+
+  New(psvl);
+  psvl^ := 'value3';
+
+  self.lsthshobjs.Add('key3', psvl);
+
+  New(psvl);
+  psvl^ := 'value4';
+
+  self.lsthshobjs.Add('key4', psvl);
+
+  New(psvl);
+  psvl^ := 'value5';
+
+  self.lsthshobjs.Add('key5', psvl);
+
+  New(psvl);
+  psvl^ := 'value6';
+
+  self.lsthshobjs.Add('key6', psvl);
+
+  New(psvl);
+  psvl^ := 'value7';
+
+  self.lsthshobjs.Add('key7', psvl);
+
+  New(psvl);
+  psvl^ := 'value8';
+
+  self.lsthshobjs.Add('key8', psvl);
+
+  New(psvl);
+  psvl^ := 'value9';
+
+  self.lsthshobjs.Add('key9', psvl);
+
+  New(psvl);
+  psvl^ := 'value10';
+
+  self.lsthshobjs.Add('key10', psvl);
+
+  psvl := self.lsthshobjs['key1'];
+
+  CheckEquals('value1', psvl^, 'LKP - key '  + chr(39) + 'key1' + chr(39)
+    + ' failed! Value is: ' + chr(39) + psvl^ + chr(39));
+
+  psvl := self.lsthshobjs['key2'];
+
+  CheckEquals('value2', psvl^, 'LKP - key '  + chr(39) + 'key2' + chr(39)
+    + ' failed! Value is: ' + chr(39) + psvl^ + chr(39));
+
+  psvl := self.lsthshobjs['key3'];
+
+  CheckEquals('value3', psvl^, 'LKP - key '  + chr(39) + 'key3' + chr(39)
+    + ' failed! Value is: ' + chr(39) + psvl^ + chr(39));
+
+  psvl := self.lsthshobjs['key4'];
+
+  CheckEquals('value4', psvl^, 'LKP - key '  + chr(39) + 'key4' + chr(39)
+    + ' failed! Value is: ' + chr(39) + psvl^ + chr(39));
+
+  psvl := self.lsthshobjs['key5'];
+
+  CheckEquals('value5', psvl^, 'LKP - key '  + chr(39) + 'key5' + chr(39)
+    + ' failed! Value is: ' + chr(39) + psvl^ + chr(39));
+
+  psvl := self.lsthshobjs['key6'];
+
+  CheckEquals('value6', psvl^, 'LKP - key '  + chr(39) + 'key6' + chr(39)
+    + ' failed! Value is: ' + chr(39) + psvl^ + chr(39));
+
+  psvl := self.lsthshobjs['key7'];
+
+  CheckEquals('value7', psvl^, 'LKP - key '  + chr(39) + 'key7' + chr(39)
+    + ' failed! Value is: ' + chr(39) + psvl^ + chr(39));
+
+  psvl := self.lsthshobjs['key8'];
+
+  CheckEquals('value8', psvl^, 'LKP - key '  + chr(39) + 'key8' + chr(39)
+    + ' failed! Value is: ' + chr(39) + psvl^ + chr(39));
+
+  psvl := self.lsthshobjs['key9'];
+
+  CheckEquals('value9', psvl^, 'LKP - key '  + chr(39) + 'key9' + chr(39)
+    + ' failed! Value is: ' + chr(39) + psvl^ + chr(39));
+
+  psvl := self.lsthshobjs['key10'];
+
+  CheckEquals('value10', psvl^, 'LKP - key '  + chr(39) + 'key10' + chr(39)
+    + ' failed! Value is: ' + chr(39) + psvl^ + chr(39));
+
+end;
+
+(*
+Test Adding 3 Keys and their Values with the Add()-Method
+Adding the 4th Value on a duplicate Key.
+The "dupAccept" Bahaviour is enabled which should override the existing Value
+*)
+procedure TTestsPointerHashList.TestAddDuplicateAccept;
+var
+  psinvl, psoutvl: PAnsiString;
+begin
+  //Set Duplicate Key Behaviour to override
+  self.lsthshobjs.Duplicates := dupAccept;
+
+  New(psinvl);
+  psinvl^ := 'value1';
+
+  self.lsthshobjs.Add('key1', psinvl);
+
+  New(psinvl);
+  psinvl^ := 'value2';
+
+  self.lsthshobjs.Add('key2', psinvl);
+
+  New(psinvl);
+  psinvl^ := 'value3';
+
+  self.lsthshobjs.Add('key3', psinvl);
+
+  //Free the old Value "value3"
+  psoutvl := self.lsthshobjs['key3'];
+
+  //Override the Value with new Data
+  New(psinvl);
+  psinvl^ := 'value3.2';
+
+  if self.lsthshobjs.Add('key3', psinvl) then
+  begin
+    //The new Value was added correctly
+    //The old Value must be freed
+    Dispose(psoutvl);
+  end
+  else  //The Value was not added
+  begin
+    //The new Value was unexpectly rejected
+    //The new Value must be freed
+    Dispose(psoutvl);
+
+    //This is a faulty Behaviour with "dupAccept"
+    Check(False, 'INS - TPLPointerHashList.Add() failed!');
+  end;  //if self.lsthshobjs.Add('key3', psinvl) then
+
+  //Should yield the new Value "value3.2"
+  psoutvl := self.lsthshobjs['key3'];
+
+  CheckEquals('value3.2', psoutvl^, 'LKP - key '  + chr(39) + 'key3' + chr(39)
+    + ' failed! Value is: ' + chr(39) + psoutvl^ + chr(39));
+
+end;
+
+(*
+Test Adding 3 Keys and their Values with the Add()-Method
+Adding the 4th Value on a duplicate Key.
+The "dupIgnore" Bahaviour is enabled which should drop the new Value
+*)
+procedure TTestsPointerHashList.TestAddDuplicateIgnore;
+var
+  psinvl, psoutvl: PAnsiString;
+begin
+  //Set Duplicate Key Behaviour to drop
+  self.lsthshobjs.Duplicates := dupIgnore;
+
+  New(psinvl);
+  psinvl^ := 'value1';
+
+  self.lsthshobjs.Add('key1', psinvl);
+
+  New(psinvl);
+  psinvl^ := 'value2';
+
+  self.lsthshobjs.Add('key2', psinvl);
+
+  New(psinvl);
+  psinvl^ := 'value3';
+
+  self.lsthshobjs.Add('key3', psinvl);
+
+  //Should give the existing Value "value3"
+  psoutvl := self.lsthshobjs['key3'];
+
+  //Insert a Value for a duplicate Key
+  New(psinvl);
+  psinvl^ := 'value3.2';
+
+  if self.lsthshobjs.Add('key3', psinvl) then
+  begin
+    //The Value was unexpectly added and the former Value must be freed
+    Dispose(psoutvl);
+
+    //This is a faulty Behaviour with "dupIgnore"
+    Check(False, 'INS - TPLPointerHashList.Add() failed!');
+  end
+  else  //The Value was not added
+  begin
+    //Ignored Value needs to be freed because it was not accepted in the List
+    Dispose(psinvl);
+  end;  //if self.lsthshobjs.Add('key3', psinvl) then
+
+  //Should yield the former Value "value3"
+  psoutvl := self.lsthshobjs['key3'];
+
+  CheckEquals('value3', psoutvl^, 'LKP - key '  + chr(39) + 'key3' + chr(39)
+    + ' failed! Value is: ' + chr(39) + psoutvl^ + chr(39));
+
+end;
+
+(*
+Test Adding 3 Keys and their Values with the Add()-Method
+Adding the 4th Value on a duplicate Key.
+The "dupError" Bahaviour is enabled which should raise an Exception
+*)
+procedure TTestsPointerHashList.TestAddDuplicateError;
+var
+  psinvl, psoutvl: PAnsiString;
+begin
+  //Set Duplicate Key Behaviour to Exception
+  self.lsthshobjs.Duplicates := dupError;
+
+  New(psinvl);
+  psinvl^ := 'value1';
+
+  self.lsthshobjs.Add('key1', psinvl);
+
+  New(psinvl);
+  psinvl^ := 'value2';
+
+  self.lsthshobjs.Add('key2', psinvl);
+
+  New(psinvl);
+  psinvl^ := 'value3';
+
+  self.lsthshobjs.Add('key3', psinvl);
+
+  //Should give the existing Value "value3"
+  psoutvl := self.lsthshobjs['key3'];
+
+  New(psinvl);
+  psinvl^ := 'value3.2';
+
+  try
+    if Self.lsthshobjs.Add('key3', psinvl) then
+    begin
+      //The Value was unexpectly added and the former Value must be freed
+      Dispose(psoutvl);
+
+      //This is a faulty Behaviour with "dupError"
+      Check(False, 'INS - TPLPointerHashList.Add() failed! Duplicate Key was accepted.');
+    end
+    else  //The Value was rejected but No Exception was raised
+    begin
+      //The rejected Value must be freed
+       Dispose(psinvl);
+
+       //This is a faulty Behaviour with "dupError"
+      Check(False, 'INS - TPLPointerHashList.Add() failed! No Exception raised.');
+    end;  //if Self.lsthshobjs.Add('key3', psinvl) then
+  except
+    //The Exception "EStringListError" is expected
+    on e: EStringListError do ;
+    else
+    begin
+      //This is an unexpected Exception
+      Check(False, 'INS - TPLPointerHashList.Add() failed! Unexpected Exception.');
+    end;
+
+    //The rejected Value must be freed
+    Dispose(psinvl);
+  end;  //try
+
+  //Should yield the former Value "value3"
+  psoutvl := self.lsthshobjs['key3'];
+
+  CheckEquals('value3', psoutvl^, 'LKP - key '  + chr(39) + 'key3' + chr(39)
+    + ' failed! Value is: ' + chr(39) + psoutvl^ + chr(39));
+
+end;
+
+
+(*
+Test Adding 10 Keys and their Values with the setValue()-Method (which should grow the List at least once)
 And Looking up their Values (they must match their inserted Values)
 *)
 procedure TTestsPointerHashList.TestInsertCheckElements;
@@ -162,53 +471,53 @@ begin
 
   psvl := self.lsthshobjs.getValue('key1');
 
-  CheckEquals('value1', psvl^, 'key '  + chr(39) + 'key1' + chr(39)
-    + ': value lookup failed! It is: ' + chr(39) + psvl^ + chr(39));
+  CheckEquals('value1', psvl^, 'LKP - key '  + chr(39) + 'key1' + chr(39)
+    + ' failed! Value is: ' + chr(39) + psvl^ + chr(39));
 
   psvl := self.lsthshobjs.getValue('key2');
 
-  CheckEquals('value2', psvl^, 'key '  + chr(39) + 'key2' + chr(39)
-    + ': value lookup failed! It is: ' + chr(39) + psvl^ + chr(39));
+  CheckEquals('value2', psvl^, 'LKP - key '  + chr(39) + 'key2' + chr(39)
+    + ' failed! Value is: ' + chr(39) + psvl^ + chr(39));
 
   psvl := self.lsthshobjs.getValue('key3');
 
-  CheckEquals('value3', psvl^, 'key '  + chr(39) + 'key3' + chr(39)
-    + ': value lookup failed! It is: ' + chr(39) + psvl^ + chr(39));
+  CheckEquals('value3', psvl^, 'LKP - key '  + chr(39) + 'key3' + chr(39)
+    + ' failed! Value is: ' + chr(39) + psvl^ + chr(39));
 
   psvl := self.lsthshobjs.getValue('key4');
 
-  CheckEquals('value4', psvl^, 'key '  + chr(39) + 'key4' + chr(39)
-    + ': value lookup failed! It is: ' + chr(39) + psvl^ + chr(39));
+  CheckEquals('value4', psvl^, 'LKP - key '  + chr(39) + 'key4' + chr(39)
+    + ' failed! Value is: ' + chr(39) + psvl^ + chr(39));
 
   psvl := self.lsthshobjs.getValue('key5');
 
-  CheckEquals('value5', psvl^, 'key '  + chr(39) + 'key5' + chr(39)
-    + ': value lookup failed! It is: ' + chr(39) + psvl^ + chr(39));
+  CheckEquals('value5', psvl^, 'LKP - key '  + chr(39) + 'key5' + chr(39)
+    + ' failed! Value is: ' + chr(39) + psvl^ + chr(39));
 
   psvl := self.lsthshobjs.getValue('key6');
 
-  CheckEquals('value6', psvl^, 'key '  + chr(39) + 'key6' + chr(39)
-    + ': value lookup failed! It is: ' + chr(39) + psvl^ + chr(39));
+  CheckEquals('value6', psvl^, 'LKP - key '  + chr(39) + 'key6' + chr(39)
+    + ' failed! Value is: ' + chr(39) + psvl^ + chr(39));
 
   psvl := self.lsthshobjs.getValue('key7');
 
-  CheckEquals('value7', psvl^, 'key '  + chr(39) + 'key7' + chr(39)
-    + ': value lookup failed! It is: ' + chr(39) + psvl^ + chr(39));
+  CheckEquals('value7', psvl^, 'LKP - key '  + chr(39) + 'key7' + chr(39)
+    + ' failed! Value is: ' + chr(39) + psvl^ + chr(39));
 
   psvl := self.lsthshobjs.getValue('key8');
 
-  CheckEquals('value8', psvl^, 'key '  + chr(39) + 'key8' + chr(39)
-    + ': value lookup failed! It is: ' + chr(39) + psvl^ + chr(39));
+  CheckEquals('value8', psvl^, 'LKP - key '  + chr(39) + 'key8' + chr(39)
+    + ' failed! Value is: ' + chr(39) + psvl^ + chr(39));
 
   psvl := self.lsthshobjs.getValue('key9');
 
-  CheckEquals('value9', psvl^, 'key '  + chr(39) + 'key9' + chr(39)
-    + ': value lookup failed! It is: ' + chr(39) + psvl^ + chr(39));
+  CheckEquals('value9', psvl^, 'LKP - key '  + chr(39) + 'key9' + chr(39)
+    + ' failed! Value is: ' + chr(39) + psvl^ + chr(39));
 
   psvl := self.lsthshobjs.getValue('key10');
 
-  CheckEquals('value10', psvl^, 'key '  + chr(39) + 'key10' + chr(39)
-    + ': value lookup failed! It is: ' + chr(39) + psvl^ + chr(39));
+  CheckEquals('value10', psvl^, 'LKP - key '  + chr(39) + 'key10' + chr(39)
+    + ' failed! Value is: ' + chr(39) + psvl^ + chr(39));
 
 end;
 
@@ -302,6 +611,9 @@ begin
     + 'Returned Key: ' + chr(39) + psvl^ + chr(39));
 
 end;
+
+//Speed Test make only sense when the Test is not compiled in Debug Mode
+{$IFDEF speedtests}
 
 (*
 Reference Performance Test against the Generics.Collections.TFastHashMap
@@ -996,6 +1308,7 @@ begin
 
 
 end;
+{$ENDIF}
 
 end.
 
