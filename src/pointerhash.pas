@@ -66,10 +66,11 @@ type
     ibucketcount: Integer;
     igrowfactor: Integer;
     iloadfactor: Integer;
+    eduplicatekeys: TDuplicates;
     procedure extendList(brebuild: Boolean = True); virtual;
-    //procedure reduceList(isize: Integer); virtual;
     procedure rebuildList(istartindex, iendindex, icount: Integer);
     class function computeHash(pskey: PAnsiString): Cardinal;
+    class procedure RaiseListException(const serrormessage: String);
   public
     constructor Create; overload;
     constructor Create(icapacity: Integer); overload;
@@ -78,9 +79,9 @@ type
     procedure setLoadFactor(ifactor: Integer);
     procedure setGrowFactor(ifactor: Integer);
     procedure setCapacity(icapacity: Integer); virtual;
+    function Add(const skey: String; ppointer: Pointer): Boolean; virtual;
     procedure setValue(const skey: String; ppointer: Pointer); virtual;
     procedure removeKey(const skey: String); virtual;
-    //procedure Pack(); virtual;
     procedure Clear(); virtual;
     function getValue(const skey: String): Pointer; virtual;
     function hasKey(const skey: String): Boolean;
@@ -89,6 +90,7 @@ type
     function getCurrentKey(): String;
     function getCurrentValue(): Pointer; virtual;
     property KeyData[const skey: String]: Pointer read getValue write setValue; default;
+    property Duplicates: TDuplicates read eduplicatekeys write eduplicatekeys;
     property LoadFactor: Integer read iloadfactor write setLoadFactor;
     property GrowFactor: Integer read igrowfactor write setGrowFactor;
     property Capacity: Integer read imaxkeycount write setCapacity;
@@ -476,6 +478,8 @@ implementation
     self.pcurrentnode := nil;
     self.psearchednode := nil;
 
+    Self.eduplicatekeys := dupAccept;
+
     //Create the Buckets
     self.extendList(False);
   end;
@@ -489,6 +493,8 @@ implementation
     self.ibucketcount := ceil(icapacity / self.iloadfactor) - self.igrowfactor;
     self.pcurrentnode := nil;
     self.psearchednode := nil;
+
+    Self.eduplicatekeys := dupAccept;
 
     if self.ibucketcount < 0 then
       self.ibucketcount := 0;
@@ -506,6 +512,8 @@ implementation
     self.ibucketcount := ceil(icapacity / self.iloadfactor) - self.igrowfactor;
     self.pcurrentnode := nil;
     self.psearchednode := nil;
+
+    Self.eduplicatekeys := dupAccept;
 
     if self.ibucketcount < 0 then
       self.ibucketcount := 0;
@@ -649,6 +657,70 @@ implementation
     {$Q+}{$R+}
   end;
 
+class procedure TPLPointerHashList.RaiseListException(const serrormessage: String);
+begin
+  raise EStringListError.Create(serrormessage);
+end;
+
+function TPLPointerHashList.Add(const skey: String; ppointer: Pointer): Boolean;
+var
+  ihsh: Cardinal;
+  ibktidx: Integer;
+begin
+  Result := False;
+
+  //Build the Hash Index
+  ihsh := computeHash(@skey);
+  ibktidx := ihsh mod self.ibucketcount;
+
+  if self.psearchednode <> nil then
+  begin
+    if not ((self.psearchednode^.ihash = ihsh)
+      and (self.psearchednode^.skey = skey)) then
+      self.psearchednode := nil;
+
+  end;  //if self.psearchednode <> nil then
+
+  if self.psearchednode = nil then
+    self.psearchednode := TPLPointerNodeList(self.arrbuckets[ibktidx]).searchNode(ihsh, @skey);
+
+  if self.psearchednode = nil then
+  begin
+    //Add a New Node
+
+    if self.ikeycount = self.imaxkeycount then
+    begin
+      self.extendList();
+
+      //Recompute Bucket Index
+      ibktidx := ihsh mod self.ibucketcount;
+    end;  //if self.ikeycount = self.imaxkeycount then
+
+    self.psearchednode := TPLPointerNodeList(self.arrbuckets[ibktidx]).addNode(ihsh, @skey, ppointer);
+
+    inc(self.ikeycount);
+
+    //The Value was successfully added
+    Result := True;
+  end
+  else  //The Key is already in the List
+  begin
+    case Self.eduplicatekeys of
+      //Update the Node Value
+      dupAccept:
+      begin
+        self.psearchednode^.pvalue := ppointer;
+
+        //The Value was successfully added
+        Result := True;
+      end;
+      dupError: RaiseListException('Key ' + chr(39) + skey + chr(39) + ': key does already exist!');
+      dupIgnore: ;
+    end;  //case Self.eduplicatekeys of
+  end;  //if self.psearchednode = nil then
+end;
+
+
   procedure TPLPointerHashList.setValue(const skey: String; ppointer: Pointer);
   var
     ihsh: Cardinal;
@@ -757,13 +829,6 @@ implementation
 
   end;
 
-(*
-  procedure TPLPointerHashList.reduceList(isize: Integer);
-  begin
-
-  end;
-  *)
-
   procedure TPLPointerHashList.rebuildList(istartindex, iendindex, icount: Integer);
   var
     plstnd: PPLHashNode;
@@ -792,51 +857,6 @@ implementation
       end; //for indidx := 0 to indlstidx do
     end;  //for ibktidx := istartindex to iendindex do
   end;
-(*
-  procedure TPLPointerHashList.Pack();
-  var
-    ibkt, ibktnwcnt: Integer;
-    brbld: Boolean = False;
-  begin
-    ibktnwcnt := ceil(self.ikeycount / self.iloadfactor);
-
-    //Forcing a uneven Bucket Count
-    if (ibktnwcnt mod 2) = 0 then
-      dec(ibktnwcnt);
-
-    if ibktnwcnt < self.ibucketcount then
-    begin
-
-
-
-
-
-
-
-      for ibkt := ibktnwcnt to self.ibucketcount - 1 do
-      begin
-        if self.arrbuckets[ibkt] = nil then
-        begin
-          self.arrbuckets[ibkt] := TPLPointerNodeList.Create(ibkt, self.iloadfactor);
-
-          brbld := True;
-        end;  //if self.arrbuckets[ibkt] = nil then
-      end;  //for ibkt := 0 to self.ibucketcount - 1 do
-
-
-      SetLength(self.arrbuckets, self.ibucketcount);
-
-
-      //Calculate the Max. Key Count
-      self.imaxkeycount := self.ibucketcount * self.iloadfactor;
-
-      if brbld then
-        //Reindex the Nodes
-        self.rebuildList(0, self.ibucketcount - 1, self.ibucketcount);
-
-    end; //if ibktnwcnt < self.ibucketcount then
-  end;
-  *)
 
   procedure TPLPointerHashList.Clear();
   var
