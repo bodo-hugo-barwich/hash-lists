@@ -53,10 +53,10 @@ Section 1.3 : TPLPointerHashList
 
 Method Description
 ------------------
+Add  
 Clear  
 Create  
 Destroy  
-getCount  
 getCurrentKey  
 getCurrentValue
  
@@ -65,12 +65,30 @@ hasKey
 moveFirst  
 moveNext  
 removeKey  
-setValue
+setCapacity
  
+setGrowFactor  
+setLoadFactor  
+setValue  
 ------------------------------------------------------------------------
 
 
-1.3.2 : TPLPointerHashList.Create
+1.3.2 : Property overview
+------------------------------------------------------------------------
+
+
+Properties Access Description
+-----------------------------
+Capacity rw  
+Count r  
+Duplicates rw  
+GrowFactor rw  
+KeyData rw  
+LoadFactor rw  
+------------------------------------------------------------------------
+
+
+1.3.3 : TPLPointerHashList.Create
 ------------------------------------------------------------------------
 
 
@@ -78,13 +96,15 @@ Procedure:
 
 Declaration:
 
-constructor Create
+constructor Create;  Overload
+constructor Create(icapacity: Integer);  Overload
+constructor Create(icapacity: Integer; ifactor: Integer);  Overload
 
 Visibility:
 public
 
 
-1.3.3 : TPLPointerHashList.Destroy
+1.3.4 : TPLPointerHashList.Destroy
 ------------------------------------------------------------------------
 
 
@@ -98,7 +118,63 @@ Visibility:
 public
 
 
-1.3.4 : TPLPointerHashList.setValue
+1.3.5 : TPLPointerHashList.setLoadFactor
+------------------------------------------------------------------------
+
+
+Procedure:
+
+Declaration:
+
+procedure setLoadFactor(ifactor: Integer)
+
+Visibility:
+public
+
+
+1.3.6 : TPLPointerHashList.setGrowFactor
+------------------------------------------------------------------------
+
+
+Procedure:
+
+Declaration:
+
+procedure setGrowFactor(ifactor: Integer)
+
+Visibility:
+public
+
+
+1.3.7 : TPLPointerHashList.setCapacity
+------------------------------------------------------------------------
+
+
+Procedure:
+
+Declaration:
+
+procedure setCapacity(icapacity: Integer);  Virtual
+
+Visibility:
+public
+
+
+1.3.8 : TPLPointerHashList.Add
+------------------------------------------------------------------------
+
+
+Procedure:
+
+Declaration:
+
+function Add(const skey: string; ppointer: Pointer) : Boolean;  Virtual
+
+Visibility:
+public
+
+
+1.3.9 : TPLPointerHashList.setValue
 ------------------------------------------------------------------------
 
 
@@ -112,7 +188,7 @@ Visibility:
 public
 
 
-1.3.5 : TPLPointerHashList.removeKey
+1.3.10 : TPLPointerHashList.removeKey
 ------------------------------------------------------------------------
 
 
@@ -126,7 +202,7 @@ Visibility:
 public
 
 
-1.3.6 : TPLPointerHashList.Clear
+1.3.11 : TPLPointerHashList.Clear
 ------------------------------------------------------------------------
 
 
@@ -140,7 +216,7 @@ Visibility:
 public
 
 
-1.3.7 : TPLPointerHashList.getValue
+1.3.12 : TPLPointerHashList.getValue
 ------------------------------------------------------------------------
 
 
@@ -154,7 +230,7 @@ Visibility:
 public
 
 
-1.3.8 : TPLPointerHashList.hasKey
+1.3.13 : TPLPointerHashList.hasKey
 ------------------------------------------------------------------------
 
 
@@ -168,7 +244,7 @@ Visibility:
 public
 
 
-1.3.9 : TPLPointerHashList.moveFirst
+1.3.14 : TPLPointerHashList.moveFirst
 ------------------------------------------------------------------------
 
 
@@ -182,7 +258,7 @@ Visibility:
 public
 
 
-1.3.10 : TPLPointerHashList.moveNext
+1.3.15 : TPLPointerHashList.moveNext
 ------------------------------------------------------------------------
 
 
@@ -196,7 +272,7 @@ Visibility:
 public
 
 
-1.3.11 : TPLPointerHashList.getCurrentKey
+1.3.16 : TPLPointerHashList.getCurrentKey
 ------------------------------------------------------------------------
 
 
@@ -210,7 +286,7 @@ Visibility:
 public
 
 
-1.3.12 : TPLPointerHashList.getCurrentValue
+1.3.17 : TPLPointerHashList.getCurrentValue
 ------------------------------------------------------------------------
 
 
@@ -224,18 +300,112 @@ Visibility:
 public
 
 
-1.3.13 : TPLPointerHashList.getCount
+1.3.18 : TPLPointerHashList.KeyData
 ------------------------------------------------------------------------
 
 
-Procedure:
+
+Property:
 
 Declaration:
 
-function getCount : Integer
+Property KeyData[skey: string]: Pointer; default
 
 Visibility:
 public
+
+Access:
+Read,Write
+
+
+1.3.19 : TPLPointerHashList.Duplicates
+------------------------------------------------------------------------
+
+
+
+Property:
+
+Declaration:
+
+Property Duplicates : TDuplicates
+
+Visibility:
+public
+
+Access:
+Read,Write
+
+
+1.3.20 : TPLPointerHashList.LoadFactor
+------------------------------------------------------------------------
+
+
+
+Property:
+
+Declaration:
+
+Property LoadFactor : Integer
+
+Visibility:
+public
+
+Access:
+Read,Write
+
+
+1.3.21 : TPLPointerHashList.GrowFactor
+------------------------------------------------------------------------
+
+
+
+Property:
+
+Declaration:
+
+Property GrowFactor : Integer
+
+Visibility:
+public
+
+Access:
+Read,Write
+
+
+1.3.22 : TPLPointerHashList.Capacity
+------------------------------------------------------------------------
+
+
+
+Property:
+
+Declaration:
+
+Property Capacity : Integer
+
+Visibility:
+public
+
+Access:
+Read,Write
+
+
+1.3.23 : TPLPointerHashList.Count
+------------------------------------------------------------------------
+
+
+
+Property:
+
+Declaration:
+
+Property Count : Integer
+
+Visibility:
+public
+
+Access:
+Read
 
 
 ------------------------------------------------------------------------
@@ -266,16 +436,30 @@ Create
 Destroy  
 getLastIndex  
 getNode  
+Pack  
+reindexList  
 removeNode  
 searchIndex  
 searchNode  
-searchValue  
+searchValue
+ 
+setGrowFactor  
 setValue  
 unsetIndex  
 ------------------------------------------------------------------------
 
 
-1.4.3 : TPLPointerNodeList.Create
+1.4.3 : Property overview
+------------------------------------------------------------------------
+
+
+Properties Access Description
+-----------------------------
+GrowFactor rw  
+------------------------------------------------------------------------
+
+
+1.4.4 : TPLPointerNodeList.Create
 ------------------------------------------------------------------------
 
 
@@ -285,12 +469,15 @@ Declaration:
 
 constructor Create;  Virtual;  Overload
 constructor Create(iindex: Integer);  Virtual;  Overload
+constructor Create(iindex: Integer; ifactor: Integer);  Virtual
+        
+         ;  Overload
 
 Visibility:
 public
 
 
-1.4.4 : TPLPointerNodeList.Destroy
+1.4.5 : TPLPointerNodeList.Destroy
 ------------------------------------------------------------------------
 
 
@@ -304,7 +491,7 @@ Visibility:
 public
 
 
-1.4.5 : TPLPointerNodeList.addNode
+1.4.6 : TPLPointerNodeList.setGrowFactor
 ------------------------------------------------------------------------
 
 
@@ -312,15 +499,29 @@ Procedure:
 
 Declaration:
 
-function addNode(pnode: PPLHashNode) : Integer;  Overload
-function addNode(ihash: Cardinal; pskey: PAnsiString; ppointer: Pointer)
-                 : Integer;  Overload
+procedure setGrowFactor(ifactor: Integer)
 
 Visibility:
 public
 
 
-1.4.6 : TPLPointerNodeList.setValue
+1.4.7 : TPLPointerNodeList.addNode
+------------------------------------------------------------------------
+
+
+Procedure:
+
+Declaration:
+
+function addNode(pnode: PPLHashNode) : PPLHashNode;  Overload
+function addNode(ihash: Cardinal; pskey: PAnsiString; ppointer: Pointer)
+                 : PPLHashNode;  Overload
+
+Visibility:
+public
+
+
+1.4.8 : TPLPointerNodeList.setValue
 ------------------------------------------------------------------------
 
 
@@ -337,7 +538,7 @@ Visibility:
 public
 
 
-1.4.7 : TPLPointerNodeList.unsetIndex
+1.4.9 : TPLPointerNodeList.unsetIndex
 ------------------------------------------------------------------------
 
 
@@ -351,7 +552,7 @@ Visibility:
 public
 
 
-1.4.8 : TPLPointerNodeList.removeNode
+1.4.10 : TPLPointerNodeList.removeNode
 ------------------------------------------------------------------------
 
 
@@ -369,7 +570,35 @@ Visibility:
 public
 
 
-1.4.9 : TPLPointerNodeList.Clear
+1.4.11 : TPLPointerNodeList.reindexList
+------------------------------------------------------------------------
+
+
+Procedure:
+
+Declaration:
+
+procedure reindexList
+
+Visibility:
+public
+
+
+1.4.12 : TPLPointerNodeList.Pack
+------------------------------------------------------------------------
+
+
+Procedure:
+
+Declaration:
+
+procedure Pack
+
+Visibility:
+public
+
+
+1.4.13 : TPLPointerNodeList.Clear
 ------------------------------------------------------------------------
 
 
@@ -383,7 +612,7 @@ Visibility:
 public
 
 
-1.4.10 : TPLPointerNodeList.getNode
+1.4.14 : TPLPointerNodeList.getNode
 ------------------------------------------------------------------------
 
 
@@ -397,7 +626,7 @@ Visibility:
 public
 
 
-1.4.11 : TPLPointerNodeList.searchNode
+1.4.15 : TPLPointerNodeList.searchNode
 ------------------------------------------------------------------------
 
 
@@ -414,7 +643,7 @@ Visibility:
 public
 
 
-1.4.12 : TPLPointerNodeList.searchValue
+1.4.16 : TPLPointerNodeList.searchValue
 ------------------------------------------------------------------------
 
 
@@ -431,7 +660,7 @@ Visibility:
 public
 
 
-1.4.13 : TPLPointerNodeList.searchIndex
+1.4.17 : TPLPointerNodeList.searchIndex
 ------------------------------------------------------------------------
 
 
@@ -448,7 +677,7 @@ Visibility:
 public
 
 
-1.4.14 : TPLPointerNodeList.getLastIndex
+1.4.18 : TPLPointerNodeList.getLastIndex
 ------------------------------------------------------------------------
 
 
@@ -460,6 +689,24 @@ function getLastIndex : Integer
 
 Visibility:
 public
+
+
+1.4.19 : TPLPointerNodeList.GrowFactor
+------------------------------------------------------------------------
+
+
+
+Property:
+
+Declaration:
+
+Property GrowFactor : Integer
+
+Visibility:
+public
+
+Access:
+Read,Write
 
 
 ========================================================================
@@ -493,11 +740,41 @@ Section 2.2 : TPLStringHashList
 
 Method Description
 ------------------
+Add  
+setCapacity  
 setValue  
 ------------------------------------------------------------------------
 
 
-2.2.2 : TPLStringHashList.setValue
+2.2.2 : TPLStringHashList.setCapacity
+------------------------------------------------------------------------
+
+
+Procedure:
+
+Declaration:
+
+procedure setCapacity(icapacity: Integer);  Override
+
+Visibility:
+public
+
+
+2.2.3 : TPLStringHashList.Add
+------------------------------------------------------------------------
+
+
+Procedure:
+
+Declaration:
+
+procedure Add(const skey: string; svalue: string);  Overload
+
+Visibility:
+public
+
+
+2.2.4 : TPLStringHashList.setValue
 ------------------------------------------------------------------------
 
 
@@ -561,7 +838,7 @@ Declaration:
 
 function addNode(ihash: Cardinal; pskey: PAnsiString; 
                
-psvalue: PAnsiString) : Integer;  Overload
+psvalue: PAnsiString) : PPLHashNode;  Overload
 
 Visibility:
 public
