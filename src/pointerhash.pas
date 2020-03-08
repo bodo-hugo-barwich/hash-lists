@@ -9,7 +9,7 @@ uses
 
 type
   PPLHashNode = ^TPLHashNode;
-  TPLHashNode = packed record
+  TPLHashNode = record
     ibucketindex: Integer;
     inodeindex: Integer;
     ihash: Cardinal;
