@@ -1,0 +1,108 @@
+﻿@startuml
+package "unit 'pointerhash'" <<Rectangle>> {
+
+class TPLPointerHashList {
+.. Properties ..
+{field} +Capacity : Integer [rw]
+{field} +Count : Integer [r]
+{field} +Duplicates : TDuplicates [rw]
+{field} +GrowFactor: Integer [rw]
+{field} +KeyData[skey: string] : Pointer [rw] (default)
+{field} +LoadFactor : Integer [rw] 
+__
+.. Constructors ..
++Create()
++Create(icapacity: Integer)
++Create(icapacity: Integer; ifactor: Integer)
++Destroy()
+.. Administration Methods ..
++setLoadFactor(ifactor: Integer)
++setGrowFactor(ifactor: Integer)
++setCapacity(icapacity: Integer)
++Add(const skey: string; ppointer: Pointer) : Boolean
++setValue(const skey: string; ppointer: Pointer)
++removeKey(const skey: string)
++Clear()
+.. Consultation Methods ..
+{method} +getValue(const skey: string) : Pointer
+{method} +hasKey(const skey: string) : Boolean
+{method} +moveFirst() : Boolean
+{method} +moveNext() : Boolean
+{method} +getCurrentKey() : string
+{method} +getCurrentValue() : Pointer
+}
+
+TPLPointerHashList "1" *-- "1" TDuplicates : uses
+TPLPointerHashList -[hidden]> TDuplicates
+enum TDuplicates {
+  dupIgnore
+  dupAccept
+  dupError
+}
+note right of TDuplicates : from Types.TDuplicates
+
+
+TPLPointerHashList "1" *-- "n" TPLPointerNodeList : contains
+class TPLPointerNodeList {
+.. Properties ..
+{field} +GrowFactor : Integer [rw]
+__
+.. Constructors ..
++Create()
++Create(iindex: Integer)
++Create(iindex: Integer; ifactor: Integer)
++Destroy()
+.. Administration Methods ..
++setGrowFactor(ifactor: Integer)
++addNode(pnode: PPLHashNode) : PPLHashNode
++addNode(ihash: Cardinal; pskey: PAnsiString; ppointer: Pointer) : PPLHashNode
++setValue(ihash: Cardinal; pskey: PansiString; ppointer: Pointer)
++setValue(pskey: PAnsiString; ppointer: Pointer)
++unsetIndex(iindex: Integer)
++removeNode(pnode: PPLHashNode) : Boolean
++removeNode(ihash: Cardinal; pskey: PAnsiString) : Boolean
++removeNode(pskey: PAnsiString) : Boolean
++reindexList()
++Clear()
+.. Consultation Methods ..
++getNode(iindex: Integer) : PPLHashNode
++searchNode(ihash: Cardinal; pskey: PAnsiString) : PPLHashNode
++searchNode(pskey: PAnsiString) : PPLHashNode
++searchValue(ihash: Cardinal; pskey: PAnsiString) : Pointer
++searchValue(pskey: PAnsiString) : Pointer
++searchIndex(ihash: Cardinal; pskey: PAnsiString) : Integer
++searchIndex(pskey: PAnsiString) : Integer
++getLastIndex() : Integer
+}
+
+
+note right of TPLPointerNodeList
+PAnsiString : Pointer to String
+end note
+
+
+TPLPointerNodeList "1" *-- "n" TPLHashNode : contains
+class TPLHashNode << (S,#FF7700) >> {
++skey : String
++ihash : Cardinal
++pvalue : Pointer
++ibucketindex : Integer
++inodeindex : Integer
+}
+hide TPLHashNode methods
+note right of TPLHashNode
+Structure that stores 
+the Key and its Data
+end note
+
+note bottom of TPLHashNode
+PPLHashNode : Pointer to TPLHashNode
+end note
+
+
+
+}
+
+@enduml
+
+

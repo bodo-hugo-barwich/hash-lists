@@ -21,6 +21,9 @@ it is beneficial to set the List size beforehand with the `Capacity` Property
 # Documentation
 The Documentation of the Data Structures was generated with the `fpdoc` tool and be found in:\
 [Project Documentation in TXT format](doc/hash-lists.txt)
+The Class Diagramm kann be found at 
+[Class Diagramm for the Unit 'pointerhash'](doc/pointerhash.jpg)
+
 
 # Motivation
 Using the FCL Data Types `TFPObjectHashTable` and `TFPStringHashTable` the performance of the Application dropped drastically.

@@ -1,6 +1,8 @@
 #Lazarus Backup Directories
 backup
 backup/*
+#Lazarus Session Storage File
+*.lps
 
 #Build Directories
 lib
