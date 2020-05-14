@@ -247,7 +247,7 @@ uses
 
     if brebuild then
       //Reindex the Nodes
-      self.rebuildList();
+      Self.rebuildList(0, Self.ibucketcount - 1, Self.ibucketcount);
 
   end;
 
