@@ -90,7 +90,7 @@
         <PackageName Value="fptest"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="5">
+    <Units Count="6">
       <Unit0>
         <Filename Value="testshashlists.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -111,6 +111,10 @@
         <Filename Value="../src/objecthash.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit4>
+      <Unit5>
+        <Filename Value="src/tests_objecthash.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit5>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

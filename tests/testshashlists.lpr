@@ -3,7 +3,7 @@ program testshashlists;
 {$mode objfpc}{$H+}
 
 uses
-  Classes, TextTestRunner, tests_pointerhash;
+  Classes, TextTestRunner, tests_pointerhash, tests_objecthash;
 
 
 begin
