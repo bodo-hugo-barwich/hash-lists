@@ -31,6 +31,10 @@ jobs:
       # Install the FreePascal Compiler
       - name: Install the FreePascal Compiler
         run: sudo apt-get install fpc fp-utils
+
+      # Create Compiling Directories
+      - name: Create Compiling Directories
+        run: mkdir -p ./lib/x86_64-linux/
         
       # Compile the Demo Application
       - name: Compile the Demo Application
