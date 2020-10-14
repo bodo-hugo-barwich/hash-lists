@@ -11,13 +11,21 @@ unit tests_pointerhash;
 interface
 
 uses
-  TestFramework, Generics.Collections, pointerhash;
+  TestFramework
+  {$IFDEF speedtests}
+  , Generics.Collections
+  {$ENDIF}
+  , pointerhash;
 
 type
+  {$IFDEF speedtests}
   TPMap = Specialize TFastHashMap<String, Pointer>;
+  {$ENDIF}
   TTestsPointerHashList = class(TTestCase)
   protected
+    {$IFDEF speedtests}
     mpobjs: TPMap;
+    {$ENDIF}
     lsthshobjs: TPLPointerHashList;
     //Allover defined Execution Time Limit for 1000 Insertions
     finsertlimit1000: Single;
@@ -74,7 +82,9 @@ end;
 }
 procedure TTestsPointerHashList.SetUp;
 begin
+  {$IFDEF speedtests}
   Self.mpobjs:= TPMap.Create;
+  {$ENDIF}
   Self.lsthshobjs := TPLPointerHashList.Create();
 
   Self.finsertlimit1000 := 1.1;
@@ -88,9 +98,12 @@ end;
 }
 procedure TTestsPointerHashList.Teardown;
 var
+  {$IFDEF speedtests}
   sky: String;
+  {$ENDIF}
   psvl: PAnsiString;
 begin
+  {$IFDEF speedtests}
   for sky in self.mpobjs.Keys do
   begin
     psvl := self.mpobjs[sky];
@@ -101,6 +114,7 @@ begin
   end;  //for sky in self.mpobjs.Keys do
 
   self.mpobjs.Free;
+  {$ENDIF}
 
 
   if self.lsthshobjs.moveFirst then

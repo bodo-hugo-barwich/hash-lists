@@ -15,11 +15,11 @@
         <CompilerOptions>
           <Version Value="11"/>
           <Target>
-            <Filename Value="testshashlists.run"/>
+            <Filename Value="tests_hash-lists.dbg.run"/>
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
-            <Libraries Value="../../fptest/src;../src"/>
+            <Libraries Value="../src"/>
             <OtherUnitFiles Value="../src;src"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
@@ -54,11 +54,11 @@
         <CompilerOptions>
           <Version Value="11"/>
           <Target>
-            <Filename Value="testshashlists.run"/>
+            <Filename Value="tests_hash-lists.run"/>
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
-            <Libraries Value="../../fptest/src;../src"/>
+            <Libraries Value="../src"/>
             <OtherUnitFiles Value="../src;src;../../generics.collections/src"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
