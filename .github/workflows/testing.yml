@@ -28,12 +28,10 @@ jobs:
       - name: Check for the FreePascal Compiler
         run: sudo apt-get update && apt-cache search fpc
 
-      # Check for the FreePascal Compiler
+      # Install the FreePascal Compiler
       - name: Install the FreePascal Compiler
         run: sudo apt-get install fpc fp-utils
         
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
-        run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+      # Compile the Demo Application
+      - name: Compile the Demo Application
+        run: /usr/bin/fpc -MObjFPC -Scghi -CX -Cg -O3 -XX -l -vewnhibq -Fi./lib/x86_64-linux -Fu./src -Fu./ -FU./lib/x86_64-linux/ -FE./ -o./demo_hash-lists.run demohashlists.pas
