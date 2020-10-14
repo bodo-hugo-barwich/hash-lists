@@ -32,19 +32,22 @@ var
   ErrorMsg: String;
 begin
   // quick check parameters
-  ErrorMsg:=CheckOptions('h', 'help');
-  if ErrorMsg<>'' then begin
+  ErrorMsg := CheckOptions('hd', ['help', 'debug']);
+
+  if ErrorMsg<>'' then
+  begin
     ShowException(Exception.Create(ErrorMsg));
     Terminate;
     Exit;
-  end;
+  end;  //if ErrorMsg<>'' then
 
   // parse parameters
-  if HasOption('h', 'help') then begin
+  if HasOption('h', 'help') then
+  begin
     WriteHelp;
     Terminate;
     Exit;
-  end;
+  end;  //if HasOption('h', 'help') then
 
 (*   *)
   hshmap := TPLPointerHashList.Create(2, 2);
@@ -79,15 +82,19 @@ begin
   if psvl <> nil then Write(psvl^);
   WriteLn(chr(39));
 
-  strmap.setValue('trying a somwhat very long key 1', 'inserting it''s somewhat very long value 1');
+  strmap.setValue('trying a somwhat very long key 1', 'inserting its somewhat very long value 1');
 
   WriteLn('hsh map (cnt: ', chr(39), hshmap.Count, chr(39), '):');
 
-  WriteLn('Sleeping 30 s ...');
+  // parse parameters
+  if HasOption('d', 'debug') then
+  begin
+    WriteLn('Sleeping 30 s ...');
 
-  Sleep(30000);
+    Sleep(30000);
 
-  WriteLn('Sleeping 30 s done.');
+    WriteLn('Sleeping 30 s done.');
+  end;  //if HasOption('d', 'debug') then
 
   if hshmap.moveFirst() then
   begin

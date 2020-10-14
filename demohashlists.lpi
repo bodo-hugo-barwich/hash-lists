@@ -20,7 +20,7 @@
         <CompilerOptions>
           <Version Value="11"/>
           <Target>
-            <Filename Value="demo_hash-lists.run"/>
+            <Filename Value="demo_hash-lists.dbg.run"/>
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
