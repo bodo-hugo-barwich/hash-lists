@@ -42,7 +42,7 @@ jobs:
       - name: Compile the Demo Application and the Test Application
         run: |
           /usr/bin/fpc  -MObjFPC -Scaghi -Cg -CirotR -gw2 -godwarfsets -gl -gh -Xg -gt -l -vewnhibq -Fi./lib/x86_64-linux -Fu./src -Fu./ -FU./lib/x86_64-linux/ -FE./ -o./demo_hash-lists.dbg.run demohashlists.pas    
-          /usr/bin/fpc  -MObjFPC -Scaghi -Cg -CirotR -gw2 -godwarfsets -gl -gh -Xg -gt -l -vewnhibq -Fi./tests/lib/x86_64-linux -Fl./src -Fu./src -Fu./tests/src -Fu/usr/lib/lazarus/2.0.0/packager/units/x86_64-linux -Fu./tests/ -FU./tests/lib/x86_64-linux/ -FE./tests/ -o./tests/tests_hash-lists.dbg.run testshashlists.lpr
+          /usr/bin/fpc  -MObjFPC -Scaghi -Cg -CirotR -gw2 -godwarfsets -gl -gh -Xg -gt -l -vewnhibq -Fi./tests/lib/x86_64-linux -Fl./src -Fu./src -Fu./tests/src -Fu/usr/lib/lazarus/2.0.0/packager/units/x86_64-linux -Fu./tests/ -FU./tests/lib/x86_64-linux/ -FE./tests/ -o./tests/tests_hash-lists.dbg.run ./tests/testshashlists.lpr
         
       # Try the Demo Application and run the Test Application
       - name: Try the Demo Application and run the Test Application
