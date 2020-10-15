@@ -38,4 +38,8 @@ jobs:
         
       # Compile the Demo Application
       - name: Compile the Demo Application
-        run: /usr/bin/fpc -MObjFPC -Scghi -CX -Cg -O3 -XX -l -vewnhibq -Fi./lib/x86_64-linux -Fu./src -Fu./ -FU./lib/x86_64-linux/ -FE./ -o./demo_hash-lists.run demohashlists.pas
+        run: /usr/bin/fpc  -MObjFPC -Scaghi -Cg -CirotR -gw2 -godwarfsets -gl -gh -Xg -gt -l -vewnhibq -Fi./lib/x86_64-linux -Fu./src -Fu./ -FU./lib/x86_64-linux/ -FE./ -o./demo_hash-lists.dbg.run demohashlists.pas
+        
+      # Try the Demo Application
+      - name: Try the Demo Application
+        run: ./demo_hash-lists.dbg.run
