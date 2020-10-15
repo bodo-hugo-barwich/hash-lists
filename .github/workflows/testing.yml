@@ -31,6 +31,10 @@ jobs:
       # Install the FreePascal Compiler
       - name: Install the FreePascal Compiler
         run: sudo apt-get install fpc fp-utils
+        
+      # Clone fptest Project
+      - name: Clone fptest Project
+        run: git clone https://github.com/graemeg/fptest.git ../fptest
 
       # Create Compiling Directories
       - name: Create Compiling Directories
