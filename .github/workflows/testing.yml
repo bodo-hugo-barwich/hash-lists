@@ -34,7 +34,11 @@ jobs:
         
       # Clone fptest Project
       - name: Clone fptest Project
-        run: git clone https://github.com/graemeg/fptest.git ../fptest
+        run: |
+          pwd ; ls -lah 
+          git clone https://github.com/graemeg/fptest.git ../fptest
+          ls -lahd ../fptest
+          ls -lah ../fptest
 
       # Create Compiling Directories
       - name: Create Compiling Directories
