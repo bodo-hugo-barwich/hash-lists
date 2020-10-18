@@ -63,5 +63,7 @@ jobs:
       # Try the Demo Application and run the Test Application
       - name: Try the Demo Application and run the Test Application
         run: |
-          ./demo_hash-lists.dbg.run ; echo "EXIT CODE: '$?'"
-          ./tests/tests_hash-lists.dbg.run ; echo "EXIT CODE: '$?'"
+          ./demo_hash-lists.dbg.run 2>&1 | tee ./demo_exec.log
+          echo "Demo Execution Log:" ; cat ./demo_exec.log
+          ./tests/tests_hash-lists.dbg.run 2>&1 | tee ./tests_exec.log
+          echo "Tests Execution Log:" ; cat ./tests_exec.log
