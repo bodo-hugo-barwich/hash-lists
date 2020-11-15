@@ -72,4 +72,4 @@ jobs:
           echo "Tests Execution Log:" ; cat ./tests_exec.log
           echo "Tests Execution Error:" ; cat ./tests_error.log
           echo "Tests Execution Heap:" ; cat ./test_heap.log
-          leak=`cat ./test_heap.log | grep -i "unfreed memory blocks" | awk '{print $1}'` ; if [ $leak -ne 0 ]; then echo "Memory Leaks: $leak" && exit 1; else echo "Memory Leaks: NONE"; fi ;
+          leak=`cat ./test_heap.log | grep -i "unfreed memory blocks" | awk '{print $1}'` ; if [ $leak -gt 1 ]; then echo "Memory Leaks: $leak" && exit 1; else echo "Memory Leaks: NONE"; fi ;
