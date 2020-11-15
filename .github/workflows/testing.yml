@@ -63,7 +63,13 @@ jobs:
       # Try the Demo Application and run the Test Application
       - name: Try the Demo Application and run the Test Application
         run: |
-          ./demo_hash-lists.dbg.run 2>&1 | tee ./demo_exec.log
+          export HEAPTRC="log=demo_heap.log"; ./demo_hash-lists.dbg.run 2>./demo_error.log | tee ./demo_exec.log
           echo "Demo Execution Log:" ; cat ./demo_exec.log
-          ./tests/tests_hash-lists.dbg.run 2>&1 | tee ./tests_exec.log
+          echo "Demo Execution Error:" ; cat ./demo_error.log
+          echo "Demo Execution Heap:" ; cat ./demo_heap.log
+          leak=`cat ./demo_heap.log | grep -i "unfreed memory blocks" | awk '{print $1}'` ; if [ $leak -ne 0 ]; then echo "Memory Leaks: $leak" && exit 1; else echo "Memory Leaks: NONE"; fi ;
+          export HEAPTRC="log=test_heap.log"; ./tests/tests_hash-lists.dbg.run 2>./tests_error.log | tee ./tests_exec.log
           echo "Tests Execution Log:" ; cat ./tests_exec.log
+          echo "Tests Execution Error:" ; cat ./tests_error.log
+          echo "Tests Execution Heap:" ; cat ./test_heap.log
+          leak=`cat ./test_heap.log | grep -i "unfreed memory blocks" | awk '{print $1}'` ; if [ $leak -ne 0 ]; then echo "Memory Leaks: $leak" && exit 1; else echo "Memory Leaks: NONE"; fi ;
