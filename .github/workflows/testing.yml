@@ -63,13 +63,19 @@ jobs:
       # Try the Demo Application and run the Test Application
       - name: Try the Demo Application and run the Test Application
         run: |
-          export HEAPTRC="log=demo_heap.log"; ./demo_hash-lists.dbg.run 2>./demo_error.log | tee ./demo_exec.log
+          #Execute the Demo Application
+          export HEAPTRC="log=demo_heap.log"; ./demo_hash-lists.dbg.run 2>./demo_error.log 1>./demo_exec.log ; error_code=$?
+          #Demo Application Execution Report
           echo "Demo Execution Log:" ; cat ./demo_exec.log
           echo "Demo Execution Error:" ; cat ./demo_error.log
           echo "Demo Execution Heap:" ; cat ./demo_heap.log
+          error=`cat ./demo_error.log` ; if [ -n "$error" ]; then echo "Demo failed with Error [Code: '$error_code']" && exit 1; fi ;
           leak=`cat ./demo_heap.log | grep -i "unfreed memory blocks" | awk '{print $1}'` ; if [ $leak -ne 0 ]; then echo "Memory Leaks: $leak" && exit 1; else echo "Memory Leaks: NONE"; fi ;
-          export HEAPTRC="log=test_heap.log"; ./tests/tests_hash-lists.dbg.run 2>./tests_error.log | tee ./tests_exec.log
+          #Execute the Application Tests
+          export HEAPTRC="log=test_heap.log"; ./tests/tests_hash-lists.dbg.run 2>./tests_error.log 1>./tests_exec.log ; error_code=$?
+          #Application Tests Execution Report
           echo "Tests Execution Log:" ; cat ./tests_exec.log
           echo "Tests Execution Error:" ; cat ./tests_error.log
           echo "Tests Execution Heap:" ; cat ./test_heap.log
+          error=`cat ./tests_error.log` ; if [ -n "$error" ]; then echo "Tests failed with Error [Code: '$error_code']" && exit 1; fi ;
           leak=`cat ./test_heap.log | grep -i "unfreed memory blocks" | awk '{print $1}'` ; if [ $leak -gt 1 ]; then echo "Memory Leaks: $leak" && exit 1; else echo "Memory Leaks: NONE"; fi ;
