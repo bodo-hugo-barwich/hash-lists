@@ -12,3 +12,7 @@ lib/*
 *.run
 #Debug Version of the Application
 *.dbg
+
+#Runtime Log Files
+*.log
+**/*.log
