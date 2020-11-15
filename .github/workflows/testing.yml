@@ -64,7 +64,9 @@ jobs:
       - name: Try the Demo Application and run the Test Application
         run: |
           #Execute the Demo Application
+          echo "Demo Application: Executing ..."
           export HEAPTRC="log=demo_heap.log"; ./demo_hash-lists.dbg.run 2>./demo_error.log 1>./demo_exec.log ; error_code=$?
+          echo "Demo Application: Execution finished with [$error_code]"
           #Demo Application Execution Report
           echo "Demo Execution Log:" ; cat ./demo_exec.log
           echo "Demo Execution Error:" ; cat ./demo_error.log
@@ -72,7 +74,9 @@ jobs:
           error=`cat ./demo_error.log` ; if [ -n "$error" ]; then echo "Demo failed with Error [Code: '$error_code']" && exit 1; fi ;
           leak=`cat ./demo_heap.log | grep -i "unfreed memory blocks" | awk '{print $1}'` ; if [ $leak -ne 0 ]; then echo "Memory Leaks: $leak" && exit 1; else echo "Memory Leaks: NONE"; fi ;
           #Execute the Application Tests
+          echo "Application Tests: Executing ..."
           export HEAPTRC="log=test_heap.log"; ./tests/tests_hash-lists.dbg.run 2>./tests_error.log 1>./tests_exec.log ; error_code=$?
+          echo "Application Tests: Tests finished with [$error_code]"
           #Application Tests Execution Report
           echo "Tests Execution Log:" ; cat ./tests_exec.log
           echo "Tests Execution Error:" ; cat ./tests_error.log
