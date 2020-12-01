@@ -67,6 +67,7 @@ type
     igrowfactor: Integer;
     iloadfactor: Integer;
     eduplicatekeys: TDuplicates;
+    procedure Init(icapacity: Integer; iload: Integer); virtual;
     procedure extendList(brebuild: Boolean = True); virtual;
     procedure rebuildList(istartindex, iendindex, icount: Integer);
     class function computeHash(pskey: PAnsiString): Cardinal;
@@ -74,7 +75,7 @@ type
   public
     constructor Create; overload;
     constructor Create(icapacity: Integer); overload;
-    constructor Create(icapacity: Integer; ifactor: Integer); overload;
+    constructor Create(icapacity: Integer; iload: Integer); overload;
     destructor Destroy; override;
     procedure setLoadFactor(ifactor: Integer);
     procedure setGrowFactor(ifactor: Integer);
@@ -468,58 +469,24 @@ implementation
   (* Class TPLPointerHashList *)
 
 
+
+  //----------------------------------------------------------------------------
+  //Constructors
+
+
   constructor TPLPointerHashList.Create;
   begin
-    self.ikeycount := 0;
-    self.imaxkeycount := 0;
-    self.ibucketcount := 0;
-    self.igrowfactor := 3;
-    self.iloadfactor := 3;
-    self.pcurrentnode := nil;
-    self.psearchednode := nil;
-
-    Self.eduplicatekeys := dupAccept;
-
-    //Create the Buckets
-    self.extendList(False);
+    Self.Init(9, 3);
   end;
 
   constructor TPLPointerHashList.Create(icapacity: Integer);
   begin
-    self.ikeycount := 0;
-    self.imaxkeycount := 0;
-    self.igrowfactor := 3;
-    self.iloadfactor := 3;
-    self.ibucketcount := ceil(icapacity / self.iloadfactor) - self.igrowfactor;
-    self.pcurrentnode := nil;
-    self.psearchednode := nil;
-
-    Self.eduplicatekeys := dupAccept;
-
-    if self.ibucketcount < 0 then
-      self.ibucketcount := 0;
-
-    //Create the Buckets
-    self.extendList(False);
+    Self.Init(icapacity, 3);
   end;
 
-  constructor TPLPointerHashList.Create(icapacity: Integer; ifactor: Integer);
+  constructor TPLPointerHashList.Create(icapacity: Integer; iload: Integer);
   begin
-    self.ikeycount := 0;
-    self.imaxkeycount := 0;
-    self.igrowfactor := 3;
-    self.iloadfactor := ifactor;
-    self.ibucketcount := ceil(icapacity / self.iloadfactor) - self.igrowfactor;
-    self.pcurrentnode := nil;
-    self.psearchednode := nil;
-
-    Self.eduplicatekeys := dupAccept;
-
-    if self.ibucketcount < 0 then
-      self.ibucketcount := 0;
-
-    //Create the Buckets
-    self.extendList(False);
+    Self.Init(icapacity, iload);
   end;
 
   destructor TPLPointerHashList.Destroy;
@@ -528,12 +495,37 @@ implementation
   begin
     for ibkt := 0 to self.ibucketcount - 1 do
     begin
-      self.arrbuckets[ibkt].Free;
+      Self.arrbuckets[ibkt].Free;
     end;
 
-    SetLength(self.arrbuckets, 0);
+    SetLength(Self.arrbuckets, 0);
 
     inherited Destroy;
+  end;
+
+
+
+  //----------------------------------------------------------------------------
+  //Administration Methods
+
+
+  procedure TPLPointerHashList.Init(icapacity: Integer; iload: Integer);
+  begin
+    Self.ikeycount := 0;
+    Self.imaxkeycount := 0;
+    Self.igrowfactor := 3;
+    Self.iloadfactor := iload;
+    Self.ibucketcount := ceil(icapacity / Self.iloadfactor) - Self.igrowfactor;
+    Self.pcurrentnode := nil;
+    Self.psearchednode := nil;
+
+    Self.eduplicatekeys := dupAccept;
+
+    if Self.ibucketcount < 0 then
+      Self.ibucketcount := 0;
+
+    //Create the Buckets
+    self.extendList(False);
   end;
 
   procedure TPLPointerHashList.setLoadFactor(ifactor: Integer);
@@ -803,7 +795,12 @@ end;
   var
     ibkt: Integer;
   begin
-    inc(self.ibucketcount, self.igrowfactor);
+    if Self.ibucketcount = 0 then
+      Self.ibucketcount := Self.igrowfactor
+    else if Self.ibucketcount < 256 / Self.iloadfactor then
+      Self.ibucketcount := Self.ibucketcount * Self.igrowfactor
+    else
+      inc(Self.ibucketcount, Self.ibucketcount DIV Self.igrowfactor);
 
     //Forcing a uneven Bucket Count
     if (self.ibucketcount mod 2) = 0 then
@@ -1006,6 +1003,12 @@ end;
       Result := self.moveFirst();
     end;  //if self.pcurrentnode <> nil then
   end;
+
+
+
+  //----------------------------------------------------------------------------
+  //Consultation Methods
+
 
   function TPLPointerHashList.getCurrentKey(): String;
   begin

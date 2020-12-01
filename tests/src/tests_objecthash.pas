@@ -27,7 +27,7 @@ type
 
 
   //==========================================================================
-  // Class TStringObject Declaration
+  // Class TTestsObjectHashList Declaration
 
 
   TTestsObjectHashList = class(TTestCase)
@@ -36,8 +36,25 @@ type
     procedure SetUp; override;
     procedure TearDown; override;
   published
+    (*
+    Test Adding 10 Keys and their Values with the setValue()-Method (which should grow the List at least once)
+    The first 5 Elements will be inserted and looked up with the Default Property
+    And Looking up their Values (they must match their inserted Values)
+    *)
     procedure TestInsertCheckElements;
+    (*
+    Test Adding 3 Keys and their Values for a valid List Test
+    And Iterating to the First Key (this is not necessary the first inserted key)
+    It should return the defined Key and its Value
+    *)
     procedure TestCheckFirstElement;
+    (*
+    Test Adding 3 Keys and their Values for a valid List Test
+    Using the Default Property
+    And Iterating to the First Key and to the Next Key (they are not necessary
+    the first and second inserted keys)
+    It should return the defined Keys and their Values
+    *)
     procedure TestCheckNextElement;
   end;
 
@@ -47,7 +64,7 @@ type
 implementation
  
 uses
-  Classes, SysUtils, DateUtils;
+  Classes, SysUtils;
 
 
 { here we register all our test classes }
@@ -90,6 +107,7 @@ procedure TTestsObjectHashList.SetUp;
 begin
   Self.lsthshobjs := TPLObjectHashList.Create;
 
+  Self.lsthshobjs.Owned := True;
 end;
 
 procedure TTestsObjectHashList.TearDown;
@@ -98,15 +116,12 @@ begin
 
 end;
 
-(*
-Test Adding 10 Keys and their Values with the setValue()-Method (which should grow the List at least once)
-The first 5 Elements will be inserted and looked up with the Default Property
-And Looking up their Values (they must match their inserted Values)
-*)
 procedure TTestsObjectHashList.TestInsertCheckElements;
 var
   elm: TStringObject;
 begin
+  //WriteLn('TTestsObjectHashList.TestInsertCheckElements: go ...');
+
   elm := TStringObject.Create('key1', 'value1');
   Self.lsthshobjs['key1'] := elm;
 
@@ -189,11 +204,6 @@ begin
 
 end;
 
-(*
-Test Adding 3 Keys and their Values for a valid List Test
-And Iterating to the First Key (this is not necessary the first inserted key)
-It should return the defined Key and its Value
-*)
 procedure TTestsObjectHashList.TestCheckFirstElement;
 var
   elm: TStringObject;
@@ -222,13 +232,6 @@ begin
 
 end;
 
-(*
-Test Adding 3 Keys and their Values for a valid List Test
-Using the Default Property
-And Iterating to the First Key and to the Next Key (they are not necessary
-the first and second inserted keys)
-It should return the defined Keys and their Values
-*)
 procedure TTestsObjectHashList.TestCheckNextElement;
 var
   elm: TStringObject;

@@ -30,6 +30,7 @@ type
   TPLObjectHashList = class(TPLPointerHashList)
   protected
     bowned: Boolean;
+    procedure Init(icapacity: Integer; iload: Integer); override;
     procedure extendList(brebuild: Boolean = True); override;
   public
     procedure setOwned(bisowned: Boolean);
@@ -170,11 +171,25 @@ uses
   (* Class TPLObjectHashList *)
 
 
+
+  //----------------------------------------------------------------------------
+  //Administration Methods
+
+
+  procedure TPLObjectHashList.Init(icapacity: Integer; iload: Integer);
+  begin
+    //Do the Base Initialization
+    inherited Init(icapacity, iload);
+
+    //Enable Ownership
+    Self.setOwned(True);
+  end;
+
   procedure TPLObjectHashList.setOwned(bisowned: Boolean);
   var
     ibkt: Integer;
   begin
-    self.bowned := bisowned;
+    Self.bowned := bisowned;
 
     for ibkt := 0 to self.ibucketcount - 1 do
     begin
@@ -223,6 +238,7 @@ uses
       end;  //if floor(self.imaxkeycount / self.iloadfactor) > self.ibucketcount then
     end; //if icapacity > self.imaxkeycount then
   end;
+
 
   procedure TPLObjectHashList.extendList(brebuild: Boolean = True);
   var

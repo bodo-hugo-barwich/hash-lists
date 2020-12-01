@@ -38,16 +38,68 @@ type
     procedure SetUp; override;
     procedure Teardown; override;
   published
+    (*
+    Test Adding 10 Keys and their Values with the Add()-Method (which should grow the List at least once)
+    And Looking up their Values (they must match their inserted Values)
+    *)
     procedure TestAddCheckElements;
+    (*
+    Test Adding 3 Keys and their Values with the Add()-Method
+    Adding the 4th Value on a duplicate Key.
+    The "dupAccept" Bahaviour is enabled which should override the existing Value
+    *)
     procedure TestAddDuplicateAccept;
+    (*
+    Test Adding 3 Keys and their Values with the Add()-Method
+    Adding the 4th Value on a duplicate Key.
+    The "dupIgnore" Bahaviour is enabled which should drop the new Value
+    *)
     procedure TestAddDuplicateIgnore;
+    (*
+    Test Adding 3 Keys and their Values with the Add()-Method
+    Adding the 4th Value on a duplicate Key.
+    The "dupError" Bahaviour is enabled which should raise an Exception
+    *)
     procedure TestAddDuplicateError;
+    (*
+    Test Adding 10 Keys and their Values with the setValue()-Method (which should grow the List at least once)
+    And Looking up their Values (they must match their inserted Values)
+    *)
     procedure TestInsertCheckElements;
+    (*
+    Test Adding 3 Keys and their Values for a valid List Test
+    And Iterating to the First Key (this is not necessary the first inserted key)
+    It should return the defined Key and its Value
+    *)
     procedure TestCheckFirstElement;
+    (*
+    Test Adding 3 Keys and their Values for a valid List Test
+    And Iterating to the First Key and to the Next Key (they are not necessary
+    the first and second inserted keys)
+    It should return the defined Keys and their Values
+    *)
     procedure TestCheckNextElement;
+    (*
+    Integrity Test. Inserting 10000 Elements and looking up their Values.
+    This Test will grow the List several times.
+    Even big Lists must not break or loose memory.
+    *)
+    procedure TestInsertCheck10000Elements;
     {$IFDEF speedtests}
     {$NOTE Speed Tests will be run}
+    (*
+    Reference Performance Test against the Generics.Collections.TFastHashMap
+    Adding 1000 Keys and their Values
+    Looking Up all their Values
+    It should return the defined Keys and their Values
+    *)
     procedure TestMapInsert1000Elements;
+    (*
+    Reference Performance Test against the Generics.Collections.TFastHashMap
+    Adding 1000 Keys and their Values
+    Looking Up all their Values
+    It should return the defined Keys and their Values
+    *)
     procedure TestMapLookup1000Elements;
     procedure TestInsert1000Elements;
     procedure TestLookup1000Elements;
@@ -129,10 +181,6 @@ begin
   self.lsthshobjs.Free;
 end;
 
-(*
-Test Adding 10 Keys and their Values with the Add()-Method (which should grow the List at least once)
-And Looking up their Values (they must match their inserted Values)
-*)
 procedure TTestsPointerHashList.TestAddCheckElements;
 var
   psvl: PAnsiString;
@@ -239,11 +287,6 @@ begin
 
 end;
 
-(*
-Test Adding 3 Keys and their Values with the Add()-Method
-Adding the 4th Value on a duplicate Key.
-The "dupAccept" Bahaviour is enabled which should override the existing Value
-*)
 procedure TTestsPointerHashList.TestAddDuplicateAccept;
 var
   psinvl, psoutvl: PAnsiString;
@@ -297,11 +340,6 @@ begin
 
 end;
 
-(*
-Test Adding 3 Keys and their Values with the Add()-Method
-Adding the 4th Value on a duplicate Key.
-The "dupIgnore" Bahaviour is enabled which should drop the new Value
-*)
 procedure TTestsPointerHashList.TestAddDuplicateIgnore;
 var
   psinvl, psoutvl: PAnsiString;
@@ -353,11 +391,6 @@ begin
 
 end;
 
-(*
-Test Adding 3 Keys and their Values with the Add()-Method
-Adding the 4th Value on a duplicate Key.
-The "dupError" Bahaviour is enabled which should raise an Exception
-*)
 procedure TTestsPointerHashList.TestAddDuplicateError;
 var
   psinvl, psoutvl: PAnsiString;
@@ -425,10 +458,6 @@ begin
 end;
 
 
-(*
-Test Adding 10 Keys and their Values with the setValue()-Method (which should grow the List at least once)
-And Looking up their Values (they must match their inserted Values)
-*)
 procedure TTestsPointerHashList.TestInsertCheckElements;
 var
   psvl: PAnsiString;
@@ -535,11 +564,6 @@ begin
 
 end;
 
-(*
-Test Adding 3 Keys and their Values for a valid List Test
-And Iterating to the First Key (this is not necessary the first inserted key)
-It should return the defined Key and its Value
-*)
 procedure TTestsPointerHashList.TestCheckFirstElement;
 var
   sky: String;
@@ -574,12 +598,6 @@ begin
 
 end;
 
-(*
-Test Adding 3 Keys and their Values for a valid List Test
-And Iterating to the First Key and to the Next Key (they are not necessary
-the first and second inserted keys)
-It should return the defined Keys and their Values
-*)
 procedure TTestsPointerHashList.TestCheckNextElement;
 var
   sky: String;
@@ -626,15 +644,69 @@ begin
 
 end;
 
+procedure TTestsPointerHashList.TestInsertCheck10000Elements;
+var
+  sky, schk: String;
+  psvl: PAnsiString;
+  iky, imtchcnt: Integer;
+begin
+  //WriteLn('TTestsPointerHashList.TestInsertCheck10000Elements: go ...');
+
+  imtchcnt := -1;
+
+  self.lsthshobjs.LoadFactor := 4;
+  self.lsthshobjs.Capacity := 1000;
+
+  for iky := 1 to 10000 do
+  begin
+    sky := 'key' + IntToStr(iky);
+
+    New(psvl);
+    psvl^ := 'value' + IntToStr(iky);
+
+    self.lsthshobjs.setValue(sky, psvl);
+  end;  //for iky := 1 to 10000 do
+
+  CheckEquals(self.lsthshobjs.Count, 10000, 'INS - Count failed! Count is: '#39
+     + IntToStr(self.lsthshobjs.Count) + ' / 10000'#39);
+
+  for iky := 1 to 10000 do
+  begin
+    sky := 'key' + IntToStr(iky);
+    schk := 'value' + IntToStr(iky);
+
+    psvl := self.lsthshobjs[sky];
+
+    if psvl <> nil then
+    begin
+      if psvl^ = schk then
+      begin
+        if imtchcnt = -1 then
+          imtchcnt := 1
+        else
+          inc(imtchcnt);
+
+      end
+      else  //if psvl^ = schk then
+        CheckEquals(schk, psvl^, 'LKP - key '  + chr(39) + sky + chr(39)
+          + ' failed! Value is: ' + chr(39) + psvl^ + chr(39));
+
+    end
+    else  //if psvl <> nil then
+      Check(psvl <> nil, 'LKP - key '  + chr(39) + sky + chr(39)
+        + ' failed! Value is: ' + chr(39) + 'nil' + chr(39));
+
+  end;  //for iky := 1 to 10000 do
+
+  CheckEquals(imtchcnt, 10000, 'LKP - Count failed! Count is: '#39
+       + IntToStr(imtchcnt) + ' / 10000'#39);
+
+end;
+
+
 //Speed Test make only sense when the Test is not compiled in Debug Mode
 {$IFDEF speedtests}
 
-(*
-Reference Performance Test against the Generics.Collections.TFastHashMap
-Adding 1000 Keys and their Values
-Looking Up all their Values
-It should return the defined Keys and their Values
-*)
 procedure TTestsPointerHashList.TestMapInsert1000Elements;
 var
   sky, schk: String;
@@ -646,7 +718,7 @@ var
   MS : Comp;
   iky: Integer;
 begin
-  WriteLn('TestMapInsert1000Elements: do ...');
+  WriteLn('TestMapInsert1000Elements: go ...');
 
   TS:=DateTimeToTimeStamp(Now);
   Writeln ('INS - Start - Now in days since 1/1/0001      : ',TS.Date);
@@ -725,12 +797,6 @@ begin
     }
 end;
 
-(*
-Reference Performance Test against the Generics.Collections.TFastHashMap
-Adding 1000 Keys and their Values
-Looking Up all their Values
-It should return the defined Keys and their Values
-*)
 procedure TTestsPointerHashList.TestMapLookup1000Elements;
 var
   sky, schk: String;
@@ -905,7 +971,7 @@ var
   TS: TTimeStamp;
   iky: Integer;
 begin
-  WriteLn('TestLookup1000Elements: do ...');
+  WriteLn('TestLookup1000Elements: go ...');
 
   TS:=DateTimeToTimeStamp(Now);
   Writeln ('INS - Start - Now in millisecs since midnight : ',TS.Time);
