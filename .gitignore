@@ -8,6 +8,9 @@ backup/*
 lib
 lib/*
 
+#Build Files
+Makefile
+
 #Compiled Application 
 *.run
 #Debug Version of the Application
