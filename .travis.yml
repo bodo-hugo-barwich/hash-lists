@@ -1,10 +1,10 @@
 language: c
+addons:
+  apt:
+    packages:
+      #Add FPC Package through 'apt' Package Manager
+      - fpc
 before_install:
-  addons:
-    apt:
-      packages:
-        #Add FPC Package through 'apt' Package Manager
-        - fpc
   # Show Location
   - >
     echo "USER: " $(whoami) ; 
