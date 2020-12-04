@@ -12,4 +12,6 @@ before_install:
     pwd ; 
     ls -lah ;
   # List pre-installed FPC Packages
-  - dpkg --get-selections | grep -iE "(fpc|lazarus)" | sort
+  - >
+    dpkg --get-selections | grep -iE "(fpc|lazarus)" | sort ;
+    dpkg -s fpc ;
