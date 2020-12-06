@@ -16,3 +16,5 @@ before_install:
   - >
     dpkg --get-selections | grep -iE "(fpc|fp\-|lazarus)" | sort ;
     dpkg -s fpc ;
+    which sh ;
+    which bash ;

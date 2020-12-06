@@ -19,3 +19,4 @@ Makefile
 #Runtime Log Files
 *.log
 **/*.log
+fptest.ini
