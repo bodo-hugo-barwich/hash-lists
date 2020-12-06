@@ -11,7 +11,7 @@ fpcpackage=y
 
 [default]
 dir=src tests tests/src
-rule=release
+rule=target_none
 
 [target]
 units=pointerhash objecthash stringhash
@@ -21,34 +21,71 @@ examples=demohashlists
 [rules]
 .NOTPARALLEL:
 
-.PHONY: test
+.PHONY: target_none
+target_none:
+      # Compile the Demo Application
+	@$(ECHO) "Don't do anything."
+	@exit
 
-test: debug examples
-      # Compile the Demo Application and the Test Application
-	@$(ECHO)  Compile the Demo Application and the Test Application
+.PHONY: test examples_debug
+
+examples_debug:
+      # Compile the Demo Application
+	@$(ECHO)  Compile the Demo Application
 	$(COMPILER) -MObjFPC -Scaghi -Cg -CirotR -gw2 -godwarfsets -gl -gh -Xg -gt -l -vewnhibq -Fi./lib/x86_64-linux -Fu./src -Fu./ -FU./lib/x86_64-linux/ -FE./ -o./demo_hash-lists.dbg.run demohashlists.pas
-	$(COMPILER) -MObjFPC -Scaghi -Cg -CirotR -gw2 -godwarfsets -gl -gh -Xg -gt -l -vewnhibq -Fi./tests/lib/x86_64-linux -Fl./src -Fu./src  -Fu./tests/ -Fu./tests/src -Fu../epiktimer -Fu../fptest/src -Fu/usr/lib/lazarus/2.0.0/packager/units/x86_64-linux -FU./tests/lib/x86_64-linux/ -FE./tests/ -o./tests/tests_hash-lists.dbg.run ./tests/testshashlists.lpr
 
+test: examples_debug
+      # Compile the Demo Application and the Test Application
+	@$(ECHO)  Compile the Test Application
+	$(COMPILER) -MObjFPC -Scaghi -Cg -CirotR -gw2 -godwarfsets -gl -gh -Xg -gt -l -vewnhibq -Fi./tests/lib/x86_64-linux -Fl./src -Fu./src  -Fu./tests/ -Fu./tests/src -Fu../epiktimer -Fu../fptest/src -Fu/usr/lib/lazarus/2.0.0/packager/units/x86_64-linux -FU./tests/lib/x86_64-linux/ -FE./tests/ -o./tests/tests_hash-lists.dbg.run ./tests/testshashlists.lpr
         # Try the Demo Application and run the Test Application
-	@$(ECHO)  Try the Demo Application and run the Test Application
+	@$(ECHO) Try the Demo Application and run the Test Application
         #Execute the Demo Application
 	@$(ECHO) "Demo Application: Executing ..."
-	export HEAPTRC="log=demo_heap.log"; ./demo_hash-lists.dbg.run 2>./demo_error.log 1>./demo_exec.log ; error_code=$?
-	@$(ECHO)  "Demo Application: Execution finished with [$error_code]"
+        $(eval error_code := $(shell export HEAPTRC="log=demo_heap.log" ; echo -n "" >./demo_heap.log ; ./demo_hash-lists.dbg.run 2>./demo_error.log 1>./demo_exec.log ; echo "$$?"))
+	@$(ECHO) Demo Application: Execution finished with \[${error_code}\]
         #Demo Application Execution Report
-	@$(ECHO)  "Demo Execution Log:" ; cat ./demo_exec.log
-	@$(ECHO)  "Demo Execution Error:" ; cat ./demo_error.log
-	@$(ECHO)  "Demo Execution Heap:" ; cat ./demo_heap.log
-	error=`cat ./demo_error.log` ; if [ -n "$error" ]; then echo "Demo failed with Error [Code: '$error_code']" && exit 1; fi ;
-	leak=`cat ./demo_heap.log | grep -i "unfreed memory blocks" | awk '{print $1}'` ; if [ $leak -ne 0 ]; then echo "Memory Leaks: $leak" && exit 1; else echo "Memory Leaks: NONE"; fi ;
+	@$(ECHO) "Demo Execution Log:"
+        cat ./demo_exec.log
+	@$(ECHO) "Demo Execution Error:"
+        cat ./demo_error.log
+	@$(ECHO) "Demo Execution Heap:"
+        cat ./demo_heap.log
+        $(eval error := $(shell cat ./demo_error.log))
+ifeq ($(strip $(error)),)
+        @$(ECHO) "NO Error: '${error}'"
+else
+        @$(ECHO) "Error detected: '${error}'"
+        $(error "Demo failed with Error [Code: '${error_code}']")
+        @exit 1
+endif
+        $(eval is_error := $(shell if [ "${error_code}" = "0" ]; then echo false ; else echo true ; fi ;))
+ifeq ($(is_error), true)
+        @$(ECHO) Exit Code non cero: '${error_code}'
+        @$(ECHO) "Demo failed with Error [Code: '${error_code}']"
+        @exit ${error_code}
+endif
+	$(eval leak := $(shell cat ./demo_heap.log | grep -i "unfreed memory blocks" | awk '{print $$1}'))
+        $(eval has_leak := $(shell if [ "$(leak)" = "0" ]; then echo false ; else echo true ; fi ;))
+ifeq (${has_leak}, true)
+        @$(ECHO) "Memory Leaks: ${leak}"
+        @exit 1
+else
+        @$(ECHO) "Memory Leaks: NONE"
+endif
+	@$(ECHO) "Demo Application: PASS"
         #Execute the Application Tests
 	@$(ECHO)  "Application Tests: Executing ..."
-	export HEAPTRC="log=test_heap.log"; ./tests/tests_hash-lists.dbg.run 2>./tests_error.log 1>./tests_exec.log ; error_code=$?
-	@$(ECHO)  "Application Tests: Tests finished with [$error_code]"
+	$(eval error_code := $(shell export HEAPTRC="log=test_heap.log" ; echo -n "" >./test_heap.log ; ./tests/tests_hash-lists.dbg.run 2>./tests_error.log 1>./tests_exec.log ; echo "$$?"))
+	@$(ECHO) Application Tests: Tests finished with [${error_code}]
         #Application Tests Execution Report
-	@$(ECHO)  "Tests Execution Log:" ; cat ./tests_exec.log
-	@$(ECHO)  "Tests Execution Error:" ; cat ./tests_error.log
-	@$(ECHO)  "Tests Execution Heap:" ; cat ./test_heap.log
-	error=`cat ./tests_error.log` ; if [ -n "$error" ]; then echo "Tests failed with Error [Code: '$error_code']" && exit 1; fi ;
-	leak=`cat ./test_heap.log | grep -i "unfreed memory blocks" | awk '{print $1}'` ; if [ $leak -gt 1 ]; then echo "Memory Leaks: $leak" && exit 1; else echo "Memory Leaks: NONE"; fi ;
+	@$(ECHO)  "Tests Execution Log:"
+        cat ./tests_exec.log
+	@$(ECHO)  "Tests Execution Error:"
+        cat ./tests_error.log
+	@$(ECHO)  "Tests Execution Heap:"
+        cat ./test_heap.log
+	error=`cat ./tests_error.log` ; if [ -n "$$error" ]; then echo "Tests failed with Error [Code: '$$error_code']" && exit 1; fi ;
+	leak=`cat ./test_heap.log | grep -i "unfreed memory blocks" | awk '{print $$1}'` ; if [ $$leak -gt 1 ]; then echo "Memory Leaks: $$leak" && exit 1; else echo "Memory Leaks: NONE"; fi ;
+	@$(ECHO) "Application Tests: PASS"
 
