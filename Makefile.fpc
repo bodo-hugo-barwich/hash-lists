@@ -22,6 +22,8 @@ examples=demohashlists
 [rules]
 .NOTPARALLEL:
 
+wrkdir := $(shell $(PWD))
+
 .PHONY: target_none
 target_none:
       # Compile the Demo Application
@@ -33,22 +35,26 @@ target_none:
 examples_debug:
       # Compile the Demo Application
 	@$(ECHO) Demo Application: compiling ...
-	$(COMPILER) -MObjFPC -Scaghi -Cg -CirotR -gw2 -godwarfsets -gl -gh -Xg -gt -l -vewnhibq -Fi./lib/x86_64-linux -Fu./src -Fu./ -FU./lib/x86_64-linux/ -FE./ -o./demo_hash-lists.dbg.run demohashlists.pas
+	@$(ECHO) "Work Directory: '${wrkdir}'"
+	$(COMPILER) -MObjFPC -Scaghi -Cg -CirotR -gw2 -godwarfsets -gl -gh -Xg -gt -l -vewnhibq -Fi./lib/x86_64-linux -Fu./src -Fu./ -FU./lib/x86_64-linux/ -FE./ -o${wrkdir}/demo_hash-lists.dbg.run demohashlists.pas
 	@$(ECHO) Demo Application - Executable:
-        ls -lah ./demo_hash-lists.dbg.run
+        ls -lah ${wrkdir}/demo_hash-lists.dbg.run
 	@$(ECHO) Demo Application: Compilation done.
 
 test: examples_debug
       # Compile the Test Application
 	@$(ECHO) Tests Application: compiling ...
-	$(COMPILER) -MObjFPC -Scaghi -Cg -CirotR -gw2 -godwarfsets -gl -gh -Xg -gt -l -vewnhibq -Fi./tests/lib/x86_64-linux -Fl./src -Fu./src  -Fu./tests/ -Fu./tests/src -Fu../epiktimer -Fu../fptest/src -Fu/usr/lib/lazarus/2.0.0/packager/units/x86_64-linux -FU./tests/lib/x86_64-linux/ -FE./tests/ -o./tests/tests_hash-lists.dbg.run ./tests/testshashlists.lpr
+	@$(ECHO) "Work Directory: '${wrkdir}'"
+	$(COMPILER) -MObjFPC -Scaghi -Cg -CirotR -gw2 -godwarfsets -gl -gh -Xg -gt -l -vewnhibq -Fi./tests/lib/x86_64-linux -Fl./src -Fu./src  -Fu./tests/ -Fu./tests/src -Fu../epiktimer -Fu../fptest/src -Fu/usr/lib/lazarus/2.0.0/packager/units/x86_64-linux -FU./tests/lib/x86_64-linux/ -FE./tests/ -o${wrkdir}/tests/tests_hash-lists.dbg.run ./tests/testshashlists.lpr
 	@$(ECHO) Tests Application - Executable:
-        ls -lah ./tests/tests_hash-lists.dbg.run
+        ls -lah ${wrkdir}/tests/tests_hash-lists.dbg.run
 	@$(ECHO) Tests Application: Compilation done.
         @$(ECHO) Project Directory Outlay:
+        @$(ECHO) PWD: $(PWD) $(shell readlink ./)
         pwd && ls -lahR
         # Try the Demo Application and run the Test Application
 	@$(ECHO) Try the Demo Application and run the Test Application
+	@$(ECHO) "Work Directory: '${wrkdir}'"
         #Execute the Demo Application
 	@$(ECHO) "Demo Application: Executing ..."
         $(eval error_code := $(shell export HEAPTRC="log=demo_heap.log" ; echo -n "" >./demo_heap.log ; ./demo_hash-lists.dbg.run 2>./demo_error.log 1>./demo_exec.log ; echo "$$?"))
@@ -85,7 +91,7 @@ endif
 	@$(ECHO) "Demo Application: PASS"
         #Execute the Application Tests
 	@$(ECHO)  "Application Tests: Executing ..."
-	$(eval error_code := $(shell export HEAPTRC="log=test_heap.log" ; echo -n "" >./test_heap.log ; ./tests/tests_hash-lists.dbg.run 2>./tests_error.log 1>./tests_exec.log ; echo "$$?"))
+	$(eval error_code := $(shell export HEAPTRC="log=test_heap.log" ; echo -n "" >./test_heap.log ; ${wrkdir}/tests/tests_hash-lists.dbg.run 2>./tests_error.log 1>./tests_exec.log ; echo "$$?"))
 	@$(ECHO) Application Tests: Tests finished with [${error_code}]
         #Application Tests Execution Report
 	@$(ECHO)  "Tests Execution - Log:"
