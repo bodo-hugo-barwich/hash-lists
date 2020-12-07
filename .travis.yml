@@ -4,7 +4,6 @@ addons:
     packages:
       #Add FPC Package through 'apt' Package Manager
       - fpc
-      - fp-units-rtl
       - fp-utils
 before_install:
   # Show Location
@@ -15,11 +14,13 @@ before_install:
     ls -lah ;
   # List pre-installed FPC Packages
   - >
+    echo "sh Shell: " $(which sh) ;
+    echo "bash Shell: " $(which bash) ;
     dpkg --get-selections | grep -iE "(fpc|fp\-|lazarus)" | sort ;
     echo "fpc Package:" ;
     dpkg -s fpc ;
-    echo "sh Shell: " $(which sh) ;
-    echo "bash Shell: " $(which bash) ;
+    echo "RTL Directory:" ;
+    dpkg -L fp-units-rtl | grep -i "/rtl/" ;
   # Clone epiktimer Project
   - >
     echo "Project 'epiktimer': cloning ..." ;
@@ -36,5 +37,11 @@ before_install:
     git clone https://github.com/graemeg/fptest.git ../fptest ;
     ls -lahd ../fptest ;
     ls -lah ../fptest ;
+
+  # Create Compiling Directories
+  - >
+    echo "Compiling: Directories creating ..." ;
+    mkdir -p ./lib/x86_64-linux/ ;
+    mkdir -p ./tests/lib/x86_64-linux/ ;
 
 
