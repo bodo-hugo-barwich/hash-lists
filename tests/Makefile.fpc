@@ -9,7 +9,7 @@ main=hash-lists
 fpcpackage=y
 
 [default]
-#fpcdir=/usr/share/fpcsrc/3.0.0/
+fpcdir=/usr/share/fpcsrc/3.0.0/
 dir=tests
 rule=target_none
 
