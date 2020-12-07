@@ -20,7 +20,7 @@ before_install:
     echo "fpc Package:" ;
     dpkg -s fpc ;
     echo "RTL Directory:" ;
-    dpkg -L fp-units-rtl-3.0.0 | grep -i "/rtl/" ;
+    dpkg -L fpc-source-3.0.4 | grep -i "/rtl/" ;
   # Clone epiktimer Project
   - >
     echo "Project 'epiktimer': cloning ..." ;
