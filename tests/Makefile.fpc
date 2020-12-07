@@ -9,7 +9,7 @@ main=hash-lists
 fpcpackage=y
 
 [default]
-fpcdir=/usr/share/fpcsrc/3.0.0/
+fpcdir=/usr/share/fpcsrc/3.0.0
 rule=target_none
 
 [compiler]
@@ -20,7 +20,7 @@ units=tests_pointerhash tests_objecthash tests_stringhash
 
 [prerules]
 ifdef $(TRAVIS_TEST)
-override DEFAULT_FPCDIR=/usr/share/fpcsrc/3.0.0/
+override DEFAULT_FPCDIR=/usr/share/fpcsrc/3.0.0
 endif
 
 [rules]
