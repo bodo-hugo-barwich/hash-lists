@@ -10,6 +10,7 @@ version=1.0.0
 fpcpackage=y
 
 [default]
+fpcdir=/usr/lib/x86_64-linux-gnu/fpc/3.0.4/units/x86_64-linux/
 dir=src tests tests/src
 rule=target_none
 
