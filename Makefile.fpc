@@ -10,7 +10,7 @@ version=1.0.0
 fpcpackage=y
 
 [default]
-fpcdir=/usr/share/fpcsrc/3.0.0/
+#fpcdir=/usr/share/fpcsrc/3.0.0/
 dir=tests
 rule=target_none
 
@@ -23,7 +23,10 @@ exampledirs=./
 examples=demohashlists
 
 [prerules]
+ifdef $(TRAVIS_TEST)
 override DEFAULT_FPCDIR=/usr/share/fpcsrc/3.0.0/
+endif
+
 
 [rules]
 .NOTPARALLEL:

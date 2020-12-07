@@ -1,4 +1,6 @@
 language: c
+env:
+  - TRAVIS_TEST=1
 addons:
   apt:
     packages:
