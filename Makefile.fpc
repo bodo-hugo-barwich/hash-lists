@@ -32,13 +32,19 @@ target_none:
 
 examples_debug:
       # Compile the Demo Application
-	@$(ECHO)  Compile the Demo Application
+	@$(ECHO) Demo Application: compiling ...
 	$(COMPILER) -MObjFPC -Scaghi -Cg -CirotR -gw2 -godwarfsets -gl -gh -Xg -gt -l -vewnhibq -Fi./lib/x86_64-linux -Fu./src -Fu./ -FU./lib/x86_64-linux/ -FE./ -o./demo_hash-lists.dbg.run demohashlists.pas
+	@$(ECHO) Demo Application - Executable:
+        ls -lah ./demo_hash-lists.dbg.run
+	@$(ECHO) Demo Application: Compilation done.
 
 test: examples_debug
       # Compile the Demo Application and the Test Application
-	@$(ECHO)  Compile the Test Application
+	@$(ECHO) Tests Application: compiling ...
 	$(COMPILER) -MObjFPC -Scaghi -Cg -CirotR -gw2 -godwarfsets -gl -gh -Xg -gt -l -vewnhibq -Fi./tests/lib/x86_64-linux -Fl./src -Fu./src  -Fu./tests/ -Fu./tests/src -Fu../epiktimer -Fu../fptest/src -Fu/usr/lib/lazarus/2.0.0/packager/units/x86_64-linux -FU./tests/lib/x86_64-linux/ -FE./tests/ -o./tests/tests_hash-lists.dbg.run ./tests/testshashlists.lpr
+	@$(ECHO) Tests Application - Executable:
+        ls -lah ./tests/tests_hash-lists.dbg.run
+	@$(ECHO) Tests Application: Compilation done.
         # Try the Demo Application and run the Test Application
 	@$(ECHO) Try the Demo Application and run the Test Application
         #Execute the Demo Application
