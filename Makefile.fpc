@@ -45,11 +45,11 @@ test: examples_debug
         $(eval error_code := $(shell export HEAPTRC="log=demo_heap.log" ; echo -n "" >./demo_heap.log ; ./demo_hash-lists.dbg.run 2>./demo_error.log 1>./demo_exec.log ; echo "$$?"))
 	@$(ECHO) Demo Application: Execution finished with \[${error_code}\]
         #Demo Application Execution Report
-	@$(ECHO) "Demo Execution Log:"
+	@$(ECHO) "Demo Execution - Log:"
         cat ./demo_exec.log
-	@$(ECHO) "Demo Execution Error:"
+	@$(ECHO) "Demo Execution - Error:"
         cat ./demo_error.log
-	@$(ECHO) "Demo Execution Heap:"
+	@$(ECHO) "Demo Execution - Heap:"
         cat ./demo_heap.log
         $(eval error := $(shell cat ./demo_error.log))
 ifeq ($(strip $(error)),)
@@ -60,13 +60,13 @@ else
         @exit 1
 endif
         $(eval is_error := $(shell if [ "${error_code}" = "0" ]; then echo false ; else echo true ; fi ;))
-ifeq ($(is_error), true)
+ifeq (${is_error}, true)
         @$(ECHO) Exit Code non cero: '${error_code}'
         @$(ECHO) "Demo failed with Error [Code: '${error_code}']"
         @exit ${error_code}
 endif
 	$(eval leak := $(shell cat ./demo_heap.log | grep -i "unfreed memory blocks" | awk '{print $$1}'))
-        $(eval has_leak := $(shell if [ "$(leak)" = "0" ]; then echo false ; else echo true ; fi ;))
+        $(eval has_leak := $(shell if [ "${leak}" = "0" ]; then echo false ; else echo true ; fi ;))
 ifeq (${has_leak}, true)
         @$(ECHO) "Memory Leaks: ${leak}"
         @exit 1
@@ -79,11 +79,11 @@ endif
 	$(eval error_code := $(shell export HEAPTRC="log=test_heap.log" ; echo -n "" >./test_heap.log ; ./tests/tests_hash-lists.dbg.run 2>./tests_error.log 1>./tests_exec.log ; echo "$$?"))
 	@$(ECHO) Application Tests: Tests finished with [${error_code}]
         #Application Tests Execution Report
-	@$(ECHO)  "Tests Execution Log:"
+	@$(ECHO)  "Tests Execution - Log:"
         cat ./tests_exec.log
-	@$(ECHO)  "Tests Execution Error:"
+	@$(ECHO)  "Tests Execution - Error:"
         cat ./tests_error.log
-	@$(ECHO)  "Tests Execution Heap:"
+	@$(ECHO)  "Tests Execution - Heap:"
         cat ./test_heap.log
 	error=`cat ./tests_error.log` ; if [ -n "$$error" ]; then echo "Tests failed with Error [Code: '$$error_code']" && exit 1; fi ;
 	leak=`cat ./test_heap.log | grep -i "unfreed memory blocks" | awk '{print $$1}'` ; if [ $$leak -gt 1 ]; then echo "Memory Leaks: $$leak" && exit 1; else echo "Memory Leaks: NONE"; fi ;

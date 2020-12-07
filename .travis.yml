@@ -15,6 +15,25 @@ before_install:
   # List pre-installed FPC Packages
   - >
     dpkg --get-selections | grep -iE "(fpc|fp\-|lazarus)" | sort ;
+    echo "fpc Package:" ;
     dpkg -s fpc ;
-    which sh ;
-    which bash ;
+    echo "sh Shell: " $(which sh) ;
+    echo "bash Shell: " $(which bash) ;
+  # Clone epiktimer Project
+  - >
+    echo "Project 'epiktimer': cloning ..." ;
+    pwd ;
+    ls -lah ;
+    git clone https://github.com/graemeg/epiktimer.git ../epiktimer ;
+    ls -lahd ../epiktimer ;
+    ls -lah ../epiktimer ;
+  # Clone fptest Project
+  - >
+    echo "Project 'fptest': cloning ..." ;
+    pwd ;
+    ls -lah ;
+    git clone https://github.com/graemeg/fptest.git ../fptest ;
+    ls -lahd ../fptest ;
+    ls -lah ../fptest ;
+
+
