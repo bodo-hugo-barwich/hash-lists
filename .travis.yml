@@ -4,6 +4,7 @@ addons:
     packages:
       #Add FPC Package through 'apt' Package Manager
       - fpc
+      - fp-units-rtl
       - fp-utils
 before_install:
   # Show Location
