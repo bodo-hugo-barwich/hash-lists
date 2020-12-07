@@ -47,12 +47,12 @@ test_debug:
 
 test: test_debug
         # Run the Testsuite Application
-	@$(ECHO) Run the Demo Application
+	@$(ECHO) Run the Testsuite Application
 	@$(ECHO) "Work Directory: '${wrkdir}'"
         #Execute the Application Tests
 	@$(ECHO) "Application Tests: Executing ..."
 	$(eval error_code := $(shell export HEAPTRC="log=test_heap.log" ; echo -n "" >./test_heap.log ; ${wrkdir}/tests_hash-lists.dbg.run 2>./tests_error.log 1>./tests_exec.log ; echo "$$?"))
-	@$(ECHO) Application Tests: Tests finished with [${error_code}]
+	@$(ECHO) Application Tests: Execution finished with [${error_code}]
         #Application Tests Execution Report
 	@$(ECHO) "Tests Execution - Log:"
         cat ./tests_exec.log
