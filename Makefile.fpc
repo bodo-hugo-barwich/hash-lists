@@ -58,6 +58,12 @@ test: examples_debug
         cat ./demo_error.log
 	@$(ECHO) "Demo Execution - Heap:"
         cat ./demo_heap.log
+        $(eval is_error := $(shell if [ "${error_code}" = "0" ]; then echo false ; else echo true ; fi ;))
+ifeq (${is_error}, true)
+        @$(ECHO) Exit Code non cero: '${error_code}'
+        @$(ECHO) "Demo failed with Error [Code: '${error_code}']"
+        @exit ${error_code}
+endif
         $(eval error := $(shell cat ./demo_error.log))
 ifeq ($(strip $(error)),)
         @$(ECHO) "NO Error: '${error}'"
@@ -65,12 +71,6 @@ else
         @$(ECHO) "Error detected: '${error}'"
         $(error "Demo failed with Error [Code: '${error_code}']")
         @exit 1
-endif
-        $(eval is_error := $(shell if [ "${error_code}" = "0" ]; then echo false ; else echo true ; fi ;))
-ifeq (${is_error}, true)
-        @$(ECHO) Exit Code non cero: '${error_code}'
-        @$(ECHO) "Demo failed with Error [Code: '${error_code}']"
-        @exit ${error_code}
 endif
 	$(eval leak := $(shell cat ./demo_heap.log | grep -i "unfreed memory blocks" | awk '{print $$1}'))
         $(eval has_leak := $(shell if [ "${leak}" = "0" ]; then echo false ; else echo true ; fi ;))
@@ -92,7 +92,13 @@ endif
         cat ./tests_error.log
 	@$(ECHO)  "Tests Execution - Heap:"
         cat ./test_heap.log
-	error=`cat ./tests_error.log` ; if [ -n "$$error" ]; then echo "Tests failed with Error [Code: '$$error_code']" && exit 1; fi ;
+        $(eval is_error := $(shell if [ "${error_code}" = "0" ]; then echo false ; else echo true ; fi ;))
+ifeq (${is_error}, true)
+        @$(ECHO) Exit Code non cero: '${error_code}'
+        @$(ECHO) "Tests failed with Error [Code: '${error_code}']"
+        @exit ${error_code}
+endif
+	error=`cat ./tests_error.log` ; if [ -n "$$error" ]; then echo "Tests failed with Error [Code: '${error_code}']" && exit 1; fi ;
 	leak=`cat ./test_heap.log | grep -i "unfreed memory blocks" | awk '{print $$1}'` ; if [ $$leak -gt 1 ]; then echo "Memory Leaks: $$leak" && exit 1; else echo "Memory Leaks: NONE"; fi ;
 	@$(ECHO) "Application Tests: PASS"
 
