@@ -1,10 +1,13 @@
 language: c
+env:
+  - TRAVIS_TEST=1
+addons:
+  apt:
+    packages:
+      #Add FPC Package through 'apt' Package Manager
+      - fpc
+      - fp-utils
 before_install:
-  addons:
-    apt:
-      packages:
-        #Add FPC Package through 'apt' Package Manager
-        - fpc
   # Show Location
   - >
     echo "USER: " $(whoami) ; 
@@ -12,4 +15,35 @@ before_install:
     pwd ; 
     ls -lah ;
   # List pre-installed FPC Packages
-  - dpkg --get-selections | grep -iE "(fpc|lazarus)" | sort
+  - >
+    echo "sh Shell: " $(which sh) ;
+    echo "bash Shell: " $(which bash) ;
+    dpkg --get-selections | grep -iE "(fpc|fp\-|lazarus)" | sort ;
+    echo "fpc Package:" ;
+    dpkg -s fpc ;
+    echo "RTL Directory:" ;
+    dpkg -L fpc-source-3.0.0 | grep -i "/rtl/" ;
+  # Clone epiktimer Project
+  - >
+    echo "Project 'epiktimer': cloning ..." ;
+    pwd ;
+    ls -lah ;
+    git clone https://github.com/graemeg/epiktimer.git ../epiktimer ;
+    ls -lahd ../epiktimer ;
+    ls -lah ../epiktimer ;
+  # Clone fptest Project
+  - >
+    echo "Project 'fptest': cloning ..." ;
+    pwd ;
+    ls -lah ;
+    git clone https://github.com/graemeg/fptest.git ../fptest ;
+    ls -lahd ../fptest ;
+    ls -lah ../fptest ;
+
+  # Create Compiling Directories
+  - >
+    echo "Compiling: Directories creating ..." ;
+    mkdir -p ./lib/x86_64-linux/ ;
+    mkdir -p ./tests/lib/x86_64-linux/ ;
+
+

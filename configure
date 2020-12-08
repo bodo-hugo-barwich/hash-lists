@@ -1,0 +1,6 @@
+#!/bin/sh
+
+
+
+fpcmake -w -Tall ./Makefile.fpc ./tests/Makefile.fpc
+

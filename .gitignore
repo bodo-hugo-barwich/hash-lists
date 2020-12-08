@@ -8,6 +8,9 @@ backup/*
 lib
 lib/*
 
+#Build Files
+Makefile
+
 #Compiled Application 
 *.run
 #Debug Version of the Application
@@ -16,3 +19,4 @@ lib/*
 #Runtime Log Files
 *.log
 **/*.log
+fptest.ini
