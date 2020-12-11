@@ -110,7 +110,7 @@
         <IsPartOfProject Value="True"/>
       </Unit4>
       <Unit5>
-        <Filename Value="configure.txt"/>
+        <Filename Value="configure"/>
         <IsPartOfProject Value="True"/>
       </Unit5>
     </Units>

@@ -1,6 +1,13 @@
 unit pointerhash;
 
 {$mode objfpc}{$H+}
+{$IFOPT Q+}
+  {$DEFINE overflow_check}
+{$ENDIF}
+{$IFOPT R+}
+  {$DEFINE range_check}
+{$ENDIF}
+
 
 interface
 
@@ -64,7 +71,8 @@ type
   PObjectArray = ^TObjectArray;
   TObjectArray = array of TObject;
 
-  TIteratorPosition = (itFirst, itCurrent, itLast);
+  TIteratorPosition = (itpFirst, itpCurrent, itpLast);
+  TIteratorDirection = (itdUp, itdDown);
 
 
 
@@ -78,6 +86,7 @@ type
     parrbuckets: PObjectArray;
     pcurrentnode: PPLHashNode;
     ibucketcount: Integer;
+    idirection: TIteratorDirection;
     function getKey: String;
     function getValue: Pointer; virtual;
   public
@@ -87,6 +96,7 @@ type
     function Last: Boolean;
     function Next: Boolean;
     function Previous: Boolean;
+    function Move: Boolean;
     property Key: String read getKey;
     property Value: Pointer read getValue;
     property PNode: PPLHashNode read pcurrentnode write pcurrentnode;
@@ -527,6 +537,7 @@ implementation
     Self.parrbuckets := pbuckets;
     Self.pcurrentnode := pnode;
     Self.ibucketcount := -1;
+    Self.idirection := itdUp;
 
     if Self.parrbuckets <> Nil then
       Self.ibucketcount := Length(Self.parrbuckets^);
@@ -541,6 +552,12 @@ implementation
 
   function TPLPtrHashListIterator.Reset(): Boolean;
   begin
+    if Self.parrbuckets <> Nil then
+      //Recalculate the Bucket Count
+      Self.ibucketcount := Length(Self.parrbuckets^)
+    else
+      Self.ibucketcount := -1;
+
     Result := Self.First();
   end;
 
@@ -550,12 +567,12 @@ implementation
   begin
     Result := False;
     Self.pcurrentnode := Nil;
+    Self.idirection := itdUp;
     ibkt := 0;
 
-    if Self.parrbuckets <> Nil then
-      Self.ibucketcount:= Length(Self.parrbuckets^)
-    else
-      Self.ibucketcount := -1;
+    if Self.ibucketcount = -1 then
+      //Calculate the Bucket Count
+      Self.ibucketcount := Length(Self.parrbuckets^);
 
     if Self.ibucketcount > 0 then
     begin
@@ -563,12 +580,12 @@ implementation
         indlstidx := TPLPointerNodeList(Self.parrbuckets^[ibkt]).getLastIndex();
         indidx := 0;
 
-        repeat
+        while (Self.pcurrentnode = Nil)
+          and (indidx <= indlstidx) do
+        begin
           Self.pcurrentnode := TPLPointerNodeList(Self.parrbuckets^[ibkt]).getNode(indidx);
-
           inc(indidx);
-        until (Self.pcurrentnode <> Nil)
-          or (indidx > indlstidx);
+        end;
 
         inc(ibkt);
       until (Self.pcurrentnode <> Nil)
@@ -585,6 +602,7 @@ implementation
   begin
     Result := False;
     Self.pcurrentnode := Nil;
+    Self.idirection := itdDown;
 
     if Self.parrbuckets <> Nil then
       Self.ibucketcount := Length(Self.parrbuckets^)
@@ -603,11 +621,11 @@ implementation
 
           dec(indidx);
         until (Self.pcurrentnode <> Nil)
-          or (ibkt <= 0);
+          or (indidx < 0);
 
         dec(ibkt);
       until (Self.pcurrentnode <> Nil)
-        or (ibkt <= 0);
+        or (ibkt < 0);
 
     end;  //if Self.ibucketcount > 0 then
 
@@ -620,6 +638,7 @@ implementation
     ibktidx, indidx, indlstidx: Integer;
   begin
     Result := False;
+    Self.idirection := itdUp;
 
     if Self.pcurrentnode <> nil then
     begin
@@ -633,8 +652,8 @@ implementation
           indlstidx := TPLPointerNodeList(Self.parrbuckets^[ibktidx]).getLastIndex();
           inc(indidx);
 
-          while (plstnd <> nil)
-            and (indidx >= indlstidx) do
+          while (plstnd = nil)
+            and (indidx <= indlstidx) do
           begin
             plstnd := TPLPointerNodeList(Self.parrbuckets^[ibktidx]).getNode(indidx);
             inc(indidx);
@@ -668,6 +687,7 @@ implementation
     ibktidx, indidx: Integer;
   begin
     Result := False;
+    Self.idirection := itdDown;
 
     if Self.pcurrentnode <> Nil then
     begin
@@ -683,7 +703,7 @@ implementation
           else
             indidx := TPLPointerNodeList(Self.parrbuckets^[ibktidx]).getLastIndex();
 
-          while (plstnd <> nil)
+          while (plstnd = nil)
             and (indidx >= 0) do
           begin
             plstnd := TPLPointerNodeList(Self.parrbuckets^[ibktidx]).getNode(indidx);
@@ -712,6 +732,14 @@ implementation
     end;  //if self.pcurrentnode <> nil then
   end;
 
+  function TPLPtrHashListIterator.Move: Boolean;
+  begin
+    if Self.idirection = itdUp then
+      Result := Self.Next
+    else if Self.idirection = itdDown then
+      Result := Self.Previous;
+
+  end;
 
 
   //----------------------------------------------------------------------------
@@ -767,8 +795,8 @@ implementation
   var
     ibkt: Integer;
   begin
-    if Self.oiterator <> Nil then
-      Self.oiterator.Free;
+    if Self.nodeiterator <> Nil then
+      Self.nodeiterator.Free;
 
     for ibkt := 0 to self.ibucketcount - 1 do
     begin
@@ -811,17 +839,26 @@ implementation
   var
     ibkt: Integer;
   begin
-    self.iloadfactor := ifactor;
+    if ifactor > 0 then
+      Self.iloadfactor := ifactor
+    else
+      //Set Minimum Load Factor
+      Self.iloadfactor := 1;
 
-    for ibkt := 0 to self.ibucketcount - 1 do
+    for ibkt := 0 to Self.ibucketcount - 1 do
     begin
-      TPLPointerNodeList(self.arrbuckets[ibkt]).GrowFactor := self.iloadfactor;
+      TPLPointerNodeList(Self.arrbuckets[ibkt]).GrowFactor := Self.iloadfactor;
     end;  //for ibkt := 0 to self.ibucketcount - 1 do
   end;
 
   procedure TPLPointerHashList.setGrowFactor(ifactor: Integer);
   begin
-    self.igrowfactor := ifactor;
+    if ifactor > 1 then
+      Self.igrowfactor := ifactor
+    else
+      //Set Minimum Grow Factor
+      Self.igrowfactor := 2;
+
   end;
 
   procedure TPLPointerHashList.setCapacity(icapacity: Integer);
@@ -907,7 +944,13 @@ implementation
   var
     pchr, pchrend: PChar;
   begin
-    {$Q-}{$R-}
+    {$IFDEF overflow_check}
+      {$Q-}
+    {$ENDIF}
+    {$IFDEF range_check}
+      {$R-}
+    {$ENDIF}
+
 
     Result := 0;
 
@@ -925,7 +968,12 @@ implementation
       end;  //while pchr < pchrend do
     end;  //if pskey <> nil then
 
-    {$Q+}{$R+}
+    {$IFDEF overflow_check}
+      {$Q+}
+    {$ENDIF}
+    {$IFDEF range_check}
+      {$R+}
+    {$ENDIF}
   end;
 
 class procedure TPLPointerHashList.RaiseListException(const serrormessage: String);
@@ -1053,20 +1101,21 @@ end;
 
     end;  //if self.psearchednode <> nil then
 
-    if self.psearchednode <> nil then
+    if Self.psearchednode = nil then
+      Self.psearchednode := TPLPointerNodeList(Self.arrbuckets[ibktidx]).searchNode(ihsh, @skey);
+
+    if Self.psearchednode <> nil then
     begin
+      if (Self.nodeiterator <> Nil)
+        and (Self.nodeiterator.PNode = Self.psearchednode) then
+        //Move the Iterator to another Node
+        Self.nodeiterator.Move;
+
       if TPLPointerNodeList(self.arrbuckets[ibktidx]).removeNode(self.psearchednode) then
       begin
         self.psearchednode := nil;
-
         dec(Self.ikeycount);
-      end;  //if TPLPointerNodeList(self.arrbuckets[ibktidx]).removeNode(self.psearchednode) then
-    end
-    else  //Searched Node does not match
-    begin
-      if TPLPointerNodeList(self.arrbuckets[ibktidx]).removeNode(ihsh, @skey) then
-        dec(Self.ikeycount);
-
+      end;
     end;  //if self.psearchednode <> nil then
   end;
 
@@ -1102,6 +1151,10 @@ end;
     if brebuild then
       //Reindex the Nodes
       self.rebuildList(0, Self.ibucketcount - 1, Self.ibucketcount);
+
+    if Self.nodeiterator <> Nil then
+      //Reset the Iterator
+      Self.nodeiterator.Reset;
 
   end;
 
@@ -1210,14 +1263,16 @@ end;
   function TPLPointerHashList.moveFirst(): Boolean;
   begin
     if Self.nodeiterator = Nil then
-      Self.GetIterator(itFirst);
+      Self.GetIterator(itpFirst)
+    else
+      Self.nodeiterator.First;
 
     Result := (Self.nodeiterator.PNode <> Nil);
   end;
 
   function TPLPointerHashList.moveNext(): Boolean;
   begin
-    if Self.nodeiterator = Nil then;
+    if Self.nodeiterator = Nil then
       Result := Self.moveFirst
     else
       Result := Self.nodeiterator.Next;
@@ -1232,7 +1287,7 @@ end;
 
   function TPLPointerHashList.GetFirstIterator: TPLPtrHashListIterator;
   begin
-    Result := Self.GetIterator(itFirst);
+    Result := Self.GetIterator(itpFirst);
   end;
 
   function TPLPointerHashList.GetIterator(position: TIteratorPosition): TPLPtrHashListIterator;
@@ -1242,9 +1297,9 @@ end;
       Self.nodeiterator := TPLPtrHashListIterator.Create(@Self.arrbuckets);
 
       case position of
-        itFirst: Self.nodeiterator.First;
-        itLast: Self.nodeiterator.Last;
-        itCurrent:
+        itpFirst: Self.nodeiterator.First;
+        itpLast: Self.nodeiterator.Last;
+        itpCurrent:
           begin
             if Self.pcurrentnode = Nil then
             begin
