@@ -97,6 +97,7 @@ type
     function Next: Boolean;
     function Previous: Boolean;
     function Move: Boolean;
+    function Return: Boolean;
     property Key: String read getKey;
     property Value: Pointer read getValue;
     property PNode: PPLHashNode read pcurrentnode write pcurrentnode;
@@ -741,6 +742,20 @@ implementation
 
   end;
 
+  function TPLPtrHashListIterator.Return: Boolean;
+  var
+    iitdir: TIteratorDirection;
+  begin
+    iitdir := Self.idirection;
+
+    if Self.idirection = itdUp then
+      Result := Self.Previous
+    else if Self.idirection = itdDown then
+      Result := Self.Next;
+
+    Self.idirection := iitdir;
+  end;
+
 
   //----------------------------------------------------------------------------
   //Consultation Methods
@@ -1108,8 +1123,8 @@ end;
     begin
       if (Self.nodeiterator <> Nil)
         and (Self.nodeiterator.PNode = Self.psearchednode) then
-        //Move the Iterator to another Node
-        Self.nodeiterator.Move;
+        //Move the Iterator to a former Node
+        Self.nodeiterator.Return;
 
       if TPLPointerNodeList(self.arrbuckets[ibktidx]).removeNode(self.psearchednode) then
       begin

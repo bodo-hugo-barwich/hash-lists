@@ -260,8 +260,127 @@ begin
 end;
 
 procedure TTestsHashListIterator.TestRemoveForward;
+var
+  itr: TPLPtrHashListIterator;
+  sky, srmky1, srmky2, srmky3, srmky4, srmky5: String;
+  psvl: PAnsiString;
+  iky, ikycnt, ikymxcnt, ikyttlcnt: Integer;
+  irmcnt, irmttlcnt: Integer;
 begin
-  CheckEquals(1, 1, 'TTestsHashListIterator.TestRemoveForward failed!');
+  WriteLn('TTestsHashListIterator.TestRemoveForward: go ...');
+
+  srmky1 := 'key2';
+  srmky2 := 'key3';
+  srmky3 := 'key8';
+  srmky4 := 'key9';
+  srmky5 := 'key19';
+  ikymxcnt := 20;
+  irmttlcnt := 5;
+
+  Self.lsthshobjs.GrowFactor := 2;
+  Self.lsthshobjs.LoadFactor := 3;
+
+  for iky := 1 to ikymxcnt do
+  begin
+    sky := 'key' + IntToStr(iky);
+
+    New(psvl);
+    psvl^ := 'value' + IntToStr(iky);
+
+    Self.lsthshobjs[sky] := psvl;
+  end;  //for iky := 1 to ikymxcnt do
+
+  ikyttlcnt := Self.lsthshobjs.Count;
+
+  CheckEquals(ikymxcnt, ikyttlcnt, 'INS - Count failed! Count is: '#39
+     + IntToStr(ikyttlcnt) + ' / ' + IntToStr(ikymxcnt) + #39);
+
+  itr := Self.lsthshobjs.Iterator;
+  iky := 0;
+  ikycnt := 0;
+  irmcnt := 0;
+
+  Check(itr <> Nil, 'TPLPointerHashList.Iterator : failed!');
+
+  repeat  //until not itr.Next;
+    inc(iky);
+    inc(ikycnt);
+
+    CheckNotEquals('', itr.Key, 'TPLPtrHashListIterator.Key No. ' + IntToStr(iky) + ' : failed! '
+      + 'Returned Key: ' + chr(39) + itr.Key + chr(39));
+
+    psvl := itr.Value;
+
+    if psvl <> Nil then
+    begin
+      WriteLn('key: '#39 + itr.Key + #39'; value: '#39 + psvl^ + #39);
+      CheckNotEquals('', psvl^, 'TPLPtrHashListIterator.Value No. ' + IntToStr(iky) + ' : failed! '
+        + 'Returned Value: ' + chr(39) + psvl^ + chr(39));
+    end
+    else
+      Check(psvl <> Nil, 'TPLPtrHashListIterator.Value No. ' + IntToStr(iky) + ' : failed! '
+        + 'Returned Value: '#39'NIL'#39);
+
+    if (itr.Key = srmky1)
+      or (itr.Key = srmky2)
+      or (itr.Key = srmky3)
+      or (itr.Key = srmky4)
+      or (itr.Key = srmky5) then
+    begin
+      WriteLn('key: '#39 + itr.Key + #39'; key removing ...');
+      //Remove the selected Keys and move on
+      Self.lsthshobjs.removeKey(itr.Key);
+      inc(irmcnt);
+    end;
+
+  until not itr.Next;
+
+  CheckEquals(ikycnt, ikyttlcnt, 'MV1 - Count failed! Count is: '#39
+     + IntToStr(ikycnt) + ' / ' + IntToStr(ikyttlcnt) + #39);
+  CheckEquals(irmcnt, irmttlcnt, 'RM - Count failed! Count is: '#39
+     + IntToStr(irmcnt) + ' / ' + IntToStr(irmttlcnt) + #39);
+
+  WriteLn('TTestsHashListIterator.TestRemoveForward: cap: '#39, Self.lsthshobjs.Capacity, #39);
+
+  Check(itr.First = True, 'TPLPointerHashList.Iterator First : failed!');
+
+  iky := 0;
+  ikycnt := 0;
+
+  repeat  //until not itr.Next;
+    inc(iky);
+    inc(ikycnt);
+
+    CheckNotEquals('', itr.Key, 'TPLPtrHashListIterator.Key No. ' + IntToStr(iky) + ' : failed! '
+      + 'Returned Key: ' + chr(39) + itr.Key + chr(39));
+
+    psvl := itr.Value;
+
+    if psvl <> Nil then
+    begin
+      WriteLn('key: '#39 + itr.Key + #39'; value: '#39 + psvl^ + #39);
+      CheckNotEquals('', psvl^, 'TPLPtrHashListIterator.Value No. ' + IntToStr(iky) + ' : failed! '
+        + 'Returned Value: ' + chr(39) + psvl^ + chr(39));
+    end
+    else
+      Check(psvl <> Nil, 'TPLPtrHashListIterator.Value No. ' + IntToStr(iky) + ' : failed! '
+        + 'Returned Value: '#39'NIL'#39);
+
+    if (itr.Key = srmky1)
+      or (itr.Key = srmky2)
+      or (itr.Key = srmky3)
+      or (itr.Key = srmky4)
+      or (itr.Key = srmky5) then
+    begin
+      Check(False, 'TPLPointerHashList.removeKey() failed! '
+        + 'Key: '#39 + itr.Key + #39' was not removed.');
+    end;
+
+  until not itr.Next;
+
+  CheckEquals(ikycnt, ikyttlcnt - irmttlcnt, 'MV2 - Count failed! Count is: '#39
+     + IntToStr(ikycnt) + ' / ' + IntToStr(ikyttlcnt - irmttlcnt) + #39);
+
 end;
 
 procedure TTestsHashListIterator.TestRemoveBackward;
