@@ -51,7 +51,7 @@ type
     procedure setValue(ihash: Cardinal; pskey: PAnsiString; ppointer: Pointer); overload;
     procedure setValue(pskey: PAnsiString; ppointer: Pointer); overload;
     procedure unsetIndex(iindex: Integer);
-    function removeNode(pnode: PPLHashNode = nil): Boolean; overload;
+    function removeNode(pnode: PPLHashNode): Boolean; virtual; overload;
     function removeNode(ihash: Cardinal; pskey: PAnsiString): Boolean; virtual; overload;
     function removeNode(pskey: PAnsiString): Boolean; virtual; overload;
     procedure reindexList;

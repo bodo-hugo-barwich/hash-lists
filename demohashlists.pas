@@ -28,6 +28,8 @@ procedure TDemoHashLists.DoRun;
 var
   hshmap: TPLPointerHashList;
   strmap: TPLStringHashList;
+  itr: TPLPtrHashListIterator;
+  sky, svl, srmky1, srmky2, srmky3, srmky4: String;
   psvl: PAnsiString;
   ErrorMsg: String;
 begin
@@ -50,7 +52,7 @@ begin
   end;  //if HasOption('h', 'help') then
 
 (*   *)
-  hshmap := TPLPointerHashList.Create(2, 2);
+  hshmap := TPLPointerHashList.Create(3, 2);
   strmap := TPLStringHashList.Create(3, 2);
 
   hshmap.setValue('en', strmap);
@@ -83,6 +85,19 @@ begin
   WriteLn(chr(39));
 
   strmap.setValue('trying a somwhat very long key 1', 'inserting its somewhat very long value 1');
+
+  strmap := TPLStringHashList.Create;
+
+  strmap.GrowFactor := 2;
+
+  hshmap.setValue('iterator', strmap);
+
+  for iky := 1 to 10 do
+  begin
+    sky := 'key' + IntToStr(iky);
+    svl := 'value' + IntToStr(iky);
+    strmap.setValue(sky, svl);
+  end;  //for iky := 1 to 10 do
 
   WriteLn('hsh map (cnt: ', chr(39), hshmap.Count, chr(39), '):');
 
@@ -118,6 +133,31 @@ begin
 
   end;  //if hshmap.moveFirst() then
 
+
+  strmap := TPLStringHashList(hshmap['iterator']);
+  itr := strmap.Iterator;
+  srmky1 := 'key2';
+  srmky2 := 'key3';
+  srmky3 := 'key8';
+  srmky4 := 'key9';
+
+  if itr <> Nil then
+  begin
+    repeat  //until not itr.Next;
+      if (itr.Key = srmky1)
+        or (itr.Key = srmky2)
+        or (itr.Key = srmky3)
+        or (itr.Key = srmky4) then
+      begin
+        WriteLn('key: '#39 + itr.Key + #39'; key removing ...');
+        //Remove the selected Keys and move on
+        strmap.removeKey(itr.Key);
+      end;
+    until not itr.Next;
+
+  end;  //if itr <> Nil then
+
+
   if hshmap.moveFirst() then
   begin
     TPLStringHashList(hshmap.getCurrentValue()).Free;
@@ -130,8 +170,6 @@ begin
 
   hshmap.Free;
 
-
-  { add your program here }
 
   // stop program loop
   Terminate;

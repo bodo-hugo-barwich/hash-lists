@@ -40,6 +40,7 @@ type
     It should return the defined Keys and their Values
     *)
     procedure TestCheckNextElement;
+    procedure TestRemoveCountElements;
   end;
 
 procedure RegisterTests;
@@ -243,6 +244,120 @@ begin
   CheckEquals(psvl^, 'last_value', 'TPLStringHashList.getCurrentValue() No. 3 : failed! '
     + 'Returned Key: ' + chr(39) + psvl^ + chr(39));
 end;
+
+procedure TTestsStringHashList.TestRemoveCountElements;
+var
+  psvl: PAnsiString;
+  sky, svl, srmky1, srmky2, srmky3, srmky4: String;
+  iky, ikycnt, ikymxcnt, ikyttlcnt: Integer;
+  irmcnt, irmttlcnt: Integer;
+begin
+  WriteLn('TTestsStringHashList.TestRemoveCountElements: go ...');
+
+  srmky1 := 'key2';
+  srmky2 := 'key3';
+  srmky3 := 'key8';
+  srmky4 := 'key9';
+  ikymxcnt := 10;
+  irmttlcnt := 4;
+
+  for iky := 1 to ikymxcnt do
+  begin
+    sky := 'key' + IntToStr(iky);
+    svl := 'value' + IntToStr(iky);
+    Self.lsthshstrs.setValue(sky, svl);
+  end;  //for iky := 1 to ikymxcnt do
+
+  ikyttlcnt := Self.lsthshstrs.Count;
+
+  CheckEquals(ikymxcnt, ikyttlcnt, 'INS - Count failed! Count is: '#39
+     + IntToStr(ikyttlcnt) + ' / ' + IntToStr(ikymxcnt) + #39);
+
+  WriteLn('TTestsStringHashList.TestRemoveCountElements: cap: '#39, Self.lsthshstrs.Capacity, #39);
+
+  Check(Self.lsthshstrs.moveFirst() = True, 'TPLStringHashList.moveFirst() No. 1 : failed!');
+
+  iky := 0;
+  ikycnt := 0;
+  irmcnt := 0;
+
+  repeat  //until not Self.lsthshstrs.moveNext();
+    inc(iky);
+    inc(ikycnt);
+
+    sky := Self.lsthshstrs.getCurrentKey();
+    psvl := PAnsiString(Self.lsthshstrs.getCurrentValue());
+
+    if psvl <> Nil then
+    begin
+      WriteLn('key: '#39 + sky + #39'; value: '#39 + psvl^ + #39);
+      CheckNotEquals('', psvl^, 'TStringObject.Value No. ' + IntToStr(iky) + ' : failed! '
+        + 'Returned Value: ' + chr(39) + psvl^ + chr(39));
+    end
+    else
+      Check(psvl <> Nil, 'TPLStringHashList.getCurrentValue() No. ' + IntToStr(iky) + ' : failed! '
+        + 'Returned Value: '#39'NIL'#39);
+
+    if (sky = srmky1)
+      or (sky = srmky2)
+      or (sky = srmky3)
+      or (sky = srmky4) then
+    begin
+      WriteLn('key: '#39 + sky + #39'; key removing ...');
+      //Remove the selected Keys and move on
+      Self.lsthshstrs.removeKey(sky);
+      inc(irmcnt);
+    end;
+  until not Self.lsthshstrs.moveNext();
+
+  CheckEquals(ikycnt, ikyttlcnt, 'MV1 - Count failed! Count is: '#39
+     + IntToStr(ikycnt) + ' / ' + IntToStr(ikyttlcnt) + #39);
+  CheckEquals(irmcnt, irmttlcnt, 'RM - Count failed! Count is: '#39
+     + IntToStr(irmcnt) + ' / ' + IntToStr(irmttlcnt) + #39);
+
+  WriteLn('TTestsStringHashList.TestRemoveCountElements: cap: '#39, Self.lsthshstrs.Capacity, #39);
+
+  Check(Self.lsthshstrs.moveFirst() = True, 'TPLStringHashList.moveFirst() No. 2 : failed!');
+
+  iky := 0;
+  ikycnt := 0;
+
+  repeat  //until not Self.lsthshstrs.moveNext();
+    inc(iky);
+    inc(ikycnt);
+
+    sky := Self.lsthshstrs.getCurrentKey();
+    psvl := PAnsiString(Self.lsthshstrs.getCurrentValue());
+
+    CheckNotEquals('', sky, 'TPLStringHashList.getCurrentKey() No. ' + IntToStr(iky) + ' : failed! '
+      + 'Returned Key: ' + chr(39) + sky + chr(39));
+
+    if psvl <> Nil then
+    begin
+      WriteLn('key: '#39 + sky + #39'; value: '#39 + psvl^ + #39);
+      CheckNotEquals('', psvl^, 'TPLStringHashList.getCurrentValue() No. ' + IntToStr(iky) + ' : failed! '
+        + 'Returned Value: ' + chr(39) + psvl^ + chr(39));
+    end
+    else
+      Check(psvl <> Nil, 'TPLStringHashList.getCurrentValue() No. ' + IntToStr(iky) + ' : failed! '
+        + 'Returned Value: '#39'NIL'#39);
+
+    if (sky = srmky1)
+      or (sky = srmky2)
+      or (sky = srmky3)
+      or (sky = srmky4) then
+    begin
+      Check(False, 'TPLStringHashList.removeKey() failed! '
+        + 'Key: '#39 + sky + #39' was not removed.');
+    end;
+
+  until not Self.lsthshstrs.moveNext();
+
+  CheckEquals(ikycnt, ikyttlcnt - irmttlcnt, 'MV2 - Count failed! Count is: '#39
+     + IntToStr(ikycnt) + ' / ' + IntToStr(ikyttlcnt - irmttlcnt) + #39);
+
+end;
+
 
 end.
 

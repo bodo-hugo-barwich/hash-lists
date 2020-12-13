@@ -5,15 +5,15 @@ unit stringhash;
 interface
 
 uses
-  Classes, SysUtils, pointerhash;
+  Classes, SysUtils
+  , pointerhash;
 
 type
   TPLStringNodeList = class(TPLPointerNodeList)
   public
     destructor Destroy; override;
     function addNode(ihash: Cardinal; pskey: PAnsiString; psvalue: PAnsiString): PPLHashNode; overload;
-    function removeNode(ihash: Cardinal; pskey: PAnsiString): Boolean; override; overload;
-    function removeNode(pskey: PAnsiString): Boolean; override; overload;
+    function removeNode(pnode: PPLHashNode): Boolean; override;
     procedure Clear; override;
   end;
 
@@ -24,6 +24,8 @@ type
     procedure setCapacity(icapacity: Integer); override;
     procedure Add(const skey: String; svalue: String); overload;
     procedure setValue(const skey: String; svalue: String); overload;
+    procedure removeKey(const skey: String); override;
+    procedure Clear(); override;
   end;
 
 
@@ -70,39 +72,18 @@ uses
     Result := inherited addNode(ihash, pskey, psvl);
   end;
 
-  function TPLStringNodeList.removeNode(ihash: Cardinal; pskey: PAnsiString): Boolean;
-  var
-    plstnd: PPLHashNode;
+function TPLStringNodeList.removeNode(pnode: PPLHashNode): Boolean;
+begin
+  Result := False;
+
+  if pnode <> nil then
   begin
-    Result := False;
+    self.unsetIndex(pnode^.inodeindex);
+    Dispose(PAnsiString(pnode^.pvalue));
 
-    plstnd := self.searchNode(ihash, pskey);
-
-    if plstnd <> nil then
-    begin
-      self.unsetIndex(plstnd^.inodeindex);
-      Dispose(PAnsiString(plstnd^.pvalue));
-
-      Result := inherited removeNode(plstnd);
-    end;  //if plstnd <> nil then
-  end;
-
-  function TPLStringNodeList.removeNode(pskey: PAnsiString): Boolean;
-  var
-    plstnd: PPLHashNode;
-  begin
-    Result := False;
-
-    plstnd := self.searchNode(pskey);
-
-    if plstnd <> nil then
-    begin
-      self.unsetIndex(plstnd^.inodeindex);
-      Dispose(PAnsiString(plstnd^.pvalue));
-
-      Result := inherited removeNode(plstnd);
-    end;  //if plstnd <> nil then
-  end;
+    Result := inherited removeNode(pnode);
+  end;  //if plstnd <> nil then
+end;
 
   procedure TPLStringNodeList.Clear;
   var
@@ -289,6 +270,58 @@ end;
       PAnsiString(self.psearchednode^.pvalue)^ := svalue;
     end;  //if self.psearchednode = nil then
   end;
+
+procedure TPLStringHashList.removeKey(const skey: String);
+var
+  ihsh: Cardinal;
+  ibktidx: Integer;
+begin
+  //Build the Hash Index
+  ihsh := computeHash(@skey);
+  ibktidx := ihsh mod self.ibucketcount;
+
+  if self.psearchednode <> nil then
+  begin
+    if not ((self.psearchednode^.ihash = ihsh)
+      and (self.psearchednode^.skey = skey)) then
+      self.psearchednode := nil;
+
+  end;  //if self.psearchednode <> nil then
+
+  if Self.psearchednode = nil then
+    Self.psearchednode := TPLStringNodeList(Self.arrbuckets[ibktidx]).searchNode(ihsh, @skey);
+
+  if Self.psearchednode <> nil then
+  begin
+    if (Self.nodeiterator <> Nil)
+      and (Self.nodeiterator.PNode = Self.psearchednode) then
+      //Move the Iterator to a former Node
+      Self.nodeiterator.Return;
+
+    if TPLStringNodeList(self.arrbuckets[ibktidx]).removeNode(self.psearchednode) then
+    begin
+      self.psearchednode := nil;
+      dec(Self.ikeycount);
+    end;
+  end;  //if self.psearchednode <> nil then
+end;
+
+procedure TPLStringHashList.Clear();
+var
+  ibkt: Integer;
+begin
+  for ibkt := 0 to self.ibucketcount - 1 do
+  begin
+    TPLStringNodeList(self.arrbuckets[ibkt]).Clear;
+
+    if ibkt >= self.igrowfactor then
+      self.arrbuckets[ibkt].Free;
+
+  end;  //for ibkt := 0 to self.ibucketcount - 1 do
+
+  //Shrink the List to its initial Size
+  SetLength(self.arrbuckets, self.igrowfactor);
+end;
 
 end.
 

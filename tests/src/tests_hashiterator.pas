@@ -16,26 +16,29 @@ type
     procedure Teardown; override;
   published
     (*
-    Test Adding 10 Keys and their Values with the Add()-Method (which should grow the List at least once)
-    And Looking up their Values (they must match their inserted Values)
+    Test Adding 20 Keys and their Values with the Default Property Method (which should grow the List more than twice)
+    And Iterating over the Keys from the Beginning and Counting the found Keys.
+    The counted number must match the inserted number.
     *)
     procedure TestIterateForward;
     (*
-    Test Adding 3 Keys and their Values with the Add()-Method
-    Adding the 4th Value on a duplicate Key.
-    The "dupAccept" Bahaviour is enabled which should override the existing Value
+    Test Adding 20 Keys and their Values with the Default Property Method (which should grow the List more than twice)
+    And Iterating over the Keys from the End and Counting the found Keys.
+    The counted number must match the inserted number.
     *)
     procedure TestIterateBackward;
     (*
-    Test Adding 3 Keys and their Values with the Add()-Method
-    Adding the 4th Value on a duplicate Key.
-    The "dupIgnore" Bahaviour is enabled which should drop the new Value
+    Test Adding 20 Keys and their Values with the Default Property Method (which should grow the List more than twice)
+    And Iterating over the Keys from the Beginning and Removing the matching Keys.
+    The number of removed Keys must match the requested number of Keys
+    and the number of remaining Keys must match the difference between the inserted Keys and the removed Keys.
     *)
     procedure TestRemoveForward;
     (*
-    Test Adding 3 Keys and their Values with the Add()-Method
-    Adding the 4th Value on a duplicate Key.
-    The "dupError" Bahaviour is enabled which should raise an Exception
+    Test Adding 20 Keys and their Values with the Default Property Method (which should grow the List more than twice)
+    And Iterating over the Keys from the End and Removing the matching Keys.
+    The number of removed Keys must match the requested number of Keys
+    and the number of remaining Keys must match the difference between the inserted Keys and the removed Keys.
     *)
     procedure TestRemoveBackward;
   end;
@@ -328,6 +331,8 @@ begin
       or (itr.Key = srmky5) then
     begin
       WriteLn('key: '#39 + itr.Key + #39'; key removing ...');
+      //Free the Value first
+      Dispose(psvl);
       //Remove the selected Keys and move on
       Self.lsthshobjs.removeKey(itr.Key);
       inc(irmcnt);
@@ -384,8 +389,129 @@ begin
 end;
 
 procedure TTestsHashListIterator.TestRemoveBackward;
+var
+  itr: TPLPtrHashListIterator;
+  sky, srmky1, srmky2, srmky3, srmky4, srmky5: String;
+  psvl: PAnsiString;
+  iky, ikycnt, ikymxcnt, ikyttlcnt: Integer;
+  irmcnt, irmttlcnt: Integer;
 begin
-  CheckEquals(1, 1, 'TestsHashListIterator.TestRemoveBackward failed!');
+  WriteLn('TTestsHashListIterator.TestRemoveBackward: go ...');
+
+  srmky1 := 'key2';
+  srmky2 := 'key3';
+  srmky3 := 'key8';
+  srmky4 := 'key9';
+  srmky5 := 'key19';
+  ikymxcnt := 20;
+  irmttlcnt := 5;
+
+  Self.lsthshobjs.GrowFactor := 2;
+  Self.lsthshobjs.LoadFactor := 3;
+
+  for iky := 1 to ikymxcnt do
+  begin
+    sky := 'key' + IntToStr(iky);
+
+    New(psvl);
+    psvl^ := 'value' + IntToStr(iky);
+
+    Self.lsthshobjs[sky] := psvl;
+  end;  //for iky := 1 to ikymxcnt do
+
+  ikyttlcnt := Self.lsthshobjs.Count;
+
+  CheckEquals(ikymxcnt, ikyttlcnt, 'INS - Count failed! Count is: '#39
+     + IntToStr(ikyttlcnt) + ' / ' + IntToStr(ikymxcnt) + #39);
+
+  itr := Self.lsthshobjs.GetIterator(itpLast);
+  iky := 0;
+  ikycnt := 0;
+  irmcnt := 0;
+
+  Check(itr <> Nil, 'TPLPointerHashList.GetIterator Last : failed!');
+
+  repeat  //until not itr.Previous;
+    inc(iky);
+    inc(ikycnt);
+
+    CheckNotEquals('', itr.Key, 'TPLPtrHashListIterator.Key No. ' + IntToStr(iky) + ' : failed! '
+      + 'Returned Key: ' + chr(39) + itr.Key + chr(39));
+
+    psvl := itr.Value;
+
+    if psvl <> Nil then
+    begin
+      WriteLn('key: '#39 + itr.Key + #39'; value: '#39 + psvl^ + #39);
+      CheckNotEquals('', psvl^, 'TPLPtrHashListIterator.Value No. ' + IntToStr(iky) + ' : failed! '
+        + 'Returned Value: ' + chr(39) + psvl^ + chr(39));
+    end
+    else
+      Check(psvl <> Nil, 'TPLPtrHashListIterator.Value No. ' + IntToStr(iky) + ' : failed! '
+        + 'Returned Value: '#39'NIL'#39);
+
+    if (itr.Key = srmky1)
+      or (itr.Key = srmky2)
+      or (itr.Key = srmky3)
+      or (itr.Key = srmky4)
+      or (itr.Key = srmky5) then
+    begin
+      WriteLn('key: '#39 + itr.Key + #39'; key removing ...');
+      //Free the Value first
+      Dispose(psvl);
+      //Remove the selected Keys and move on
+      Self.lsthshobjs.removeKey(itr.Key);
+      inc(irmcnt);
+    end;
+
+  until not itr.Previous;
+
+  CheckEquals(ikycnt, ikyttlcnt, 'MV1 - Count failed! Count is: '#39
+     + IntToStr(ikycnt) + ' / ' + IntToStr(ikyttlcnt) + #39);
+  CheckEquals(irmcnt, irmttlcnt, 'RM - Count failed! Count is: '#39
+     + IntToStr(irmcnt) + ' / ' + IntToStr(irmttlcnt) + #39);
+
+  WriteLn('TTestsHashListIterator.TestRemoveBackward: cap: '#39, Self.lsthshobjs.Capacity, #39);
+
+  Check(itr.Last = True, 'TPLPointerHashList.Iterator Last : failed!');
+
+  iky := 0;
+  ikycnt := 0;
+
+  repeat  //until not itr.Next;
+    inc(iky);
+    inc(ikycnt);
+
+    CheckNotEquals('', itr.Key, 'TPLPtrHashListIterator.Key No. ' + IntToStr(iky) + ' : failed! '
+      + 'Returned Key: ' + chr(39) + itr.Key + chr(39));
+
+    psvl := itr.Value;
+
+    if psvl <> Nil then
+    begin
+      WriteLn('key: '#39 + itr.Key + #39'; value: '#39 + psvl^ + #39);
+      CheckNotEquals('', psvl^, 'TPLPtrHashListIterator.Value No. ' + IntToStr(iky) + ' : failed! '
+        + 'Returned Value: ' + chr(39) + psvl^ + chr(39));
+    end
+    else
+      Check(psvl <> Nil, 'TPLPtrHashListIterator.Value No. ' + IntToStr(iky) + ' : failed! '
+        + 'Returned Value: '#39'NIL'#39);
+
+    if (itr.Key = srmky1)
+      or (itr.Key = srmky2)
+      or (itr.Key = srmky3)
+      or (itr.Key = srmky4)
+      or (itr.Key = srmky5) then
+    begin
+      Check(False, 'TPLPointerHashList.removeKey() failed! '
+        + 'Key: '#39 + itr.Key + #39' was not removed.');
+    end;
+
+  until not itr.Previous;
+
+  CheckEquals(ikycnt, ikyttlcnt - irmttlcnt, 'MV2 - Count failed! Count is: '#39
+     + IntToStr(ikycnt) + ' / ' + IntToStr(ikyttlcnt - irmttlcnt) + #39);
+
 end;
 
 end.
