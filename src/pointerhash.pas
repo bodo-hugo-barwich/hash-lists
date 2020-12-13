@@ -98,6 +98,8 @@ type
     property Count: Integer read ikeycount;
   end;
 
+  DuplicateKeyException = class(EListError);
+
 implementation
 
   uses
@@ -706,7 +708,7 @@ begin
         //The Value was successfully added
         Result := True;
       end;
-      dupError: RaiseListException('Key ' + chr(39) + skey + chr(39) + ': key does already exist!');
+      dupError: raise DuplicateKeyException.Create('Key ' + chr(39) + skey + chr(39) + ': key does already exist!');
       dupIgnore: ;
     end;  //case Self.eduplicatekeys of
   end;  //if self.psearchednode = nil then

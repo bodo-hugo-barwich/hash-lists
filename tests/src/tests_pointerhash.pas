@@ -137,12 +137,12 @@ begin
   {$IFDEF speedtests}
   Self.mpobjs:= TPMap.Create;
   {$ENDIF}
-  Self.lsthshobjs := TPLPointerHashList.Create();
+  lsthshobjs := TPLPointerHashList.Create();
 
-  Self.finsertlimit1000 := 1.1;
-  Self.flookuplimit1000 := 1.1;
-  Self.finsertlimit5000 := 6.1;
-  Self.flookuplimit5000 := 4.1;
+  finsertlimit1000 := 1.1;
+  flookuplimit1000 := 1.1;
+  finsertlimit5000 := 6.1;
+  flookuplimit5000 := 4.1;
 end;
 
 {
@@ -169,7 +169,7 @@ begin
   {$ENDIF}
 
 
-  if self.lsthshobjs.moveFirst then
+  if lsthshobjs.moveFirst then
   begin
     repeat  //until not self.lsthshobjs.moveNext();
       psvl := self.lsthshobjs.getCurrentValue();
@@ -178,7 +178,7 @@ begin
     until not self.lsthshobjs.moveNext();
   end;  //if self.lsthshobjs.moveFirst then
 
-  self.lsthshobjs.Free;
+  FreeAndNil(lsthshobjs);
 end;
 
 procedure TTestsPointerHashList.TestAddCheckElements;
@@ -420,33 +420,29 @@ begin
   psinvl^ := 'value3.2';
 
   try
-    if Self.lsthshobjs.Add('key3', psinvl) then
-    begin
-      //The Value was unexpectly added and the former Value must be freed
-      Dispose(psoutvl);
-
-      //This is a faulty Behaviour with "dupError"
-      Check(False, 'INS - TPLPointerHashList.Add() failed! Duplicate Key was accepted.');
-    end
-    else  //The Value was rejected but No Exception was raised
-    begin
-      //The rejected Value must be freed
-       Dispose(psinvl);
-
-       //This is a faulty Behaviour with "dupError"
-      Check(False, 'INS - TPLPointerHashList.Add() failed! No Exception raised.');
-    end;  //if Self.lsthshobjs.Add('key3', psinvl) then
+    Self.lsthshobjs.Add('key3', psinvl);
+    //This is a faulty Behaviour with "dupError"
+    Fail('INS - TPLPointerHashList.Add() failed! Duplicate Key was accepted.');
   except
-    //The Exception "EStringListError" is expected
-    on e: EStringListError do ;
+    on e: DuplicateKeyException do
+      begin
+        writeln('Duplicate hash key detected. ' + e.Message);
+        Dispose(psinvl);
+      end;
+
+    on e: EStringListError do
+    begin
+        writeln('A generic EStringListErrer detected. ' + e.Message);
+        Dispose(psinvl);
+    end
     else
     begin
+      //The rejected Value must be freed
+      Dispose(psinvl);
       //This is an unexpected Exception
-      Check(False, 'INS - TPLPointerHashList.Add() failed! Unexpected Exception.');
+      Fail('INS - TPLPointerHashList.Add() failed! Unexpected Exception.');
     end;
 
-    //The rejected Value must be freed
-    Dispose(psinvl);
   end;  //try
 
   //Should yield the former Value "value3"
@@ -454,7 +450,6 @@ begin
 
   CheckEquals('value3', psoutvl^, 'LKP - key '  + chr(39) + 'key3' + chr(39)
     + ' failed! Value is: ' + chr(39) + psoutvl^ + chr(39));
-
 end;
 
 
