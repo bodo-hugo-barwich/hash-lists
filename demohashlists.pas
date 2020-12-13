@@ -30,8 +30,9 @@ var
   strmap: TPLStringHashList;
   itr: TPLPtrHashListIterator;
   sky, svl, srmky1, srmky2, srmky3, srmky4: String;
-  psvl: PAnsiString;
   ErrorMsg: String;
+  psvl: PAnsiString;
+  iky: Integer;
 begin
   // quick check parameters
   ErrorMsg := CheckOptions('hd', ['help', 'debug']);

@@ -33,13 +33,20 @@ type
     *)
     procedure TestCheckFirstElement;
     (*
-    Test Adding 3 Keys and their Values for a valid List Test
-    Using the Default Property
+    Test Adding 3 Keys and their Values for a valid List Test using the Default Property
     And Iterating to the First Key and to the Next Key (they are not necessary
     the first and second inserted keys)
     It should return the defined Keys and their Values
     *)
     procedure TestCheckNextElement;
+    (*
+    Test Adding 10 Keys and their Values
+    And Iterating from the Beginning and Removing 4 Keys
+    The number of counted Keys must match the number of inserted Keys
+    The number of removed Keys must match the requested number of Keys
+    and the number of remaining Keys must match the difference between the inserted Keys and the removed Keys.
+    Memory does not need to be freed but must not leak either.
+    *)
     procedure TestRemoveCountElements;
   end;
 
@@ -254,10 +261,10 @@ var
 begin
   WriteLn('TTestsStringHashList.TestRemoveCountElements: go ...');
 
-  srmky1 := 'key2';
-  srmky2 := 'key3';
-  srmky3 := 'key8';
-  srmky4 := 'key9';
+  srmky1 := 'key3';
+  srmky2 := 'key5';
+  srmky3 := 'key6';
+  srmky4 := 'key8';
   ikymxcnt := 10;
   irmttlcnt := 4;
 

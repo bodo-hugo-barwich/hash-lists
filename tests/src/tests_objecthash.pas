@@ -56,6 +56,14 @@ type
     It should return the defined Keys and their Values
     *)
     procedure TestCheckNextElement;
+    (*
+    Test Adding 10 Keys and their Values using the Default Property
+    And Iterating from the Beginning and Removing 4 Keys
+    The number of counted Keys must match the number of inserted Keys
+    The number of removed Keys must match the requested number of Keys
+    and the number of remaining Keys must match the difference between the inserted Keys and the removed Keys.
+    Memory does not need to be freed but must not leak either.
+    *)
     procedure TestRemoveCountElements;
   end;
 
