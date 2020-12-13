@@ -155,6 +155,8 @@ type
     property Iterator: TPLPtrHashListIterator read GetFirstIterator;
   end;
 
+  DuplicateKeyException = class(EListError);
+
 
 
 implementation
@@ -993,7 +995,8 @@ implementation
 
 class procedure TPLPointerHashList.RaiseListException(const serrormessage: String);
 begin
-  raise EStringListError.Create(serrormessage);
+  //raise EStringListError.Create(serrormessage);
+  raise DuplicateKeyException.Create(serrormessage);
 end;
 
 function TPLPointerHashList.Add(const skey: String; ppointer: Pointer): Boolean;
