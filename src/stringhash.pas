@@ -214,6 +214,11 @@ begin
     self.psearchednode := TPLStringNodeList(self.arrbuckets[ibktidx]).addNode(ihsh, @skey, PAnsiString(@svalue));
 
     inc(self.ikeycount);
+
+    if Self.nodeiterator <> Nil then
+      //Reset the Iterator
+      Self.nodeiterator.Reset;
+
   end
   else  //The Key is already in the List
   begin
@@ -227,49 +232,54 @@ begin
 end;
 
 
-  procedure TPLStringHashList.setValue(const skey: String; svalue: String);
-  var
-    ihsh: Cardinal;
-    ibktidx: Integer;
+procedure TPLStringHashList.setValue(const skey: String; svalue: String);
+var
+  ihsh: Cardinal;
+  ibktidx: Integer;
+begin
+  //Build the Hash Index
+  ihsh := computeHash(@skey);
+  ibktidx := ihsh mod self.ibucketcount;
+
+  if self.psearchednode <> nil then
   begin
-    //Build the Hash Index
-    ihsh := computeHash(@skey);
-    ibktidx := ihsh mod self.ibucketcount;
+    if not ((self.psearchednode^.ihash = ihsh)
+      and (self.psearchednode^.skey = skey)) then
+      self.psearchednode := nil;
 
-    if self.psearchednode <> nil then
+  end;  //if self.psearchednode <> nil then
+
+  if self.psearchednode = nil then
+    self.psearchednode := TPLStringNodeList(self.arrbuckets[ibktidx]).searchNode(ihsh, @skey);
+
+  if self.psearchednode = nil then
+  begin
+    //Add a New Node
+
+    if self.ikeycount = self.imaxkeycount then
     begin
-      if not ((self.psearchednode^.ihash = ihsh)
-        and (self.psearchednode^.skey = skey)) then
-        self.psearchednode := nil;
+      self.extendList();
 
-    end;  //if self.psearchednode <> nil then
+      //Recompute Bucket Index
+      ibktidx := ihsh mod self.ibucketcount;
+    end;  //if self.ikeycount = self.imaxkeycount then
 
-    if self.psearchednode = nil then
-      self.psearchednode := TPLStringNodeList(self.arrbuckets[ibktidx]).searchNode(ihsh, @skey);
+    self.psearchednode := TPLStringNodeList(self.arrbuckets[ibktidx]).addNode(ihsh, @skey, PAnsiString(@svalue));
 
-    if self.psearchednode = nil then
-    begin
-      //Add a New Node
+    inc(self.ikeycount);
 
-      if self.ikeycount = self.imaxkeycount then
-      begin
-        self.extendList();
+    if Self.nodeiterator <> Nil then
+      //Reset the Iterator
+      Self.nodeiterator.Reset;
 
-        //Recompute Bucket Index
-        ibktidx := ihsh mod self.ibucketcount;
-      end;  //if self.ikeycount = self.imaxkeycount then
+  end
+  else  //The Key is already in the List
+  begin
+    //Update the Node Value
 
-      self.psearchednode := TPLStringNodeList(self.arrbuckets[ibktidx]).addNode(ihsh, @skey, PAnsiString(@svalue));
-
-      inc(self.ikeycount);
-    end
-    else  //The Key is already in the List
-    begin
-      //Update the Node Value
-
-      PAnsiString(self.psearchednode^.pvalue)^ := svalue;
-    end;  //if self.psearchednode = nil then
-  end;
+    PAnsiString(self.psearchednode^.pvalue)^ := svalue;
+  end;  //if self.psearchednode = nil then
+end;
 
 procedure TPLStringHashList.removeKey(const skey: String);
 var
@@ -321,6 +331,16 @@ begin
 
   //Shrink the List to its initial Size
   SetLength(self.arrbuckets, self.igrowfactor);
+
+  //Reset Counter
+  Self.ibucketcount := Self.igrowfactor;
+  Self.ikeycount := 0;
+  Self.imaxkeycount := Self.ibucketcount * Self.iloadfactor;
+
+  if Self.nodeiterator <> Nil then
+    //Reset the Iterator
+    Self.nodeiterator.Reset;
+
 end;
 
 end.

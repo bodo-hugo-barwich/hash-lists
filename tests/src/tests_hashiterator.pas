@@ -27,6 +27,7 @@ type
     The counted number must match the inserted number.
     *)
     procedure TestIterateBackward;
+    procedure TestResetOnAdd;
     (*
     Test Adding 20 Keys and their Values with the Default Property Method (which should grow the List more than twice)
     And Iterating over the Keys from the Beginning and Removing the matching Keys.
@@ -260,6 +261,76 @@ begin
 
   CheckEquals(ikycnt, ikyttlcnt, 'MV - Count failed! Count is: '#39
      + IntToStr(ikycnt) + ' / ' + IntToStr(ikyttlcnt) + #39);
+end;
+
+procedure TTestsHashListIterator.TestResetOnAdd;
+var
+  itr: TPLPtrHashListIterator;
+  psvl: PAnsiString;
+  sky, sfstky: String;
+  iky, ikymxcnt, ikyttlcnt: Integer;
+begin
+  WriteLn('TTestsHashListIterator.TestResetOnAdd: go ...');
+
+  ikymxcnt := 10;
+
+  Self.lsthshobjs.LoadFactor := 2;
+
+  for iky := 1 to ikymxcnt do
+  begin
+    sky := 'key' + IntToStr(iky);
+
+    New(psvl);
+    psvl^ := 'value' + IntToStr(iky);
+
+    Self.lsthshobjs[sky] := psvl;
+  end;  //for iky := 1 to ikymxcnt do
+
+  ikyttlcnt := Self.lsthshobjs.Count;
+
+  CheckEquals(ikymxcnt, ikyttlcnt, 'INS - Count failed! Count is: '#39
+     + IntToStr(ikyttlcnt) + ' / ' + IntToStr(ikymxcnt) + #39);
+
+  WriteLn('TTestsHashListIterator.TestResetOnAdd: cap: '#39, Self.lsthshobjs.Capacity, #39);
+
+  itr := Self.lsthshobjs.Iterator;
+
+  Check(itr <> Nil, 'TPLPointerHashList.Iterator : failed!');
+
+  sfstky := itr.Key;
+
+  CheckNotEquals('', sfstky, 'TPLPtrHashListIterator.Key First No. 1 : failed! '
+    + 'Returned Key: ' + chr(39) + sfstky + chr(39));
+
+  psvl := itr.Value;
+
+  if psvl <> Nil then
+  begin
+    WriteLn('key: '#39 + itr.Key + #39'; value: '#39 + psvl^ + #39);
+    CheckNotEquals('', psvl^, 'TPLPtrHashListIterator.Value First No. 1 : failed! '
+      + 'Returned Value: ' + chr(39) + psvl^ + chr(39));
+  end
+  else
+    Check(psvl <> Nil, 'TPLPtrHashListIterator.Value First No. 1 : failed! '
+      + 'Returned Value: '#39'NIL'#39);
+
+  for iky := 1 to 3 do
+  begin
+    Check(itr.Next <> False, 'TPLPtrHashListIterator.Next() No. ' + IntToStr(iky) + '  : failed! '
+      + 'Returned Value: '#39'FALSE'#39);
+  end;  //for iky := 1 to 3 do
+
+  sky := 'key' + IntToStr(ikymxcnt + 1);
+
+  New(psvl);
+  psvl^ := 'value' + IntToStr(ikymxcnt + 1);
+
+  Self.lsthshobjs[sky] := psvl;
+
+  WriteLn('TTestsHashListIterator.TestResetOnAdd: cap: '#39, Self.lsthshobjs.Capacity, #39);
+
+  CheckEquals(sfstky, itr.Key, 'INS - TPLPtrHashListIterator.Reset() failed! TPLPtrHashListIterator.Key is: '#39
+     + itr.Key + ' / ' + sfstky + #39);
 end;
 
 procedure TTestsHashListIterator.TestRemoveForward;

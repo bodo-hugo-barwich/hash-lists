@@ -9,6 +9,7 @@
       <UseAppBundle Value="False"/>
       <ResourceType Value="res"/>
     </General>
+    <LazDoc Paths="../doc/src"/>
     <BuildModes Count="3">
       <Item1 Name="Default" Default="True"/>
       <Item2 Name="Debug">

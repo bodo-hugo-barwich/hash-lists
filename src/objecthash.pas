@@ -283,6 +283,11 @@ begin
     self.psearchednode := TPLObjectNodeList(self.arrbuckets[ibktidx]).addNode(ihsh, @skey, TObject(value));
 
     inc(self.ikeycount);
+
+    if Self.nodeiterator <> Nil then
+      //Reset the Iterator
+      Self.nodeiterator.Reset;
+
   end
   else  //The Key is already in the List
   begin
@@ -331,6 +336,11 @@ end;
       self.psearchednode := TPLObjectNodeList(self.arrbuckets[ibktidx]).addNode(ihsh, @skey, TObject(value));
 
       inc(self.ikeycount);
+
+      if Self.nodeiterator <> Nil then
+        //Reset the Iterator
+        Self.nodeiterator.Reset;
+
     end
     else  //The Key is already in the List
     begin
@@ -390,6 +400,16 @@ begin
 
   //Shrink the List to its initial Size
   SetLength(self.arrbuckets, self.igrowfactor);
+
+  //Reset Counter
+  Self.ibucketcount := Self.igrowfactor;
+  Self.ikeycount := 0;
+  Self.imaxkeycount := Self.ibucketcount * Self.iloadfactor;
+
+  if Self.nodeiterator <> Nil then
+    //Reset the Iterator
+    Self.nodeiterator.Reset;
+
 end;
 
 end.

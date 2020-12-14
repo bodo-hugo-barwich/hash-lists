@@ -410,22 +410,28 @@ implementation
     SetLength(self.arrnodes, self.inodecount);
   end;
 
-  procedure TPLPointerNodeList.Clear;
-  var
-     ind: Integer;
+procedure TPLPointerNodeList.Clear;
+var
+   ind: Integer;
+begin
+  for ind := 0 to Self.imaxcount - 1 do
   begin
-    for ind := 0 to self.imaxcount - 1 do
-    begin
-     if self.arrnodes[ind] <> nil then
-     begin
-       Dispose(self.arrnodes[ind]);
-       self.arrnodes[ind] := nil;
-     end;
-    end; //for ind := 0 to self.imaxcount - 1 do
+   if Self.arrnodes[ind] <> nil then
+   begin
+     Dispose(Self.arrnodes[ind]);
+     Self.arrnodes[ind] := nil;
+   end;
+  end; //for ind := 0 to self.imaxcount - 1 do
 
-    //Shrink the List to its initial Size
-    SetLength(self.arrnodes, self.igrowfactor);
-  end;
+  //Shrink the List to its initial Size
+  SetLength(Self.arrnodes, Self.igrowfactor);
+
+  //Reset Counter
+  Self.ilastindex := 0;
+  Self.inextindex := 0;
+  Self.inodecount := 0;
+  Self.imaxcount := Self.igrowfactor;
+end;
 
   function TPLPointerNodeList.getNode(iindex: Integer): PPLHashNode;
   begin
@@ -852,21 +858,23 @@ implementation
     self.extendList(False);
   end;
 
-  procedure TPLPointerHashList.setLoadFactor(ifactor: Integer);
-  var
-    ibkt: Integer;
-  begin
-    if ifactor > 0 then
-      Self.iloadfactor := ifactor
-    else
-      //Set Minimum Load Factor
-      Self.iloadfactor := 1;
+procedure TPLPointerHashList.setLoadFactor(ifactor: Integer);
+var
+  ibkt: Integer;
+begin
+  if ifactor > 0 then
+    Self.iloadfactor := ifactor
+  else
+    //Set Minimum Load Factor
+    Self.iloadfactor := 1;
 
-    for ibkt := 0 to Self.ibucketcount - 1 do
-    begin
-      TPLPointerNodeList(Self.arrbuckets[ibkt]).GrowFactor := Self.iloadfactor;
-    end;  //for ibkt := 0 to self.ibucketcount - 1 do
-  end;
+  Self.imaxkeycount := Self.ibucketcount * Self.iloadfactor;
+
+  for ibkt := 0 to Self.ibucketcount - 1 do
+  begin
+    TPLPointerNodeList(Self.arrbuckets[ibkt]).GrowFactor := Self.iloadfactor;
+  end;  //for ibkt := 0 to self.ibucketcount - 1 do
+end;
 
   procedure TPLPointerHashList.setGrowFactor(ifactor: Integer);
   begin
@@ -1037,6 +1045,10 @@ begin
 
     inc(self.ikeycount);
 
+    if Self.nodeiterator <> Nil then
+      //Reset the Iterator
+      Self.nodeiterator.Reset;
+
     //The Value was successfully added
     Result := True;
   end
@@ -1093,6 +1105,11 @@ end;
       self.psearchednode := TPLPointerNodeList(self.arrbuckets[ibktidx]).addNode(ihsh, @skey, ppointer);
 
       inc(self.ikeycount);
+
+      if Self.nodeiterator <> Nil then
+        //Reset the Iterator
+        Self.nodeiterator.Reset;
+
     end
     else  //The Key is already in the List
     begin
@@ -1170,10 +1187,6 @@ end;
       //Reindex the Nodes
       self.rebuildList(0, Self.ibucketcount - 1, Self.ibucketcount);
 
-    if Self.nodeiterator <> Nil then
-      //Reset the Iterator
-      Self.nodeiterator.Reset;
-
   end;
 
   procedure TPLPointerHashList.rebuildList(istartindex, iendindex, icount: Integer);
@@ -1209,17 +1222,26 @@ end;
   var
     ibkt: Integer;
   begin
-    for ibkt := 0 to self.ibucketcount - 1 do
+    for ibkt := 0 to Self.ibucketcount - 1 do
     begin
-      TPLPointerNodeList(self.arrbuckets[ibkt]).Clear;
+      TPLPointerNodeList(Self.arrbuckets[ibkt]).Clear;
 
-      if ibkt >= self.igrowfactor then
-        self.arrbuckets[ibkt].Free;
+      if ibkt >= Self.igrowfactor then
+        Self.arrbuckets[ibkt].Free;
 
-    end;  //for ibkt := 0 to self.ibucketcount - 1 do
+    end;  //for ibkt := 0 to Self.ibucketcount - 1 do
 
     //Shrink the List to its initial Size
-    SetLength(self.arrbuckets, self.igrowfactor);
+    SetLength(Self.arrbuckets, Self.igrowfactor);
+
+    //Reset Counter
+    Self.ibucketcount := Self.igrowfactor;
+    Self.ikeycount := 0;
+    Self.imaxkeycount := Self.ibucketcount * Self.iloadfactor;
+
+    if Self.nodeiterator <> Nil then
+      //Reset the Iterator
+      Self.nodeiterator.Reset;
   end;
 
   function TPLPointerHashList.getValue(const skey: String): Pointer;

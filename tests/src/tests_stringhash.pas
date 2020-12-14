@@ -298,7 +298,7 @@ begin
     if psvl <> Nil then
     begin
       WriteLn('key: '#39 + sky + #39'; value: '#39 + psvl^ + #39);
-      CheckNotEquals('', psvl^, 'TStringObject.Value No. ' + IntToStr(iky) + ' : failed! '
+      CheckNotEquals('', psvl^, 'TPLStringHashList.getCurrentValue() No. ' + IntToStr(iky) + ' : failed! '
         + 'Returned Value: ' + chr(39) + psvl^ + chr(39));
     end
     else

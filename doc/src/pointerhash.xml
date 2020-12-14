@@ -2,10 +2,9 @@
 <fpdoc-descriptions>
 <package name="hash-lists">
 <module name="pointerhash">
-<descr>
-The Class Diagramm kann be found at pointerhash.jpg
+<descr>The Class Diagramm kann be found at pointerhash.jpg
 <img file="pointerhash.jpg" caption="Class Diagramm"/>
-</descr>
+      </descr>
 <element name="PPLHashNode">
 <short>A Pointer to the <link id="TPLHashNode"/> Structure</short>
 </element>
