@@ -56,6 +56,22 @@ type
     It should return the defined Keys and their Values
     *)
     procedure TestCheckNextElement;
+    (*
+    Test Adding 10 Keys and their Values using the Default Property
+    And Iterating from the Beginning and Removing 4 Keys
+    The number of counted Keys must match the number of inserted Keys
+    The number of removed Keys must match the requested number of Keys
+    and the number of remaining Keys must match the difference between the inserted Keys and the removed Keys.
+    Memory does not need to be freed but must not leak either.
+    *)
+    procedure TestRemoveCountElements;
+    (*
+    Clear Function Test. Inserting 10 Elements and Calling the Clear Method.
+    This Test will grow the List once.
+    The List must be empty and the Capacity must be reset to the minimum.
+    The Memory must be freed correctly. (Values will be freed automatically)
+    *)
+    procedure TestInsertClear;
   end;
 
  procedure RegisterTests;
@@ -277,6 +293,162 @@ begin
   CheckEquals('last_value', elm.Value, 'TPLObjectHashList.getCurrentValue() No. 3 : failed! '
     + 'Returned Key: ' + chr(39) + elm.Value + chr(39));
 end;
+
+procedure TTestsObjectHashList.TestRemoveCountElements;
+var
+  elm: TStringObject;
+  sky, svl, srmky1, srmky2, srmky3, srmky4: String;
+  iky, ikycnt, ikymxcnt, ikyttlcnt: Integer;
+  irmcnt, irmttlcnt: Integer;
+begin
+  //WriteLn('TTestsObjectHashList.TestRemoveCountElements: go ...');
+
+  srmky1 := 'key2';
+  srmky2 := 'key3';
+  srmky3 := 'key8';
+  srmky4 := 'key9';
+  ikymxcnt := 10;
+  irmttlcnt := 4;
+
+  for iky := 1 to ikymxcnt do
+  begin
+    sky := 'key' + IntToStr(iky);
+    svl := 'value' + IntToStr(iky);
+    Self.lsthshobjs[sky] := TStringObject.Create(sky, svl);
+  end;  //for iky := 1 to ikymxcnt do
+
+  ikyttlcnt := Self.lsthshobjs.Count;
+
+  CheckEquals(ikymxcnt, ikyttlcnt, 'INS - Count failed! Count is: '#39
+     + IntToStr(ikyttlcnt) + ' / ' + IntToStr(ikymxcnt) + #39);
+
+  //WriteLn('TTestsObjectHashList.TestRemoveCountElements: cap: '#39, Self.lsthshobjs.Capacity, #39);
+
+  Check(Self.lsthshobjs.moveFirst() = True, 'TPLObjectHashList.moveFirst() No. 1 : failed!');
+
+  iky := 0;
+  ikycnt := 0;
+  irmcnt := 0;
+
+  repeat  //until not Self.lsthshobjs.moveNext();
+    inc(iky);
+    inc(ikycnt);
+
+    sky := Self.lsthshobjs.getCurrentKey();
+    elm := TStringObject(Self.lsthshobjs.getCurrentValue());
+
+    if elm <> Nil then
+    begin
+      //WriteLn('key: '#39 + elm.Key + #39'; value: '#39 + elm.Value + #39);
+      CheckNotEquals('', elm.Value, 'TStringObject.Value No. ' + IntToStr(iky) + ' : failed! '
+        + 'Returned Value: ' + chr(39) + elm.Value + chr(39));
+    end
+    else
+      Check(elm <> Nil, 'TPLObjectHashList.getCurrentValue() No. ' + IntToStr(iky) + ' : failed! '
+        + 'Returned Value: '#39'NIL'#39);
+
+    if (sky = srmky1)
+      or (sky = srmky2)
+      or (sky = srmky3)
+      or (sky = srmky4) then
+    begin
+      //WriteLn('key: '#39 + sky + #39'; key removing ...');
+      //Remove the selected Keys and move on
+      Self.lsthshobjs.removeKey(sky);
+      inc(irmcnt);
+    end;
+  until not Self.lsthshobjs.moveNext();
+
+  CheckEquals(ikycnt, ikyttlcnt, 'MV1 - Count failed! Count is: '#39
+     + IntToStr(ikycnt) + ' / ' + IntToStr(ikyttlcnt) + #39);
+  CheckEquals(irmcnt, irmttlcnt, 'RM - Count failed! Count is: '#39
+     + IntToStr(irmcnt) + ' / ' + IntToStr(irmttlcnt) + #39);
+
+  //WriteLn('TTestsObjectHashList.TestRemoveCountElements: cap: '#39, Self.lsthshobjs.Capacity, #39);
+
+  Check(Self.lsthshobjs.moveFirst() = True, 'TPLObjectHashList.moveFirst() No. 2 : failed!');
+
+  iky := 0;
+  ikycnt := 0;
+
+  repeat  //until not Self.lsthshobjs.moveNext();
+    inc(iky);
+    inc(ikycnt);
+
+    sky := Self.lsthshobjs.getCurrentKey();
+    elm := TStringObject(Self.lsthshobjs.getCurrentValue());
+
+    CheckNotEquals('', sky, 'TPLObjectHashList.getCurrentKey() No. ' + IntToStr(iky) + ' : failed! '
+      + 'Returned Key: ' + chr(39) + sky + chr(39));
+
+    if elm <> Nil then
+    begin
+      //WriteLn('key: '#39 + elm.Key + #39'; value: '#39 + elm.Value + #39);
+      CheckNotEquals('', elm.Value, 'TPLObjectHashList.getCurrentValue() No. ' + IntToStr(iky) + ' : failed! '
+        + 'Returned Value: ' + chr(39) + elm.Value + chr(39));
+    end
+    else
+      Check(elm <> Nil, 'TPLObjectHashList.getCurrentValue() No. ' + IntToStr(iky) + ' : failed! '
+        + 'Returned Value: '#39'NIL'#39);
+
+    if (sky = srmky1)
+      or (sky = srmky2)
+      or (sky = srmky3)
+      or (sky = srmky4) then
+    begin
+      Check(False, 'TPLPointerHashList.removeKey() failed! '
+        + 'Key: '#39 + sky + #39' was not removed.');
+    end;
+
+  until not Self.lsthshobjs.moveNext();
+
+  CheckEquals(ikycnt, ikyttlcnt - irmttlcnt, 'MV2 - Count failed! Count is: '#39
+     + IntToStr(ikycnt) + ' / ' + IntToStr(ikyttlcnt - irmttlcnt) + #39);
+
+end;
+
+procedure TTestsObjectHashList.TestInsertClear;
+var
+  sky, svl: String;
+  iky, imincap, ikymxcnt, ikyttlcnt: Integer;
+begin
+  //WriteLn('TTestsObjectHashList.TestInsertClear: go ...');
+
+  ikymxcnt := 10;
+
+  Self.lsthshobjs.LoadFactor := 2;
+
+  //WriteLn('TTestsObjectHashList.TestInsertClear: cap 0: '#39, Self.lsthshobjs.Capacity, #39);
+
+  imincap := Self.lsthshobjs.GrowFactor * Self.lsthshobjs.LoadFactor;
+
+  for iky := 1 to ikymxcnt do
+  begin
+    sky := 'key' + IntToStr(iky);
+    svl := 'value' + IntToStr(iky);
+    Self.lsthshobjs[sky] := TStringObject.Create(sky, svl);
+  end;  //for iky := 1 to ikymxcnt do
+
+  ikyttlcnt := Self.lsthshobjs.Count;
+
+  CheckEquals(ikymxcnt, ikyttlcnt, 'INS - Count failed! Count is: '#39
+     + IntToStr(ikyttlcnt) + ' / ' + IntToStr(ikymxcnt) + #39);
+
+  //WriteLn('TTestsObjectHashList.TestInsertClear: cap 1: '#39, Self.lsthshobjs.Capacity, #39);
+
+  Self.lsthshobjs.Clear();
+
+  ikyttlcnt := Self.lsthshobjs.Count;
+
+  CheckEquals(0, ikyttlcnt, 'DEL - TPLObjectHashList.Clear() failed! Count is: '#39
+     + IntToStr(ikyttlcnt) + ' / 0'#39);
+  CheckEquals(imincap, Self.lsthshobjs.Capacity, 'DEL - TPLObjectHashList.Clear() failed! Capacity is: '#39
+     + IntToStr(Self.lsthshobjs.Capacity) + ' / ' + IntToStr(imincap) + #39);
+
+  //WriteLn('TTestsObjectHashList.TestInsertClear: cap 2: '#39, Self.lsthshobjs.Capacity, #39);
+
+end;
+
 
 end.
 

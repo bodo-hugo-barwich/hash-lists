@@ -33,13 +33,28 @@ type
     *)
     procedure TestCheckFirstElement;
     (*
-    Test Adding 3 Keys and their Values for a valid List Test
-    Using the Default Property
+    Test Adding 3 Keys and their Values for a valid List Test using the Default Property
     And Iterating to the First Key and to the Next Key (they are not necessary
     the first and second inserted keys)
     It should return the defined Keys and their Values
     *)
     procedure TestCheckNextElement;
+    (*
+    Test Adding 10 Keys and their Values
+    And Iterating from the Beginning and Removing 4 Keys
+    The number of counted Keys must match the number of inserted Keys
+    The number of removed Keys must match the requested number of Keys
+    and the number of remaining Keys must match the difference between the inserted Keys and the removed Keys.
+    Memory does not need to be freed but must not leak either.
+    *)
+    procedure TestRemoveCountElements;
+    (*
+    Clear Function Test. Inserting 10 Elements and Calling the Clear Method.
+    This Test will grow the List once.
+    The List must be empty and the Capacity must be reset to the minimum.
+    The Memory must be freed correctly. (Values will be freed automatically)
+    *)
+    procedure TestInsertClear;
   end;
 
 procedure RegisterTests;
@@ -243,6 +258,163 @@ begin
   CheckEquals(psvl^, 'last_value', 'TPLStringHashList.getCurrentValue() No. 3 : failed! '
     + 'Returned Key: ' + chr(39) + psvl^ + chr(39));
 end;
+
+procedure TTestsStringHashList.TestRemoveCountElements;
+var
+  psvl: PAnsiString;
+  sky, svl, srmky1, srmky2, srmky3, srmky4: String;
+  iky, ikycnt, ikymxcnt, ikyttlcnt: Integer;
+  irmcnt, irmttlcnt: Integer;
+begin
+  //WriteLn('TTestsStringHashList.TestRemoveCountElements: go ...');
+
+  srmky1 := 'key3';
+  srmky2 := 'key5';
+  srmky3 := 'key6';
+  srmky4 := 'key8';
+  ikymxcnt := 10;
+  irmttlcnt := 4;
+
+  for iky := 1 to ikymxcnt do
+  begin
+    sky := 'key' + IntToStr(iky);
+    svl := 'value' + IntToStr(iky);
+    Self.lsthshstrs.setValue(sky, svl);
+  end;  //for iky := 1 to ikymxcnt do
+
+  ikyttlcnt := Self.lsthshstrs.Count;
+
+  CheckEquals(ikymxcnt, ikyttlcnt, 'INS - Count failed! Count is: '#39
+     + IntToStr(ikyttlcnt) + ' / ' + IntToStr(ikymxcnt) + #39);
+
+  //WriteLn('TTestsStringHashList.TestRemoveCountElements: cap: '#39, Self.lsthshstrs.Capacity, #39);
+
+  Check(Self.lsthshstrs.moveFirst() = True, 'TPLStringHashList.moveFirst() No. 1 : failed!');
+
+  iky := 0;
+  ikycnt := 0;
+  irmcnt := 0;
+
+  repeat  //until not Self.lsthshstrs.moveNext();
+    inc(iky);
+    inc(ikycnt);
+
+    sky := Self.lsthshstrs.getCurrentKey();
+    psvl := PAnsiString(Self.lsthshstrs.getCurrentValue());
+
+    if psvl <> Nil then
+    begin
+      //WriteLn('key: '#39 + sky + #39'; value: '#39 + psvl^ + #39);
+      CheckNotEquals('', psvl^, 'TPLStringHashList.getCurrentValue() No. ' + IntToStr(iky) + ' : failed! '
+        + 'Returned Value: ' + chr(39) + psvl^ + chr(39));
+    end
+    else
+      Check(psvl <> Nil, 'TPLStringHashList.getCurrentValue() No. ' + IntToStr(iky) + ' : failed! '
+        + 'Returned Value: '#39'NIL'#39);
+
+    if (sky = srmky1)
+      or (sky = srmky2)
+      or (sky = srmky3)
+      or (sky = srmky4) then
+    begin
+      //WriteLn('key: '#39 + sky + #39'; key removing ...');
+      //Remove the selected Keys and move on
+      Self.lsthshstrs.removeKey(sky);
+      inc(irmcnt);
+    end;
+  until not Self.lsthshstrs.moveNext();
+
+  CheckEquals(ikycnt, ikyttlcnt, 'MV1 - Count failed! Count is: '#39
+     + IntToStr(ikycnt) + ' / ' + IntToStr(ikyttlcnt) + #39);
+  CheckEquals(irmcnt, irmttlcnt, 'RM - Count failed! Count is: '#39
+     + IntToStr(irmcnt) + ' / ' + IntToStr(irmttlcnt) + #39);
+
+  //WriteLn('TTestsStringHashList.TestRemoveCountElements: cap: '#39, Self.lsthshstrs.Capacity, #39);
+
+  Check(Self.lsthshstrs.moveFirst() = True, 'TPLStringHashList.moveFirst() No. 2 : failed!');
+
+  iky := 0;
+  ikycnt := 0;
+
+  repeat  //until not Self.lsthshstrs.moveNext();
+    inc(iky);
+    inc(ikycnt);
+
+    sky := Self.lsthshstrs.getCurrentKey();
+    psvl := PAnsiString(Self.lsthshstrs.getCurrentValue());
+
+    CheckNotEquals('', sky, 'TPLStringHashList.getCurrentKey() No. ' + IntToStr(iky) + ' : failed! '
+      + 'Returned Key: ' + chr(39) + sky + chr(39));
+
+    if psvl <> Nil then
+    begin
+      //WriteLn('key: '#39 + sky + #39'; value: '#39 + psvl^ + #39);
+      CheckNotEquals('', psvl^, 'TPLStringHashList.getCurrentValue() No. ' + IntToStr(iky) + ' : failed! '
+        + 'Returned Value: ' + chr(39) + psvl^ + chr(39));
+    end
+    else
+      Check(psvl <> Nil, 'TPLStringHashList.getCurrentValue() No. ' + IntToStr(iky) + ' : failed! '
+        + 'Returned Value: '#39'NIL'#39);
+
+    if (sky = srmky1)
+      or (sky = srmky2)
+      or (sky = srmky3)
+      or (sky = srmky4) then
+    begin
+      Check(False, 'TPLStringHashList.removeKey() failed! '
+        + 'Key: '#39 + sky + #39' was not removed.');
+    end;
+
+  until not Self.lsthshstrs.moveNext();
+
+  CheckEquals(ikycnt, ikyttlcnt - irmttlcnt, 'MV2 - Count failed! Count is: '#39
+     + IntToStr(ikycnt) + ' / ' + IntToStr(ikyttlcnt - irmttlcnt) + #39);
+
+end;
+
+procedure TTestsStringHashList.TestInsertClear;
+var
+  sky, svl: String;
+  iky, imincap, ikymxcnt, ikyttlcnt: Integer;
+begin
+  //WriteLn('TTestsStringHashList.TestInsertClear: go ...');
+
+  ikymxcnt := 10;
+
+  Self.lsthshstrs.LoadFactor := 2;
+
+  //WriteLn('TTestsStringHashList.TestInsertClear: cap 0: '#39, Self.lsthshstrs.Capacity, #39);
+
+  imincap := Self.lsthshstrs.GrowFactor * Self.lsthshstrs.LoadFactor;
+
+  for iky := 1 to ikymxcnt do
+  begin
+    sky := 'key' + IntToStr(iky);
+    svl := 'value' + IntToStr(iky);
+    Self.lsthshstrs.setValue(sky, svl);
+  end;  //for iky := 1 to ikymxcnt do
+
+  ikyttlcnt := Self.lsthshstrs.Count;
+
+  CheckEquals(ikymxcnt, ikyttlcnt, 'INS - Count failed! Count is: '#39
+     + IntToStr(ikyttlcnt) + ' / ' + IntToStr(ikymxcnt) + #39);
+
+  //WriteLn('TTestsStringHashList.TestInsertClear: cap 1: '#39, Self.lsthshstrs.Capacity, #39);
+
+  Self.lsthshstrs.Clear();
+
+  ikyttlcnt := Self.lsthshstrs.Count;
+
+  CheckEquals(0, ikyttlcnt, 'DEL - TPLStringHashList.Clear() failed! Count is: '#39
+     + IntToStr(ikyttlcnt) + ' / 0'#39);
+  CheckEquals(imincap, Self.lsthshstrs.Capacity, 'DEL - TPLStringHashList.Clear() failed! Capacity is: '#39
+     + IntToStr(Self.lsthshstrs.Capacity) + ' / ' + IntToStr(imincap) + #39);
+
+  //WriteLn('TTestsStringHashList.TestInsertClear: cap 2: '#39, Self.lsthshstrs.Capacity, #39);
+
+end;
+
+
 
 end.
 
