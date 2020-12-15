@@ -433,13 +433,13 @@ begin
   except
     on e: DuplicateKeyException do
     begin
-      writeln('Duplicate hash key detected. ' + e.Message);
+      //writeln('Duplicate hash key detected. ' + e.Message);
       Dispose(psinvl);
     end;
 
     on e: EStringListError do
     begin
-      writeln('A generic EStringListError detected. ' + e.Message);
+      //writeln('A generic EStringListError detected. ' + e.Message);
       Dispose(psinvl);
     end
     else
@@ -711,13 +711,13 @@ var
   psvl: PAnsiString;
   iky, imincap, ikymxcnt, ikyttlcnt: Integer;
 begin
-  WriteLn('TTestsPointerHashList.TestInsertClear: go ...');
+  //WriteLn('TTestsPointerHashList.TestInsertClear: go ...');
 
   ikymxcnt := 10;
 
   Self.lsthshobjs.LoadFactor := 2;
 
-  WriteLn('TTestsPointerHashList.TestInsertClear: cap 0: '#39, Self.lsthshobjs.Capacity, #39);
+  //WriteLn('TTestsPointerHashList.TestInsertClear: cap 0: '#39, Self.lsthshobjs.Capacity, #39);
 
   imincap := Self.lsthshobjs.GrowFactor * Self.lsthshobjs.LoadFactor;
 
@@ -736,7 +736,7 @@ begin
   CheckEquals(ikymxcnt, ikyttlcnt, 'INS - Count failed! Count is: '#39
      + IntToStr(ikyttlcnt) + ' / ' + IntToStr(ikymxcnt) + #39);
 
-  WriteLn('TTestsPointerHashList.TestInsertClear: cap 1: '#39, Self.lsthshobjs.Capacity, #39);
+  //WriteLn('TTestsPointerHashList.TestInsertClear: cap 1: '#39, Self.lsthshobjs.Capacity, #39);
 
   Check(Self.lsthshobjs.moveFirst() = True, 'TPLPointerHashList.moveFirst() : failed!');
 
@@ -771,7 +771,7 @@ begin
   CheckEquals(imincap, Self.lsthshobjs.Capacity, 'DEL - TPLPointerHashList.Clear() failed! Capacity is: '#39
      + IntToStr(Self.lsthshobjs.Capacity) + ' / ' + IntToStr(imincap) + #39);
 
-  WriteLn('TTestsPointerHashList.TestInsertClear: cap 2: '#39, Self.lsthshobjs.Capacity, #39);
+  //WriteLn('TTestsPointerHashList.TestInsertClear: cap 2: '#39, Self.lsthshobjs.Capacity, #39);
 
 end;
 

@@ -112,7 +112,7 @@ var
   psvl: PAnsiString;
   iky, ikycnt, ikymxcnt, ikyttlcnt: Integer;
 begin
-  WriteLn('TTestsHashListIterator.TestIterateForward: go ...');
+  //WriteLn('TTestsHashListIterator.TestIterateForward: go ...');
 
   ikymxcnt := 20;
 
@@ -131,7 +131,7 @@ begin
 
   ikyttlcnt := Self.lsthshobjs.Count;
 
-  WriteLn('TTestsHashListIterator.TestIterateForward: cap: '#39, Self.lsthshobjs.Capacity, #39);
+  //WriteLn('TTestsHashListIterator.TestIterateForward: cap: '#39, Self.lsthshobjs.Capacity, #39);
 
   CheckEquals(ikymxcnt, ikyttlcnt, 'INS - Count failed! Count is: '#39
      + IntToStr(ikyttlcnt) + ' / ' + IntToStr(ikymxcnt) + #39);
@@ -147,7 +147,7 @@ begin
 
   if psvl <> Nil then
   begin
-    WriteLn('key: '#39 + itr.Key + #39'; value: '#39 + psvl^ + #39);
+    //WriteLn('key: '#39 + itr.Key + #39'; value: '#39 + psvl^ + #39);
     CheckNotEquals('', psvl^, 'TPLPtrHashListIterator.Value First : failed! '
       + 'Returned Value: ' + chr(39) + psvl^ + chr(39));
   end
@@ -170,7 +170,7 @@ begin
 
     if psvl <> Nil then
     begin
-      WriteLn('key: '#39 + itr.Key + #39'; value: '#39 + psvl^ + #39);
+      //WriteLn('key: '#39 + itr.Key + #39'; value: '#39 + psvl^ + #39);
       CheckNotEquals('', psvl^, 'TPLPtrHashListIterator.Value No. ' + IntToStr(iky) + ' : failed! '
         + 'Returned Value: ' + chr(39) + psvl^ + chr(39));
     end
@@ -191,7 +191,7 @@ var
   psvl: PAnsiString;
   iky, ikycnt, ikymxcnt, ikyttlcnt: Integer;
 begin
-  WriteLn('TTestsHashListIterator.TestIterateBackward: go ...');
+  //WriteLn('TTestsHashListIterator.TestIterateBackward: go ...');
 
   ikymxcnt := 20;
 
@@ -210,7 +210,7 @@ begin
 
   ikyttlcnt := Self.lsthshobjs.Count;
 
-  WriteLn('TTestsHashListIterator.TestIterateBackward: cap: '#39, Self.lsthshobjs.Capacity, #39);
+  //WriteLn('TTestsHashListIterator.TestIterateBackward: cap: '#39, Self.lsthshobjs.Capacity, #39);
 
   CheckEquals(ikymxcnt, ikyttlcnt, 'INS - Count failed! Count is: '#39
      + IntToStr(ikyttlcnt) + ' / ' + IntToStr(ikymxcnt) + #39);
@@ -226,7 +226,7 @@ begin
 
   if psvl <> Nil then
   begin
-    WriteLn('key: '#39 + itr.Key + #39'; value: '#39 + psvl^ + #39);
+    //WriteLn('key: '#39 + itr.Key + #39'; value: '#39 + psvl^ + #39);
     CheckNotEquals('', psvl^, 'TPLPtrHashListIterator.Value Last : failed! '
       + 'Returned Value: ' + chr(39) + psvl^ + chr(39));
   end
@@ -249,7 +249,7 @@ begin
 
     if psvl <> Nil then
     begin
-      WriteLn('key: '#39 + itr.Key + #39'; value: '#39 + psvl^ + #39);
+      //WriteLn('key: '#39 + itr.Key + #39'; value: '#39 + psvl^ + #39);
       CheckNotEquals('', psvl^, 'TPLPtrHashListIterator.Value No. ' + IntToStr(iky) + ' : failed! '
         + 'Returned Value: ' + chr(39) + psvl^ + chr(39));
     end
@@ -270,13 +270,13 @@ var
   sky, sfstky: String;
   iky, ikymxcnt, ikyttlcnt: Integer;
 begin
-  WriteLn('TTestsHashListIterator.TestResetOnAdd: go ...');
+  //WriteLn('TTestsHashListIterator.TestResetOnAdd: go ...');
 
   ikymxcnt := 10;
 
   Self.lsthshobjs.LoadFactor := 2;
 
-  WriteLn('TTestsHashListIterator.TestResetOnAdd: cap 0: '#39, Self.lsthshobjs.Capacity, #39);
+  //WriteLn('TTestsHashListIterator.TestResetOnAdd: cap 0: '#39, Self.lsthshobjs.Capacity, #39);
 
   for iky := 1 to ikymxcnt do
   begin
@@ -293,7 +293,7 @@ begin
   CheckEquals(ikymxcnt, ikyttlcnt, 'INS - Count failed! Count is: '#39
      + IntToStr(ikyttlcnt) + ' / ' + IntToStr(ikymxcnt) + #39);
 
-  WriteLn('TTestsHashListIterator.TestResetOnAdd: cap 1: '#39, Self.lsthshobjs.Capacity, #39);
+  //WriteLn('TTestsHashListIterator.TestResetOnAdd: cap 1: '#39, Self.lsthshobjs.Capacity, #39);
 
   itr := Self.lsthshobjs.Iterator;
 
@@ -308,7 +308,7 @@ begin
 
   if psvl <> Nil then
   begin
-    WriteLn('key: '#39 + itr.Key + #39'; value: '#39 + psvl^ + #39);
+    //WriteLn('key: '#39 + itr.Key + #39'; value: '#39 + psvl^ + #39);
     CheckNotEquals('', psvl^, 'TPLPtrHashListIterator.Value First No. 1 : failed! '
       + 'Returned Value: ' + chr(39) + psvl^ + chr(39));
   end
@@ -329,7 +329,7 @@ begin
 
   Self.lsthshobjs[sky] := psvl;
 
-  WriteLn('TTestsHashListIterator.TestResetOnAdd: cap 2: '#39, Self.lsthshobjs.Capacity, #39);
+  //WriteLn('TTestsHashListIterator.TestResetOnAdd: cap 2: '#39, Self.lsthshobjs.Capacity, #39);
 
   CheckEquals(sfstky, itr.Key, 'INS - TPLPtrHashListIterator.Reset() failed! TPLPtrHashListIterator.Key is: '#39
      + itr.Key + ' / ' + sfstky + #39);
@@ -343,7 +343,7 @@ var
   iky, ikycnt, ikymxcnt, ikyttlcnt: Integer;
   irmcnt, irmttlcnt: Integer;
 begin
-  WriteLn('TTestsHashListIterator.TestRemoveForward: go ...');
+  //WriteLn('TTestsHashListIterator.TestRemoveForward: go ...');
 
   srmky1 := 'key2';
   srmky2 := 'key3';
@@ -389,7 +389,7 @@ begin
 
     if psvl <> Nil then
     begin
-      WriteLn('key: '#39 + itr.Key + #39'; value: '#39 + psvl^ + #39);
+      //WriteLn('key: '#39 + itr.Key + #39'; value: '#39 + psvl^ + #39);
       CheckNotEquals('', psvl^, 'TPLPtrHashListIterator.Value No. ' + IntToStr(iky) + ' : failed! '
         + 'Returned Value: ' + chr(39) + psvl^ + chr(39));
     end
@@ -403,7 +403,7 @@ begin
       or (itr.Key = srmky4)
       or (itr.Key = srmky5) then
     begin
-      WriteLn('key: '#39 + itr.Key + #39'; key removing ...');
+      //WriteLn('key: '#39 + itr.Key + #39'; key removing ...');
       //Free the Value first
       Dispose(psvl);
       //Remove the selected Keys and move on
@@ -418,7 +418,7 @@ begin
   CheckEquals(irmcnt, irmttlcnt, 'RM - Count failed! Count is: '#39
      + IntToStr(irmcnt) + ' / ' + IntToStr(irmttlcnt) + #39);
 
-  WriteLn('TTestsHashListIterator.TestRemoveForward: cap: '#39, Self.lsthshobjs.Capacity, #39);
+  //WriteLn('TTestsHashListIterator.TestRemoveForward: cap: '#39, Self.lsthshobjs.Capacity, #39);
 
   Check(itr.First = True, 'TPLPointerHashList.Iterator First : failed!');
 
@@ -436,7 +436,7 @@ begin
 
     if psvl <> Nil then
     begin
-      WriteLn('key: '#39 + itr.Key + #39'; value: '#39 + psvl^ + #39);
+      //WriteLn('key: '#39 + itr.Key + #39'; value: '#39 + psvl^ + #39);
       CheckNotEquals('', psvl^, 'TPLPtrHashListIterator.Value No. ' + IntToStr(iky) + ' : failed! '
         + 'Returned Value: ' + chr(39) + psvl^ + chr(39));
     end
@@ -469,7 +469,7 @@ var
   iky, ikycnt, ikymxcnt, ikyttlcnt: Integer;
   irmcnt, irmttlcnt: Integer;
 begin
-  WriteLn('TTestsHashListIterator.TestRemoveBackward: go ...');
+  //WriteLn('TTestsHashListIterator.TestRemoveBackward: go ...');
 
   srmky1 := 'key2';
   srmky2 := 'key3';
@@ -515,7 +515,7 @@ begin
 
     if psvl <> Nil then
     begin
-      WriteLn('key: '#39 + itr.Key + #39'; value: '#39 + psvl^ + #39);
+      //WriteLn('key: '#39 + itr.Key + #39'; value: '#39 + psvl^ + #39);
       CheckNotEquals('', psvl^, 'TPLPtrHashListIterator.Value No. ' + IntToStr(iky) + ' : failed! '
         + 'Returned Value: ' + chr(39) + psvl^ + chr(39));
     end
@@ -529,7 +529,7 @@ begin
       or (itr.Key = srmky4)
       or (itr.Key = srmky5) then
     begin
-      WriteLn('key: '#39 + itr.Key + #39'; key removing ...');
+      //WriteLn('key: '#39 + itr.Key + #39'; key removing ...');
       //Free the Value first
       Dispose(psvl);
       //Remove the selected Keys and move on
@@ -544,7 +544,7 @@ begin
   CheckEquals(irmcnt, irmttlcnt, 'RM - Count failed! Count is: '#39
      + IntToStr(irmcnt) + ' / ' + IntToStr(irmttlcnt) + #39);
 
-  WriteLn('TTestsHashListIterator.TestRemoveBackward: cap: '#39, Self.lsthshobjs.Capacity, #39);
+  //WriteLn('TTestsHashListIterator.TestRemoveBackward: cap: '#39, Self.lsthshobjs.Capacity, #39);
 
   Check(itr.Last = True, 'TPLPointerHashList.Iterator Last : failed!');
 
@@ -562,7 +562,7 @@ begin
 
     if psvl <> Nil then
     begin
-      WriteLn('key: '#39 + itr.Key + #39'; value: '#39 + psvl^ + #39);
+      //WriteLn('key: '#39 + itr.Key + #39'; value: '#39 + psvl^ + #39);
       CheckNotEquals('', psvl^, 'TPLPtrHashListIterator.Value No. ' + IntToStr(iky) + ' : failed! '
         + 'Returned Value: ' + chr(39) + psvl^ + chr(39));
     end

@@ -301,7 +301,7 @@ var
   iky, ikycnt, ikymxcnt, ikyttlcnt: Integer;
   irmcnt, irmttlcnt: Integer;
 begin
-  WriteLn('TTestsObjectHashList.TestRemoveCountElements: go ...');
+  //WriteLn('TTestsObjectHashList.TestRemoveCountElements: go ...');
 
   srmky1 := 'key2';
   srmky2 := 'key3';
@@ -322,7 +322,7 @@ begin
   CheckEquals(ikymxcnt, ikyttlcnt, 'INS - Count failed! Count is: '#39
      + IntToStr(ikyttlcnt) + ' / ' + IntToStr(ikymxcnt) + #39);
 
-  WriteLn('TTestsObjectHashList.TestRemoveCountElements: cap: '#39, Self.lsthshobjs.Capacity, #39);
+  //WriteLn('TTestsObjectHashList.TestRemoveCountElements: cap: '#39, Self.lsthshobjs.Capacity, #39);
 
   Check(Self.lsthshobjs.moveFirst() = True, 'TPLObjectHashList.moveFirst() No. 1 : failed!');
 
@@ -339,7 +339,7 @@ begin
 
     if elm <> Nil then
     begin
-      WriteLn('key: '#39 + elm.Key + #39'; value: '#39 + elm.Value + #39);
+      //WriteLn('key: '#39 + elm.Key + #39'; value: '#39 + elm.Value + #39);
       CheckNotEquals('', elm.Value, 'TStringObject.Value No. ' + IntToStr(iky) + ' : failed! '
         + 'Returned Value: ' + chr(39) + elm.Value + chr(39));
     end
@@ -352,7 +352,7 @@ begin
       or (sky = srmky3)
       or (sky = srmky4) then
     begin
-      WriteLn('key: '#39 + sky + #39'; key removing ...');
+      //WriteLn('key: '#39 + sky + #39'; key removing ...');
       //Remove the selected Keys and move on
       Self.lsthshobjs.removeKey(sky);
       inc(irmcnt);
@@ -364,7 +364,7 @@ begin
   CheckEquals(irmcnt, irmttlcnt, 'RM - Count failed! Count is: '#39
      + IntToStr(irmcnt) + ' / ' + IntToStr(irmttlcnt) + #39);
 
-  WriteLn('TTestsObjectHashList.TestRemoveCountElements: cap: '#39, Self.lsthshobjs.Capacity, #39);
+  //WriteLn('TTestsObjectHashList.TestRemoveCountElements: cap: '#39, Self.lsthshobjs.Capacity, #39);
 
   Check(Self.lsthshobjs.moveFirst() = True, 'TPLObjectHashList.moveFirst() No. 2 : failed!');
 
@@ -383,7 +383,7 @@ begin
 
     if elm <> Nil then
     begin
-      WriteLn('key: '#39 + elm.Key + #39'; value: '#39 + elm.Value + #39);
+      //WriteLn('key: '#39 + elm.Key + #39'; value: '#39 + elm.Value + #39);
       CheckNotEquals('', elm.Value, 'TPLObjectHashList.getCurrentValue() No. ' + IntToStr(iky) + ' : failed! '
         + 'Returned Value: ' + chr(39) + elm.Value + chr(39));
     end
@@ -412,13 +412,13 @@ var
   sky, svl: String;
   iky, imincap, ikymxcnt, ikyttlcnt: Integer;
 begin
-  WriteLn('TTestsObjectHashList.TestInsertClear: go ...');
+  //WriteLn('TTestsObjectHashList.TestInsertClear: go ...');
 
   ikymxcnt := 10;
 
   Self.lsthshobjs.LoadFactor := 2;
 
-  WriteLn('TTestsObjectHashList.TestInsertClear: cap 0: '#39, Self.lsthshobjs.Capacity, #39);
+  //WriteLn('TTestsObjectHashList.TestInsertClear: cap 0: '#39, Self.lsthshobjs.Capacity, #39);
 
   imincap := Self.lsthshobjs.GrowFactor * Self.lsthshobjs.LoadFactor;
 
@@ -434,7 +434,7 @@ begin
   CheckEquals(ikymxcnt, ikyttlcnt, 'INS - Count failed! Count is: '#39
      + IntToStr(ikyttlcnt) + ' / ' + IntToStr(ikymxcnt) + #39);
 
-  WriteLn('TTestsObjectHashList.TestInsertClear: cap 1: '#39, Self.lsthshobjs.Capacity, #39);
+  //WriteLn('TTestsObjectHashList.TestInsertClear: cap 1: '#39, Self.lsthshobjs.Capacity, #39);
 
   Self.lsthshobjs.Clear();
 
@@ -445,7 +445,7 @@ begin
   CheckEquals(imincap, Self.lsthshobjs.Capacity, 'DEL - TPLObjectHashList.Clear() failed! Capacity is: '#39
      + IntToStr(Self.lsthshobjs.Capacity) + ' / ' + IntToStr(imincap) + #39);
 
-  WriteLn('TTestsObjectHashList.TestInsertClear: cap 2: '#39, Self.lsthshobjs.Capacity, #39);
+  //WriteLn('TTestsObjectHashList.TestInsertClear: cap 2: '#39, Self.lsthshobjs.Capacity, #39);
 
 end;
 
