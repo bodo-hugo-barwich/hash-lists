@@ -65,6 +65,13 @@ type
     Memory does not need to be freed but must not leak either.
     *)
     procedure TestRemoveCountElements;
+    (*
+    Clear Function Test. Inserting 10 Elements and Calling the Clear Method.
+    This Test will grow the List once.
+    The List must be empty and the Capacity must be reset to the minimum.
+    The Memory must be freed correctly. (Values will be freed automatically)
+    *)
+    procedure TestInsertClear;
   end;
 
  procedure RegisterTests;
@@ -399,6 +406,49 @@ begin
      + IntToStr(ikycnt) + ' / ' + IntToStr(ikyttlcnt - irmttlcnt) + #39);
 
 end;
+
+procedure TTestsObjectHashList.TestInsertClear;
+var
+  sky, svl: String;
+  iky, imincap, ikymxcnt, ikyttlcnt: Integer;
+begin
+  WriteLn('TTestsObjectHashList.TestInsertClear: go ...');
+
+  ikymxcnt := 10;
+
+  Self.lsthshobjs.LoadFactor := 2;
+
+  WriteLn('TTestsObjectHashList.TestInsertClear: cap 0: '#39, Self.lsthshobjs.Capacity, #39);
+
+  imincap := Self.lsthshobjs.GrowFactor * Self.lsthshobjs.LoadFactor;
+
+  for iky := 1 to ikymxcnt do
+  begin
+    sky := 'key' + IntToStr(iky);
+    svl := 'value' + IntToStr(iky);
+    Self.lsthshobjs[sky] := TStringObject.Create(sky, svl);
+  end;  //for iky := 1 to ikymxcnt do
+
+  ikyttlcnt := Self.lsthshobjs.Count;
+
+  CheckEquals(ikymxcnt, ikyttlcnt, 'INS - Count failed! Count is: '#39
+     + IntToStr(ikyttlcnt) + ' / ' + IntToStr(ikymxcnt) + #39);
+
+  WriteLn('TTestsObjectHashList.TestInsertClear: cap 1: '#39, Self.lsthshobjs.Capacity, #39);
+
+  Self.lsthshobjs.Clear();
+
+  ikyttlcnt := Self.lsthshobjs.Count;
+
+  CheckEquals(0, ikyttlcnt, 'DEL - TPLObjectHashList.Clear() failed! Count is: '#39
+     + IntToStr(ikyttlcnt) + ' / 0'#39);
+  CheckEquals(imincap, Self.lsthshobjs.Capacity, 'DEL - TPLObjectHashList.Clear() failed! Capacity is: '#39
+     + IntToStr(Self.lsthshobjs.Capacity) + ' / ' + IntToStr(imincap) + #39);
+
+  WriteLn('TTestsObjectHashList.TestInsertClear: cap 2: '#39, Self.lsthshobjs.Capacity, #39);
+
+end;
+
 
 end.
 

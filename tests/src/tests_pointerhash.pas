@@ -85,6 +85,12 @@ type
     Even big Lists must not break or loose memory.
     *)
     procedure TestInsertCheck10000Elements;
+    (*
+    Clear Function Test. Inserting 10 Elements and Calling the Clear Method.
+    This Test will grow the List once.
+    The List must be empty and the Capacity must be reset to the minimum.
+    The Memory must be freed correctly. (Values must be freed manually)
+    *)
     procedure TestInsertClear;
     {$IFDEF speedtests}
     {$NOTE Speed Tests will be run}
@@ -426,15 +432,15 @@ begin
     Fail('INS - TPLPointerHashList.Add() failed! Duplicate Key was accepted.');
   except
     on e: DuplicateKeyException do
-      begin
-        writeln('Duplicate hash key detected. ' + e.Message);
-        Dispose(psinvl);
-      end;
+    begin
+      writeln('Duplicate hash key detected. ' + e.Message);
+      Dispose(psinvl);
+    end;
 
     on e: EStringListError do
     begin
-        writeln('A generic EStringListError detected. ' + e.Message);
-        Dispose(psinvl);
+      writeln('A generic EStringListError detected. ' + e.Message);
+      Dispose(psinvl);
     end
     else
     begin
@@ -705,13 +711,13 @@ var
   psvl: PAnsiString;
   iky, imincap, ikymxcnt, ikyttlcnt: Integer;
 begin
-  //WriteLn('TTestsPointerHashList.TestInsertClear: go ...');
-
-(*  CheckEquals(1, 1, 'TTestsPointerHashList.TestInsertClear failed!');   *)
+  WriteLn('TTestsPointerHashList.TestInsertClear: go ...');
 
   ikymxcnt := 10;
 
   Self.lsthshobjs.LoadFactor := 2;
+
+  WriteLn('TTestsPointerHashList.TestInsertClear: cap 0: '#39, Self.lsthshobjs.Capacity, #39);
 
   imincap := Self.lsthshobjs.GrowFactor * Self.lsthshobjs.LoadFactor;
 
@@ -723,14 +729,14 @@ begin
     psvl^ := 'value' + IntToStr(iky);
 
     Self.lsthshobjs.setValue(sky, psvl);
-  end;  //for iky := 1 to 10000 do
+  end;  //for iky := 1 to ikymxcnt do
 
   ikyttlcnt := Self.lsthshobjs.Count;
 
   CheckEquals(ikymxcnt, ikyttlcnt, 'INS - Count failed! Count is: '#39
      + IntToStr(ikyttlcnt) + ' / ' + IntToStr(ikymxcnt) + #39);
 
-  WriteLn('TTestsPointerHashList.TestInsertClear: cap: '#39, Self.lsthshobjs.Capacity, #39);
+  WriteLn('TTestsPointerHashList.TestInsertClear: cap 1: '#39, Self.lsthshobjs.Capacity, #39);
 
   Check(Self.lsthshobjs.moveFirst() = True, 'TPLPointerHashList.moveFirst() : failed!');
 
@@ -763,9 +769,9 @@ begin
   CheckEquals(0, ikyttlcnt, 'DEL - TPLPointerHashList.Clear() failed! Count is: '#39
      + IntToStr(ikyttlcnt) + ' / 0'#39);
   CheckEquals(imincap, Self.lsthshobjs.Capacity, 'DEL - TPLPointerHashList.Clear() failed! Capacity is: '#39
-     + IntToStr(Self.lsthshobjs.Capacity) + ' / ' + IntToStr(imincap) +#39);
+     + IntToStr(Self.lsthshobjs.Capacity) + ' / ' + IntToStr(imincap) + #39);
 
-  WriteLn('TTestsPointerHashList.TestInsertClear: cap: '#39, Self.lsthshobjs.Capacity, #39);
+  WriteLn('TTestsPointerHashList.TestInsertClear: cap 2: '#39, Self.lsthshobjs.Capacity, #39);
 
 end;
 

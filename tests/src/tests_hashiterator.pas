@@ -276,6 +276,8 @@ begin
 
   Self.lsthshobjs.LoadFactor := 2;
 
+  WriteLn('TTestsHashListIterator.TestResetOnAdd: cap 0: '#39, Self.lsthshobjs.Capacity, #39);
+
   for iky := 1 to ikymxcnt do
   begin
     sky := 'key' + IntToStr(iky);
@@ -291,7 +293,7 @@ begin
   CheckEquals(ikymxcnt, ikyttlcnt, 'INS - Count failed! Count is: '#39
      + IntToStr(ikyttlcnt) + ' / ' + IntToStr(ikymxcnt) + #39);
 
-  WriteLn('TTestsHashListIterator.TestResetOnAdd: cap: '#39, Self.lsthshobjs.Capacity, #39);
+  WriteLn('TTestsHashListIterator.TestResetOnAdd: cap 1: '#39, Self.lsthshobjs.Capacity, #39);
 
   itr := Self.lsthshobjs.Iterator;
 
@@ -327,7 +329,7 @@ begin
 
   Self.lsthshobjs[sky] := psvl;
 
-  WriteLn('TTestsHashListIterator.TestResetOnAdd: cap: '#39, Self.lsthshobjs.Capacity, #39);
+  WriteLn('TTestsHashListIterator.TestResetOnAdd: cap 2: '#39, Self.lsthshobjs.Capacity, #39);
 
   CheckEquals(sfstky, itr.Key, 'INS - TPLPtrHashListIterator.Reset() failed! TPLPtrHashListIterator.Key is: '#39
      + itr.Key + ' / ' + sfstky + #39);

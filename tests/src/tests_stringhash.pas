@@ -48,6 +48,13 @@ type
     Memory does not need to be freed but must not leak either.
     *)
     procedure TestRemoveCountElements;
+    (*
+    Clear Function Test. Inserting 10 Elements and Calling the Clear Method.
+    This Test will grow the List once.
+    The List must be empty and the Capacity must be reset to the minimum.
+    The Memory must be freed correctly. (Values will be freed automatically)
+    *)
+    procedure TestInsertClear;
   end;
 
 procedure RegisterTests;
@@ -364,6 +371,49 @@ begin
      + IntToStr(ikycnt) + ' / ' + IntToStr(ikyttlcnt - irmttlcnt) + #39);
 
 end;
+
+procedure TTestsStringHashList.TestInsertClear;
+var
+  sky, svl: String;
+  iky, imincap, ikymxcnt, ikyttlcnt: Integer;
+begin
+  WriteLn('TTestsStringHashList.TestInsertClear: go ...');
+
+  ikymxcnt := 10;
+
+  Self.lsthshstrs.LoadFactor := 2;
+
+  WriteLn('TTestsStringHashList.TestInsertClear: cap 0: '#39, Self.lsthshstrs.Capacity, #39);
+
+  imincap := Self.lsthshstrs.GrowFactor * Self.lsthshstrs.LoadFactor;
+
+  for iky := 1 to ikymxcnt do
+  begin
+    sky := 'key' + IntToStr(iky);
+    svl := 'value' + IntToStr(iky);
+    Self.lsthshstrs.setValue(sky, svl);
+  end;  //for iky := 1 to ikymxcnt do
+
+  ikyttlcnt := Self.lsthshstrs.Count;
+
+  CheckEquals(ikymxcnt, ikyttlcnt, 'INS - Count failed! Count is: '#39
+     + IntToStr(ikyttlcnt) + ' / ' + IntToStr(ikymxcnt) + #39);
+
+  WriteLn('TTestsStringHashList.TestInsertClear: cap 1: '#39, Self.lsthshstrs.Capacity, #39);
+
+  Self.lsthshstrs.Clear();
+
+  ikyttlcnt := Self.lsthshstrs.Count;
+
+  CheckEquals(0, ikyttlcnt, 'DEL - TPLStringHashList.Clear() failed! Count is: '#39
+     + IntToStr(ikyttlcnt) + ' / 0'#39);
+  CheckEquals(imincap, Self.lsthshstrs.Capacity, 'DEL - TPLStringHashList.Clear() failed! Capacity is: '#39
+     + IntToStr(Self.lsthshstrs.Capacity) + ' / ' + IntToStr(imincap) + #39);
+
+  WriteLn('TTestsStringHashList.TestInsertClear: cap 2: '#39, Self.lsthshstrs.Capacity, #39);
+
+end;
+
 
 
 end.
