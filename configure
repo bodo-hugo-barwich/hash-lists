@@ -1,6 +1,53 @@
 #!/bin/sh
 
 
+slstmkfls="./Makefile.fpc ./tests/Makefile.fpc"
 
-fpcmake -w -Tall ./Makefile.fpc ./tests/Makefile.fpc
+#Find the FPC Source Code Path
+slstfpcpkgs=`dpkg --get-selections | grep -E "fpc?\-" | grep -vi deinstall | awk '{print $1}' | tr "\n" " "`
+slstpkgscntnt=`dpkg -L $slstfpcpkgs`
+sfpclibpth=`echo "$slstpkgscntnt" | grep -i "/rtl/system.ppu"`
+sfpcsrcpth=`echo "$slstpkgscntnt" | grep -i "/rtl/" | grep -i makefile.fpc | grep -i linux`
+
+
+if [ -n "$sfpclibpth" ]; then
+  sfpclibpth=`echo -n "$sfpclibpth" | sed -re 's#/rtl/.*##i'`
+fi
+
+if [ -n "$sfpcsrcpth" ]; then
+  sfpcsrcpth=`echo -n "$sfpcsrcpth" | sed -re 's#/rtl/.*##i'`
+fi
+
+echo "FPC PKGs installed: '$slstfpcpkgs'"
+
+echo "FPC RTL lib: '$sfpclibpth'"
+echo "FPC RTL src: '$sfpcsrcpth'"
+
+if [ -n "$sfpcsrcpth" ]; then
+  if [ -n "$sfpclibpth" ]; then
+    sfpcsrcpth="$sfpcsrcpth $sfpclibpth"
+  else
+    sfpcsrcpth=""
+  fi
+fi
+
+if [ -n "$sfpcsrcpth" ]; then
+  for smkfl in $slstmkfls ; do
+    smkfltpl=`echo -n "$smkfl" |sed -re 's#.fpc#.fpc.tpl#i'`
+
+    if [ -e $smkfltpl ]; then
+      cat $smkfltpl | sed -re "s#^fpcdir=.*#fpcdir=$sfpcsrcpth#i" > $smkfl
+    fi
+  done  #for smkfl in $slstmkfls ; do
+else  #Source Code Path was not found
+  echo "FPC RTL Dependency Paths could not be found!"
+  exit 1
+fi  #if [[ -n "$sfpclibpth" && -n "$sfpcsrcpth" ]]; then
+
+if [ -n "$slstmkfls" ]; then
+  fpcmake -w -Tall $slstmkfls
+else
+  echo "List of Makefiles is empty!"
+  exit 2
+fi
 

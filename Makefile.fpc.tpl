@@ -23,7 +23,8 @@ exampledirs=./
 examples=demohashlists
 
 [prerules]
-ifdef $(TRAVIS_TEST)
+travis_test := $(shell if [ -n "$$TRAVIS_TEST" ]; then echo true ; else echo false ; fi ;)
+ifeq (${travis_test}, true)
 override DEFAULT_FPCDIR=/usr/share/fpcsrc/3.0.0
 endif
 

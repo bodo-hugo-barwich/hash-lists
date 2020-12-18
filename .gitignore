@@ -7,9 +7,14 @@ backup/*
 #Build Directories
 lib
 lib/*
+units
+units/*
 
 #Build Files
+demohashlists
+fpcmade*
 Makefile
+Makefile.fpc
 
 #Compiled Application 
 *.run

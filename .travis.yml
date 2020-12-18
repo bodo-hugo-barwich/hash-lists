@@ -1,12 +1,12 @@
 language: c
 env:
   - TRAVIS_TEST=1
-addons:
-  apt:
-    packages:
+#addons:
+#  apt:
+#    packages:
       #Add FPC Package through 'apt' Package Manager
-      - fpc
-      - fp-utils
+#      - fpc
+#      - fp-utils
 before_install:
   # Show Location
   - >
@@ -14,15 +14,28 @@ before_install:
     echo "HOME: '$HOME'" ; 
     pwd ; 
     ls -lah ;
+  # Download FPC Packages
+  - >
+    mkdir ../fpc_download && cd ../fpc_download ;
+    wget https://downloads.sourceforge.net/project/lazarus/Lazarus%20Linux%20amd64%20DEB/Lazarus%202.0.10/fpc-laz_3.2.0-1_amd64.deb ;
+    wget https://downloads.sourceforge.net/project/lazarus/Lazarus%20Linux%20amd64%20DEB/Lazarus%202.0.10/fpc-src_3.2.0-1_amd64.deb ;
+    pwd ;
+    ls -lah ;
+    sudo dpkg -i fpc-laz_3.2.0-1_amd64.deb && sudo dpkg -i fpc-src_3.2.0-1_amd64.deb ;
+    cd ../hash-lists ;
+    pwd ;
+    ls -lah ;
   # List pre-installed FPC Packages
   - >
     echo "sh Shell: " $(which sh) ;
     echo "bash Shell: " $(which bash) ;
-    dpkg --get-selections | grep -iE "(fpc|fp\-|lazarus)" | sort ;
+    echo "Installed FreePascal Compiler:" ;
+    fpc -h | sed -n 1,2p ;
+    dpkg --get-selections | grep -iE "(fpc?\-|lazarus)" | sort ;
     echo "fpc Package:" ;
-    dpkg -s fpc ;
+    dpkg -s $(dpkg -S $(which fpc) | cut -d: -f1) ;
     echo "RTL Directory:" ;
-    dpkg -L fpc-source-3.0.0 | grep -i "/rtl/" ;
+    dpkg -L $(dpkg --get-selections | grep -iE "(fpc?\-|lazarus)" | grep -vi deinstall | awk '{print $1}' | tr "\n" " ") | grep -i "/rtl/" | grep -i "/rtl/" | grep -i makefile.fpc | grep -i linux;
   # Clone epiktimer Project
   - >
     echo "Project 'epiktimer': cloning ..." ;

@@ -28,10 +28,25 @@ jobs:
       - name: Check for the FreePascal Compiler
         run: sudo apt-get update && apt-cache search fpc
 
+      # Download the FreePascal Compiler Packages
+      - name: Download the FreePascal Compiler Packages
+        run: |
+          mkdir ../fpc_download && cd ../fpc_download
+          wget https://downloads.sourceforge.net/project/lazarus/Lazarus%20Linux%20amd64%20DEB/Lazarus%202.0.10/fpc-laz_3.2.0-1_amd64.deb
+          wget https://downloads.sourceforge.net/project/lazarus/Lazarus%20Linux%20amd64%20DEB/Lazarus%202.0.10/fpc-src_3.2.0-1_amd64.deb
+          pwd ; ls -lah
+
       # Install the FreePascal Compiler
       - name: Install the FreePascal Compiler
-        run: sudo apt-get install fpc fp-utils
-        
+        run: |
+          #sudo apt-get install fpc fp-utils
+          cd ../fpc_download
+          sudo dpkg -i fpc-laz_3.2.0-1_amd64.deb && sudo dpkg -i fpc-src_3.2.0-1_amd64.deb
+
+      # Check the installed FreePascal Compiler
+      - name: Check the installed FreePascal Compiler
+        run: fpc -h | sed -n 1,2p
+
       # Clone epiktimer Project
       - name: Clone epiktimer Project
         run: |
