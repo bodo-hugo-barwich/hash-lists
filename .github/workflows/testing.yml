@@ -31,12 +31,13 @@ jobs:
       # Download the FreePascal Compiler Packages
       - name:
         run: |
+          ping -c 10 downloads.sourceforge.net || echo "exit code: '$?'"
           ping -c 10 netcologne.dl.sourceforge.net || echo "exit code: '$?'"
           ping -c 10 kumisystems.dl.sourceforge.net || echo "exit code: '$?'"
           ping -c 10 vorboss.dl.sourceforge.net || echo "exit code: '$?'"
-          wget https://netcologne.dl.sourceforge.net/project/lazarus/Lazarus%20Linux%20amd64%20DEB/Lazarus%202.0.10/fpc-laz_3.2.0-1_amd64.deb
-          wget https://kumisystems.dl.sourceforge.net/project/lazarus/Lazarus%20Linux%20amd64%20DEB/Lazarus%202.0.10/fpc-src_3.2.0-1_amd64.deb
-          #wget https://vorboss.dl.sourceforge.net/project/lazarus/Lazarus%20Linux%20amd64%20DEB/Lazarus%202.0.10/lazarus-project_2.0.10-0_amd64.deb
+          wget https://downloads.sourceforge.net/project/lazarus/Lazarus%20Linux%20amd64%20DEB/Lazarus%202.0.10/fpc-laz_3.2.0-1_amd64.deb
+          wget https://downloads.sourceforge.net/project/lazarus/Lazarus%20Linux%20amd64%20DEB/Lazarus%202.0.10/fpc-src_3.2.0-1_amd64.deb
+          #wget https://downloads.sourceforge.net/project/lazarus/Lazarus%20Linux%20amd64%20DEB/Lazarus%202.0.10/lazarus-project_2.0.10-0_amd64.deb
 
       # Install the FreePascal Compiler
       - name: Install the FreePascal Compiler
