@@ -1,12 +1,12 @@
 language: c
 env:
   - TRAVIS_TEST=1
-addons:
-  apt:
-    packages:
+#addons:
+#  apt:
+#    packages:
       #Add FPC Package through 'apt' Package Manager
-      - fpc
-      - fp-utils
+#      - fpc
+#      - fp-utils
 before_install:
   # Show Location
   - >
@@ -19,6 +19,10 @@ before_install:
     mkdir ../fpc_download && cd ../fpc_download ;
     wget https://downloads.sourceforge.net/project/lazarus/Lazarus%20Linux%20amd64%20DEB/Lazarus%202.0.10/fpc-laz_3.2.0-1_amd64.deb ;
     wget https://downloads.sourceforge.net/project/lazarus/Lazarus%20Linux%20amd64%20DEB/Lazarus%202.0.10/fpc-src_3.2.0-1_amd64.deb ;
+    pwd ;
+    ls -lah ;
+    sudo dpkg -i fpc-laz_3.2.0-1_amd64.deb && sudo -i fpc-src_3.2.0-1_amd64.deb ;
+    cd ../hash-lists ;
     pwd ;
     ls -lah ;
   # List pre-installed FPC Packages
