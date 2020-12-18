@@ -31,11 +31,11 @@ before_install:
     echo "bash Shell: " $(which bash) ;
     echo "Installed FreePascal Compiler:" ;
     fpc -h | sed -n 1,2p ;
-    dpkg --get-selections | grep -iE "(fpc|fp\-|lazarus)" | sort ;
+    dpkg --get-selections | grep -iE "(fpc?\-|lazarus)" | sort ;
     echo "fpc Package:" ;
     dpkg -s fpc ;
     echo "RTL Directory:" ;
-    dpkg -L fpc-source-3.0.0 | grep -i "/rtl/" ;
+    dpkg -L $(dpkg --get-selections | grep -iE "(fpc?\-|lazarus)" | grep -vi deinstall | awk '{print $1}' | tr "\n" " ") | grep -i "/rtl/" | grep -i "/rtl/" | grep -i makefile.fpc | grep -i linux;
   # Clone epiktimer Project
   - >
     echo "Project 'epiktimer': cloning ..." ;
