@@ -35,7 +35,7 @@ before_install:
     echo "fpc Package:" ;
     dpkg -s $(dpkg -S $(which fpc) | cut -d: -f1) ;
     echo "RTL Directory:" ;
-    dpkg -L $(dpkg --get-selections | grep -iE "(fpc?\-|lazarus)" | grep -vi deinstall | awk '{print $1}' | tr "\n" " ") | grep -i "/rtl/" | grep -i "/rtl/" | grep -i makefile.fpc | grep -i linux;
+    dpkg -L $(dpkg --get-selections | grep -iE "(fpc?\-|lazarus)" | grep -vi deinstall | awk '{print $1}' | tr "\n" " ") | grep -i "/rtl/" | grep -i makefile.fpc | grep -i linux;
   # Clone epiktimer Project
   - >
     echo "Project 'epiktimer': cloning ..." ;
