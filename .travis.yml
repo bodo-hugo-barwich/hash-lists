@@ -21,7 +21,7 @@ before_install:
     wget https://downloads.sourceforge.net/project/lazarus/Lazarus%20Linux%20amd64%20DEB/Lazarus%202.0.10/fpc-src_3.2.0-1_amd64.deb ;
     pwd ;
     ls -lah ;
-    sudo dpkg -i fpc-laz_3.2.0-1_amd64.deb && sudo -i fpc-src_3.2.0-1_amd64.deb ;
+    sudo dpkg -i fpc-laz_3.2.0-1_amd64.deb && sudo dpkg -i fpc-src_3.2.0-1_amd64.deb ;
     cd ../hash-lists ;
     pwd ;
     ls -lah ;
@@ -33,7 +33,7 @@ before_install:
     fpc -h | sed -n 1,2p ;
     dpkg --get-selections | grep -iE "(fpc?\-|lazarus)" | sort ;
     echo "fpc Package:" ;
-    dpkg -s fpc ;
+    dpkg -s $(dpkg -S $(which fpc) | cut -d: -f1) ;
     echo "RTL Directory:" ;
     dpkg -L $(dpkg --get-selections | grep -iE "(fpc?\-|lazarus)" | grep -vi deinstall | awk '{print $1}' | tr "\n" " ") | grep -i "/rtl/" | grep -i "/rtl/" | grep -i makefile.fpc | grep -i linux;
   # Clone epiktimer Project
