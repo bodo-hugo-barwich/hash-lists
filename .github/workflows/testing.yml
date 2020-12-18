@@ -41,7 +41,11 @@ jobs:
       # Install the FreePascal Compiler
       - name: Install the FreePascal Compiler
         run: sudo apt-get install fpc fp-utils
-        
+
+      # Check the installed FreePascal Compiler
+      - name: Check the installed FreePascal Compiler
+        run: fpc -h | sed -n 1,2p
+
       # Clone epiktimer Project
       - name: Clone epiktimer Project
         run: |

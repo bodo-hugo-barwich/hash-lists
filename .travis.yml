@@ -18,6 +18,8 @@ before_install:
   - >
     echo "sh Shell: " $(which sh) ;
     echo "bash Shell: " $(which bash) ;
+    echo "Installed FreePascal Compiler:" ;
+    fpc -h | sed -n 1,2p ;
     dpkg --get-selections | grep -iE "(fpc|fp\-|lazarus)" | sort ;
     echo "fpc Package:" ;
     dpkg -s fpc ;
