@@ -14,6 +14,13 @@ before_install:
     echo "HOME: '$HOME'" ; 
     pwd ; 
     ls -lah ;
+  # Download FPC Packages
+  - >
+    mkdir ../fpc_download && cd ../fpc_download ;
+    wget https://downloads.sourceforge.net/project/lazarus/Lazarus%20Linux%20amd64%20DEB/Lazarus%202.0.10/fpc-laz_3.2.0-1_amd64.deb ;
+    wget https://downloads.sourceforge.net/project/lazarus/Lazarus%20Linux%20amd64%20DEB/Lazarus%202.0.10/fpc-src_3.2.0-1_amd64.deb ;
+    pwd ;
+    ls -lah ;
   # List pre-installed FPC Packages
   - >
     echo "sh Shell: " $(which sh) ;
