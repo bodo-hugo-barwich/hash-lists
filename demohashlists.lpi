@@ -88,7 +88,7 @@
       <FormatVersion Value="2"/>
       <Modes Count="0"/>
     </RunParams>
-    <Units Count="6">
+    <Units Count="7">
       <Unit0>
         <Filename Value="demohashlists.pas"/>
         <IsPartOfProject Value="True"/>
@@ -106,13 +106,17 @@
         <IsPartOfProject Value="True"/>
       </Unit3>
       <Unit4>
-        <Filename Value="Makefile.fpc"/>
+        <Filename Value="configure"/>
         <IsPartOfProject Value="True"/>
       </Unit4>
       <Unit5>
-        <Filename Value="configure"/>
+        <Filename Value="Makefile.fpc.tpl"/>
         <IsPartOfProject Value="True"/>
       </Unit5>
+      <Unit6>
+        <Filename Value="src/pointerhasharray.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit6>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

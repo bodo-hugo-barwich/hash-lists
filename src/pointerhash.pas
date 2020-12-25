@@ -19,6 +19,7 @@ type
   TPLHashNode = record
     ibucketindex: Integer;
     inodeindex: Integer;
+    iinsertindex: Integer;
     ihash: Cardinal;
     skey: String;
     pvalue: Pointer;
@@ -39,13 +40,15 @@ type
     inodecount: Integer;
     imaxcount: Integer;
     igrowfactor: Integer;
+    bnodesowned: Boolean;
     procedure extendList;
   public
     constructor Create; virtual; overload;
-    constructor Create(iindex: Integer); virtual; overload;
-    constructor Create(iindex: Integer; ifactor: Integer); virtual; overload;
+    constructor Create(ibucket: Integer); virtual; overload;
+    constructor Create(ibucket, igrowth: Integer); virtual; overload;
     destructor Destroy; override;
-    procedure setGrowFactor(ifactor: Integer);
+    procedure SetGrowFactor(igrowth: Integer); inline;
+    procedure SetNodesOwned(bisowned: Boolean); inline;
     function addNode(pnode: PPLHashNode = nil): PPLHashNode; overload;
     function addNode(ihash: Cardinal; pskey: PAnsiString; ppointer: Pointer): PPLHashNode; overload;
     procedure setValue(ihash: Cardinal; pskey: PAnsiString; ppointer: Pointer); overload;
@@ -64,7 +67,8 @@ type
     function searchValue(pskey: PAnsiString): Pointer; overload;
     function searchIndex(ihash: Cardinal; pskey: PAnsiString): Integer; overload;
     function searchIndex(pskey: PAnsiString): Integer; overload;
-    function getLastIndex(): Integer;
+    function GetLastIndex: Integer; inline;
+    function IsNodesOwned: Boolean; inline;
     property GrowFactor: Integer read igrowfactor write setGrowFactor;
   end;
 
@@ -166,67 +170,83 @@ implementation
 
 
 
-  (*==========================================================================*)
-  (* Class TPLPointerNodeList Implementation *)
+(*==========================================================================*)
+(* Class TPLPointerNodeList Implementation *)
 
 
-  constructor TPLPointerNodeList.Create;
-  begin
-    self.ibucketindex := -1;
-    self.ilastindex := 0;
-    self.inextindex := 0;
-    self.inodecount := 0;
-    self.imaxcount := 3;
-    self.igrowfactor := 2;
 
-    SetLength(self.arrnodes, self.imaxcount);
-  end;
+//----------------------------------------------------------------------------
+//Constructors
 
-  constructor TPLPointerNodeList.Create(iindex: Integer);
-  begin
-    self.ibucketindex := iindex;
-    self.ilastindex := 0;
-    self.inextindex := 0;
-    self.inodecount := 0;
-    self.imaxcount := 3;
-    self.igrowfactor := 2;
 
-    SetLength(self.arrnodes, self.imaxcount);
-  end;
+constructor TPLPointerNodeList.Create;
+begin
+  Self.ibucketindex := -1;
+  Self.ilastindex := 0;
+  Self.inextindex := 0;
+  Self.inodecount := 0;
+  Self.imaxcount := 3;
+  Self.igrowfactor := 2;
+  Self.bnodesowned := True;
 
-  constructor TPLPointerNodeList.Create(iindex: Integer; ifactor: Integer);
-  begin
-    self.ibucketindex := iindex;
-    self.ilastindex := 0;
-    self.inextindex := 0;
-    self.inodecount := 0;
-    self.imaxcount := ifactor;
-    self.igrowfactor := ifactor;
+  SetLength(Self.arrnodes, Self.imaxcount);
+end;
 
-    SetLength(self.arrnodes, self.imaxcount);
-  end;
+constructor TPLPointerNodeList.Create(ibucket: Integer);
+begin
+  Self.ibucketindex := ibucket;
+  Self.ilastindex := 0;
+  Self.inextindex := 0;
+  Self.inodecount := 0;
+  Self.imaxcount := 3;
+  Self.igrowfactor := 2;
+  Self.bnodesowned := True;
 
-  destructor TPLPointerNodeList.Destroy;
-  var
-    ind: Integer;
-  begin
-    for ind := 0 to self.imaxcount - 1 do
-    begin
-      if self.arrnodes[ind] <> nil then
-      begin
-        Dispose(self.arrnodes[ind]);
-      end;
-    end; //for ind := 0 to self.imaxcount - 1 do
+  SetLength(Self.arrnodes, Self.imaxcount);
+end;
 
-    SetLength(self.arrnodes, 0);
+constructor TPLPointerNodeList.Create(ibucket, igrowth: Integer);
+begin
+  Self.ibucketindex := ibucket;
+  Self.ilastindex := 0;
+  Self.inextindex := 0;
+  Self.inodecount := 0;
+  Self.imaxcount := igrowth;
+  Self.igrowfactor := igrowth;
+  Self.bnodesowned := True;
 
-    inherited Destroy;
-  end;
+  SetLength(Self.arrnodes, Self.imaxcount);
+end;
 
-  procedure TPLPointerNodeList.setGrowFactor(ifactor: Integer);
-  begin
-    self.igrowfactor := ifactor;
-  end;
+destructor TPLPointerNodeList.Destroy;
+var
+  ind: Integer;
+begin
+  if Self.bnodesowned then
+    for ind := 0 to Self.imaxcount - 1 do
+      if Self.arrnodes[ind] <> nil then
+        Dispose(Self.arrnodes[ind]);
+
+  SetLength(Self.arrnodes, 0);
+
+  inherited Destroy;
+end;
+
+procedure TPLPointerNodeList.SetGrowFactor(igrowth: Integer);
+begin
+  Self.igrowfactor := igrowth;
+end;
+
+
+
+//----------------------------------------------------------------------------
+//Administration Methods
+
+
+procedure TPLPointerNodeList.SetNodesOwned(bisowned: Boolean);
+begin
+  Self.bnodesowned := bisowned;
+end;
 
   procedure TPLPointerNodeList.extendList;
   begin
@@ -525,10 +545,22 @@ end;
     if plstnd <> nil then Result := plstnd^.inodeindex;
   end;
 
-  function TPLPointerNodeList.getLastIndex(): Integer;
-  begin
-    Result := self.ilastindex;
-  end;
+
+
+//----------------------------------------------------------------------------
+//Consultation Methods
+
+
+function TPLPointerNodeList.GetLastIndex: Integer;
+begin
+  Result := Self.ilastindex;
+end;
+
+function TPLPointerNodeList.IsNodesOwned: Boolean;
+begin
+  Result := Self.bnodesowned;
+end;
+
 
 
 
