@@ -10,7 +10,7 @@ uses
 
 type
   //==========================================================================
-  // Class TPLPointerNodeList Declaration
+  // Class TPLPtrNodeArrayList Declaration
 
 
   TPLPtrNodeArrayList = class
@@ -22,32 +22,56 @@ type
     imaxcount: Integer;
     igrowfactor: Integer;
     bnodesowned: Boolean;
-    procedure SetGrowFactor(ifactor: Integer);
+    procedure SetGrowFactor(igrowth: Integer);
+    procedure SetCapacity(icapacity: Integer);
     procedure SetNode(iindex: Integer; phashnode: PPLHashNode);
     procedure ExtendList(iminimumcapacity: Integer = -1);
     function GetNode(iindex: Integer): PPLHashNode;
   public
     constructor Create; virtual; overload;
     constructor Create(icapacity: Integer); virtual; overload;
-    constructor Create(icapacity: Integer; ifactor: Integer); virtual; overload;
+    constructor Create(icapacity: Integer; igrowth: Integer); virtual; overload;
     destructor Destroy; override;
     procedure SetNodesOwned(bisowned: Boolean); inline;
     function Add(pnode: PPLHashNode = Nil): PPLHashNode; virtual; overload;
     function Add(ihash: Cardinal; const skey: String; pvalue: Pointer): Integer; virtual; overload;
     procedure SetValue(iindex: Integer; pvalue: Pointer); virtual;
+    procedure Clear(); virtual;
     function GetLastIndex: Integer; inline;
     function IsNodesOwned: Boolean; inline;
     property GrowFactor: Integer read igrowfactor write SetGrowFactor;
-    property PNode[iindex: Integer]: PPLHashNode read GetNode write SetNode; default;
+    property PNodes[iindex: Integer]: PPLHashNode read GetNode write SetNode; default;
     property Count: Integer read inodecount;
-    property Capacity: Integer read imaxcount;
+    property Capacity: Integer read imaxcount write SetCapacity;
   end;
+
+
+
+  (*==========================================================================*)
+  (* Class TPLPtrHashArrayList Declaration *)
+
+
+  TPLPtrHashArrayList = class(TPLPointerHashList)
+  protected
+    lstnodes: TPLPtrNodeArrayList;
+    bnodesowned: Boolean;
+    procedure Init(icapacity: Integer; iload: Integer); override;
+    procedure SetGrowFactor(igrowth: Integer); override;
+    procedure setCapacity(icapacity: Integer); override;
+  public
+    procedure Add(const skey: String; pvalue: Pointer); override;
+    procedure setValue(const skey: String; pvalue: Pointer); override;
+    procedure removeKey(const skey: String); override;
+    procedure Clear(); override;
+  end;
+
+
 
 
 implementation
 
 uses
-  SysUtils, math;
+  SysUtils;
 
 
 
@@ -79,11 +103,11 @@ begin
   Self.ExtendList(icapacity);
 end;
 
-constructor TPLPtrNodeArrayList.Create(icapacity: Integer; ifactor: Integer);
+constructor TPLPtrNodeArrayList.Create(icapacity: Integer; igrowth: Integer);
 begin
   Self.Create;
 
-  Self.SetGrowFactor(ifactor);
+  Self.SetGrowFactor(igrowth);
 
   Self.ExtendList(icapacity);
 end;
@@ -108,12 +132,18 @@ end;
 //Administration Methods
 
 
-procedure TPLPtrNodeArrayList.SetGrowFactor(ifactor: Integer);
+procedure TPLPtrNodeArrayList.SetGrowFactor(igrowth: Integer);
 begin
-  if ifactor < 2 then
-    ifactor := 2;
+  if igrowth > 1 then
+    Self.igrowfactor := igrowth
+  else
+    Self.igrowfactor := 2;
 
-  Self.igrowfactor := ifactor;
+end;
+
+procedure TPLPtrNodeArrayList.SetCapacity(icapacity: Integer);
+begin
+  Self.ExtendList(icapacity);
 end;
 
 procedure TPLPtrNodeArrayList.SetNodesOwned(bisowned: Boolean);
@@ -161,8 +191,10 @@ begin
   end
   else  //A Capacity is requested
   begin
-    //Align the requested Capacity to the Grow Factor
-    Self.imaxcount := ((iminimumcapacity DIV Self.igrowfactor) + 1) * Self.igrowfactor;
+    if iminimumcapacity > Self.imaxcount then
+      //Align the requested Capacity to the Grow Factor
+      Self.imaxcount := ((iminimumcapacity DIV Self.igrowfactor) + 1) * Self.igrowfactor;
+
   end; //if iminimumcapacity = -1 then
 
   //Extend the Node List
@@ -213,6 +245,10 @@ begin
   Result := pnd^.iinsertindex;
 end;
 
+procedure TPLPtrNodeArrayList.Clear();
+begin
+end;
+
 
 
 //----------------------------------------------------------------------------
@@ -238,6 +274,63 @@ begin
     Result := Nil;
 
 end;
+
+
+
+
+//==========================================================================
+// Class TPLPtrHashArrayList Implementation
+
+
+
+//----------------------------------------------------------------------------
+//Administration Methods
+
+
+procedure TPLPtrHashArrayList.Init(icapacity: Integer; iload: Integer);
+begin
+  //Create the Array List
+  Self.lstnodes := TPLPtrNodeArrayList.Create(icapacity);
+
+  //Do the Base Initialization
+  inherited Init(icapacity, iload);
+end;
+
+procedure TPLPtrHashArrayList.SetGrowFactor(igrowth: Integer);
+begin
+  //Execute the Base Functionality
+  inherited SetGrowFactor(igrowth);
+
+  //Propagate the Configuration to the Array List
+  Self.lstnodes.GrowFactor := igrowth;
+end;
+
+procedure TPLPtrHashArrayList.setCapacity(icapacity: Integer);
+begin
+  //Execute the Base Functionality
+  inherited setCapacity(icapacity);
+
+  //Propagate the Configuration to the Array List
+  Self.lstnodes.Capacity := igrowth;
+end;
+
+procedure TPLPtrHashArrayList.Add(const skey: String; pvalue: Pointer);
+begin
+
+end;
+
+{
+TPLPtrHashArrayList = class(TPLPointerHashList)
+protected
+  lstnodes: TPLPtrNodeArrayList;
+  bnodesowned: Boolean;
+public
+  procedure setValue(const skey: String; pvalue: Pointer); override;
+  procedure removeKey(const skey: String); override;
+  procedure Clear(); override;
+end;
+}
+
 
 
 end.

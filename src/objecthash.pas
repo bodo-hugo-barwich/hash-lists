@@ -29,11 +29,11 @@ type
   TPLObjectHashList = class(TPLPointerHashList)
   protected
     bowned: Boolean;
-    procedure Init(icapacity: Integer; iload: Integer); override;
+    procedure Initialize(icapacity: Integer; iload: Integer); override;
+    procedure setCapacity(icapacity: Integer); override;
+    procedure setOwned(bisowned: Boolean);
     procedure extendList(brebuild: Boolean = True); override;
   public
-    procedure setOwned(bisowned: Boolean);
-    procedure setCapacity(icapacity: Integer); override;
     procedure Add(const skey: String; value: TObject); overload;
     procedure setValue(const skey: String; value: TObject); overload;
     procedure removeKey(const skey: String); override;
@@ -156,25 +156,13 @@ uses
   //Administration Methods
 
 
-  procedure TPLObjectHashList.Init(icapacity: Integer; iload: Integer);
+  procedure TPLObjectHashList.Initialize(icapacity: Integer; iload: Integer);
   begin
     //Do the Base Initialization
-    inherited Init(icapacity, iload);
+    inherited Initialize(icapacity, iload);
 
     //Enable Ownership
     Self.setOwned(True);
-  end;
-
-  procedure TPLObjectHashList.setOwned(bisowned: Boolean);
-  var
-    ibkt: Integer;
-  begin
-    Self.bowned := bisowned;
-
-    for ibkt := 0 to self.ibucketcount - 1 do
-    begin
-      TPLObjectNodeList(self.arrbuckets[ibkt]).Owned := self.bowned;
-    end;  //for ibkt := 0 to self.ibucketcount - 1 do
   end;
 
   procedure TPLObjectHashList.setCapacity(icapacity: Integer);
@@ -217,6 +205,18 @@ uses
 
       end;  //if floor(self.imaxkeycount / self.iloadfactor) > self.ibucketcount then
     end; //if icapacity > self.imaxkeycount then
+  end;
+
+  procedure TPLObjectHashList.setOwned(bisowned: Boolean);
+  var
+    ibkt: Integer;
+  begin
+    Self.bowned := bisowned;
+
+    for ibkt := 0 to self.ibucketcount - 1 do
+    begin
+      TPLObjectNodeList(self.arrbuckets[ibkt]).Owned := self.bowned;
+    end;  //for ibkt := 0 to self.ibucketcount - 1 do
   end;
 
 

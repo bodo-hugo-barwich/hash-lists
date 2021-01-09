@@ -41,6 +41,7 @@ type
     imaxcount: Integer;
     igrowfactor: Integer;
     bnodesowned: Boolean;
+    procedure Initialize(ibucket, igrowth: Integer); virtual;
     procedure extendList;
   public
     constructor Create; virtual; overload;
@@ -125,7 +126,10 @@ type
     igrowfactor: Integer;
     iloadfactor: Integer;
     eduplicatekeys: TDuplicates;
-    procedure Init(icapacity: Integer; iload: Integer); virtual;
+    procedure Initialize(icapacity: Integer; iload: Integer); virtual;
+    procedure setLoadFactor(ifactor: Integer);
+    procedure SetGrowFactor(igrowth: Integer); virtual;
+    procedure setCapacity(icapacity: Integer); virtual;
     procedure extendList(brebuild: Boolean = True); virtual;
     procedure rebuildList(istartindex, iendindex, icount: Integer);
     class function computeHash(pskey: PAnsiString): Cardinal;
@@ -136,9 +140,6 @@ type
     constructor Create(icapacity: Integer); overload;
     constructor Create(icapacity: Integer; iload: Integer); overload;
     destructor Destroy; override;
-    procedure setLoadFactor(ifactor: Integer);
-    procedure setGrowFactor(ifactor: Integer);
-    procedure setCapacity(icapacity: Integer); virtual;
     function Add(const skey: String; ppointer: Pointer): Boolean; virtual;
     procedure setValue(const skey: String; ppointer: Pointer); virtual;
     procedure removeKey(const skey: String); virtual;
@@ -181,41 +182,21 @@ implementation
 
 constructor TPLPointerNodeList.Create;
 begin
-  Self.ibucketindex := -1;
-  Self.ilastindex := 0;
-  Self.inextindex := 0;
-  Self.inodecount := 0;
-  Self.imaxcount := 3;
-  Self.igrowfactor := 2;
-  Self.bnodesowned := True;
+  Self.Initialize(-1, 3);
 
-  SetLength(Self.arrnodes, Self.imaxcount);
+  Self.igrowfactor := 2;
 end;
 
 constructor TPLPointerNodeList.Create(ibucket: Integer);
 begin
-  Self.ibucketindex := ibucket;
-  Self.ilastindex := 0;
-  Self.inextindex := 0;
-  Self.inodecount := 0;
-  Self.imaxcount := 3;
-  Self.igrowfactor := 2;
-  Self.bnodesowned := True;
+  Self.Initialize(ibucket, 3);
 
-  SetLength(Self.arrnodes, Self.imaxcount);
+  Self.igrowfactor := 2;
 end;
 
 constructor TPLPointerNodeList.Create(ibucket, igrowth: Integer);
 begin
-  Self.ibucketindex := ibucket;
-  Self.ilastindex := 0;
-  Self.inextindex := 0;
-  Self.inodecount := 0;
-  Self.imaxcount := igrowth;
-  Self.igrowfactor := igrowth;
-  Self.bnodesowned := True;
-
-  SetLength(Self.arrnodes, Self.imaxcount);
+  Self.Initialize(ibucket, igrowth);
 end;
 
 destructor TPLPointerNodeList.Destroy;
@@ -234,7 +215,12 @@ end;
 
 procedure TPLPointerNodeList.SetGrowFactor(igrowth: Integer);
 begin
-  Self.igrowfactor := igrowth;
+  if igrowth > 0 then
+    Self.igrowfactor := igrowth
+  else
+    //Set Minimum Grow Factor
+    Self.igrowfactor := 1;
+
 end;
 
 
@@ -242,6 +228,21 @@ end;
 //----------------------------------------------------------------------------
 //Administration Methods
 
+
+procedure TPLPointerNodeList.Initialize(ibucket, igrowth: Integer);
+begin
+  if igrowth < 1 then igrowth := 1;
+
+  Self.ibucketindex := ibucket;
+  Self.ilastindex := 0;
+  Self.inextindex := 0;
+  Self.inodecount := 0;
+  Self.imaxcount := igrowth;
+  Self.igrowfactor := igrowth;
+  Self.bnodesowned := True;
+
+  SetLength(Self.arrnodes, Self.imaxcount);
+end;
 
 procedure TPLPointerNodeList.SetNodesOwned(bisowned: Boolean);
 begin
@@ -833,17 +834,17 @@ end;
 
   constructor TPLPointerHashList.Create;
   begin
-    Self.Init(9, 3);
+    Self.Initialize(9, 3);
   end;
 
   constructor TPLPointerHashList.Create(icapacity: Integer);
   begin
-    Self.Init(icapacity, 3);
+    Self.Initialize(icapacity, 3);
   end;
 
   constructor TPLPointerHashList.Create(icapacity: Integer; iload: Integer);
   begin
-    Self.Init(icapacity, iload);
+    Self.Initialize(icapacity, iload);
   end;
 
   destructor TPLPointerHashList.Destroy;
@@ -869,7 +870,7 @@ end;
   //Administration Methods
 
 
-  procedure TPLPointerHashList.Init(icapacity: Integer; iload: Integer);
+  procedure TPLPointerHashList.Initialize(icapacity: Integer; iload: Integer);
   begin
     Self.nodeiterator := Nil;
 
@@ -908,10 +909,10 @@ begin
   end;  //for ibkt := 0 to self.ibucketcount - 1 do
 end;
 
-  procedure TPLPointerHashList.setGrowFactor(ifactor: Integer);
+  procedure TPLPointerHashList.setGrowFactor(igrowth: Integer);
   begin
-    if ifactor > 1 then
-      Self.igrowfactor := ifactor
+    if igrowth > 1 then
+      Self.igrowfactor := igrowth
     else
       //Set Minimum Grow Factor
       Self.igrowfactor := 2;

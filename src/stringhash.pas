@@ -19,9 +19,9 @@ type
 
   TPLStringHashList = class(TPLPointerHashList)
   protected
+    procedure setCapacity(icapacity: Integer); override;
     procedure extendList(brebuild: Boolean = True); override;
   public
-    procedure setCapacity(icapacity: Integer); override;
     procedure Add(const skey: String; svalue: String); overload;
     procedure setValue(const skey: String; svalue: String); overload;
     procedure removeKey(const skey: String); override;
