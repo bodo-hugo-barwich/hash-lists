@@ -13,17 +13,15 @@ uses
 type
   TPLObjectNodeList = class(TPLPointerNodeList)
   protected
-    bowned: Boolean;
-  public
-    constructor Create; override; overload;
-    constructor Create(iindex: Integer); override; overload;
-    constructor Create(iindex: Integer; ifactor: Integer); override; overload;
-    destructor Destroy; override;
+    procedure Initialize(ibucket, igrowth: Integer); override;
     procedure setOwned(bisowned: Boolean);
+    function IsValuesOwned: Boolean; inline;
+  public
+    destructor Destroy; override;
     function addNode(ihash: Cardinal; pskey: PAnsiString; value: TObject): PPLHashNode; overload;
     function removeNode(pnode: PPLHashNode): Boolean; override;
     procedure Clear; override;
-    property Owned: Boolean read bowned write setOwned;
+    property Owned: Boolean read IsValuesOwned write setOwned;
   end;
 
   TPLObjectHashList = class(TPLPointerHashList)
@@ -50,100 +48,109 @@ uses
 
 
 
-  (*==========================================================================*)
-  (* Class TPLObjectNodeList *)
+(*==========================================================================*)
+(* Class TPLObjectNodeList *)
 
 
-  constructor TPLObjectNodeList.Create;
+destructor TPLObjectNodeList.Destroy;
+var
+  ind: Integer;
+begin
+  if Self.IsValuesOwned then
   begin
-    inherited Create;
-
-    self.bowned := True;
-  end;
-
-  constructor TPLObjectNodeList.Create(iindex: Integer);
-  begin
-    inherited Create(iindex);
-
-    self.bowned := True;
-  end;
-
-  constructor TPLObjectNodeList.Create(iindex: Integer; ifactor: Integer);
-  begin
-    inherited Create(iindex, ifactor);
-
-    self.bowned := True;
-  end;
-
-  destructor TPLObjectNodeList.Destroy;
-  var
-    ind: Integer;
-  begin
-    if self.bowned then
+    for ind := 0 to self.imaxcount - 1 do
     begin
-      for ind := 0 to self.imaxcount - 1 do
+      if self.arrnodes[ind] <> nil then
       begin
-        if self.arrnodes[ind] <> nil then
+        if self.arrnodes[ind]^.pvalue <> nil then
         begin
-          if self.arrnodes[ind]^.pvalue <> nil then
-          begin
-            //Free the added Data Object
-            TObject(self.arrnodes[ind]^.pvalue).Free;
-            self.arrnodes[ind]^.pvalue := nil;
-          end;
-        end;  //if self.arrnodes[ind] <> nil then
-      end; //for ind := 0 to self.imaxcount - 1 do
-    end; //if self.bowned then
+          //Free the added Data Object
+          TObject(self.arrnodes[ind]^.pvalue).Free;
+          self.arrnodes[ind]^.pvalue := nil;
+        end;
+      end;  //if self.arrnodes[ind] <> nil then
+    end; //for ind := 0 to self.imaxcount - 1 do
+  end; //if self.bowned then
 
-    inherited Destroy;
-  end;
+  inherited Destroy;
+end;
 
-  procedure TPLObjectNodeList.setOwned(bisowned: Boolean);
-  begin
-    self.bowned := bisowned;
-  end;
+procedure TPLObjectNodeList.Initialize(ibucket, igrowth: Integer);
+begin
+  inherited Initialize(ibucket, igrowth: Integer);
+
+  Self.setOwned(True);
+end;
+
+procedure TPLObjectNodeList.setOwned(bisowned: Boolean);
+var
+  stlstopts: TListOptions;
+begin
+  stlstopts:= Self.stoptions;
+
+  if bisowned then
+    Include(stlstopts, oplValuesOwned)
+  else
+    Exclude(stlstopts, oplValuesOwned);
+
+  Self.stoptions := stlstopts;
+end;
 
   function TPLObjectNodeList.addNode(ihash: Cardinal; pskey: PAnsiString; value: TObject): PPLHashNode;
   begin
     Result := inherited addNode(ihash, pskey, value);
   end;
 
-  function TPLObjectNodeList.removeNode(pnode: PPLHashNode): Boolean;
-  begin
-    Result := False;
+function TPLObjectNodeList.removeNode(pnode: PPLHashNode): Boolean;
+begin
+  Result := False;
 
-    if pnode <> nil then
-    begin
-      self.unsetIndex(pnode^.inodeindex);
+  if pnode <> nil then
+  begin
+    self.unsetIndex(pnode^.inodeindex);
+
+    if Self.IsValuesOwned then
       TObject(pnode^.pvalue).Free;
 
-      Result := inherited removeNode(pnode);
-    end;  //if plstnd <> nil then
-  end;
+    Result := inherited removeNode(pnode);
+  end;  //if plstnd <> nil then
+end;
 
-  procedure TPLObjectNodeList.Clear;
-  var
-    ind: Integer;
+procedure TPLObjectNodeList.Clear;
+var
+  ind: Integer;
+begin
+  if Self.IsValuesOwned then
   begin
-    if self.bowned then
+    for ind := 0 to self.imaxcount - 1 do
     begin
-      for ind := 0 to self.imaxcount - 1 do
+      if self.arrnodes[ind] <> nil then
       begin
-        if self.arrnodes[ind] <> nil then
+        if self.arrnodes[ind]^.pvalue <> nil then
         begin
-          if self.arrnodes[ind]^.pvalue <> nil then
-          begin
-            //Free the added Data Object
-            TObject(self.arrnodes[ind]^.pvalue).Free;
-            self.arrnodes[ind]^.pvalue := nil;
-          end;
-        end;  //if self.arrnodes[ind] <> nil then
-      end; //for ind := 0 to self.imaxcount - 1 do
-    end;  //if self.bowned then
+          //Free the added Data Object
+          TObject(self.arrnodes[ind]^.pvalue).Free;
+          self.arrnodes[ind]^.pvalue := nil;
+        end;
+      end;  //if self.arrnodes[ind] <> nil then
+    end; //for ind := 0 to self.imaxcount - 1 do
+  end;  //if self.bowned then
 
-    //Do the Clearing of the Nodes
-    inherited Clear;
-  end;
+  //Do the Clearing of the Nodes
+  inherited Clear;
+end;
+
+
+
+//----------------------------------------------------------------------------
+//Consultation Methods
+
+
+function TPLObjectNodeList.IsValuesOwned: Boolean;
+begin
+  Result := (oplValuesOwned in Self.stoptions);
+end;
+
 
 
 
@@ -207,17 +214,15 @@ uses
     end; //if icapacity > self.imaxkeycount then
   end;
 
-  procedure TPLObjectHashList.setOwned(bisowned: Boolean);
-  var
-    ibkt: Integer;
-  begin
-    Self.bowned := bisowned;
+procedure TPLObjectHashList.setOwned(bisowned: Boolean);
+begin
+  self.bowned := bisowned;
 
-    for ibkt := 0 to self.ibucketcount - 1 do
-    begin
-      TPLObjectNodeList(self.arrbuckets[ibkt]).Owned := self.bowned;
-    end;  //for ibkt := 0 to self.ibucketcount - 1 do
-  end;
+  for ibkt := 0 to self.ibucketcount - 1 do
+  begin
+    TPLObjectNodeList(self.arrbuckets[ibkt]).Owned := self.bowned;
+  end;  //for ibkt := 0 to self.ibucketcount - 1 do
+end;
 
 
   procedure TPLObjectHashList.extendList(brebuild: Boolean = True);

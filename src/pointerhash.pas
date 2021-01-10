@@ -25,6 +25,9 @@ type
     pvalue: Pointer;
   end;
 
+  TListOption = (oplNodesOwned, oplValuesOwned);
+  TListOptions = set of TListOption;
+
 
 
   (*==========================================================================*)
@@ -40,7 +43,7 @@ type
     inodecount: Integer;
     imaxcount: Integer;
     igrowfactor: Integer;
-    bnodesowned: Boolean;
+    stoptions: TListOptions;
     procedure Initialize(ibucket, igrowth: Integer); virtual;
     procedure extendList;
   public
@@ -203,7 +206,7 @@ destructor TPLPointerNodeList.Destroy;
 var
   ind: Integer;
 begin
-  if Self.bnodesowned then
+  if Self.IsNodesOwned then
     for ind := 0 to Self.imaxcount - 1 do
       if Self.arrnodes[ind] <> nil then
         Dispose(Self.arrnodes[ind]);
@@ -239,14 +242,23 @@ begin
   Self.inodecount := 0;
   Self.imaxcount := igrowth;
   Self.igrowfactor := igrowth;
-  Self.bnodesowned := True;
+  Self.stoptions := [oplNodesOwned];
 
   SetLength(Self.arrnodes, Self.imaxcount);
 end;
 
 procedure TPLPointerNodeList.SetNodesOwned(bisowned: Boolean);
+var
+  stlstopts: TListOptions;
 begin
-  Self.bnodesowned := bisowned;
+  stlstopts:= Self.stoptions;
+
+  if bisowned then
+    Include(stlstopts, oplNodesOwned)
+  else
+    Exclude(stlstopts, oplNodesOwned);
+
+  Self.stoptions := stlstopts;
 end;
 
   procedure TPLPointerNodeList.extendList;
@@ -559,7 +571,7 @@ end;
 
 function TPLPointerNodeList.IsNodesOwned: Boolean;
 begin
-  Result := Self.bnodesowned;
+  Result := (oplNodesOwned in Self.stoptions);
 end;
 
 
