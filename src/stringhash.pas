@@ -10,22 +10,31 @@ uses
 
 type
   TPLStringNodeList = class(TPLPointerNodeList)
+  protected
+    procedure Initialize(ibucket, igrowth: Integer); override;
+    procedure SetOwned(bisowned: Boolean);
+    function IsValuesOwned: Boolean; inline;
   public
     destructor Destroy; override;
-    function addNode(ihash: Cardinal; pskey: PAnsiString; psvalue: PAnsiString): PPLHashNode; overload;
+    function AddNode(ihash: Cardinal; pskey: PAnsiString; psvalue: PAnsiString): PPLHashNode; overload;
     function removeNode(pnode: PPLHashNode): Boolean; override;
     procedure Clear; override;
+    property Owned: Boolean read IsValuesOwned write setOwned;
   end;
 
   TPLStringHashList = class(TPLPointerHashList)
   protected
-    procedure setCapacity(icapacity: Integer); override;
-    procedure extendList(brebuild: Boolean = True); override;
+    bowned: Boolean;
+    procedure Initialize(icapacity: Integer; iload: Integer); override;
+    procedure SetCapacity(icapacity: Integer); override;
+    procedure SetOwned(bisowned: Boolean);
+    procedure ExtendList(brebuild: Boolean = True); override;
   public
     procedure Add(const skey: String; svalue: String); overload;
     procedure setValue(const skey: String; svalue: String); overload;
     procedure removeKey(const skey: String); override;
     procedure Clear(); override;
+    property Owned: Boolean read bowned write SetOwned;
   end;
 
 
@@ -61,16 +70,48 @@ uses
     inherited Destroy;
   end;
 
-  function TPLStringNodeList.addNode(ihash: Cardinal; pskey: PAnsiString; psvalue: PAnsiString): PPLHashNode;
-  var
-    psvl: PAnsiString;
+
+
+//----------------------------------------------------------------------------
+//Administration Methods
+
+
+procedure TPLStringNodeList.Initialize(ibucket, igrowth: Integer);
+begin
+  inherited Initialize(ibucket, igrowth);
+
+  Self.SetOwned(True);
+end;
+
+procedure TPLStringNodeList.SetOwned(bisowned: Boolean);
+var
+  stlstopts: TListOptions;
+begin
+  stlstopts:= Self.stoptions;
+
+  if bisowned then
+    Include(stlstopts, oplValuesOwned)
+  else
+    Exclude(stlstopts, oplValuesOwned);
+
+  Self.stoptions := stlstopts;
+end;
+
+function TPLStringNodeList.AddNode(ihash: Cardinal; pskey: PAnsiString; psvalue: PAnsiString): PPLHashNode;
+var
+  psvl: PAnsiString;
+begin
+  if Self.IsValuesOwned then
   begin
     //Create New String Pointer
     New(psvl);
     psvl^ := psvalue^;
+  end
+  else
+    psvl := psvalue;
 
-    Result := inherited addNode(ihash, pskey, psvl);
-  end;
+  Result := inherited addNode(ihash, pskey, psvl);
+end;
 
 function TPLStringNodeList.removeNode(pnode: PPLHashNode): Boolean;
 begin
@@ -79,18 +120,22 @@ begin
   if pnode <> nil then
   begin
     self.unsetIndex(pnode^.inodeindex);
-    Dispose(PAnsiString(pnode^.pvalue));
+
+    if Self.IsValuesOwned then
+      Dispose(PAnsiString(pnode^.pvalue));
 
     Result := inherited removeNode(pnode);
   end;  //if plstnd <> nil then
 end;
 
-  procedure TPLStringNodeList.Clear;
-  var
-    ind: Integer;
-  begin
+procedure TPLStringNodeList.Clear;
+var
+  ind: Integer;
+begin
+  if Self.IsValuesOwned then
+    //List has Ownership of Values and
+    //Values need to be freed
     for ind := 0 to self.imaxcount - 1 do
-    begin
       if self.arrnodes[ind] <> nil then
       begin
         if self.arrnodes[ind]^.pvalue <> nil then
@@ -100,11 +145,22 @@ end;
           self.arrnodes[ind]^.pvalue := nil;
         end;
       end;  //if self.arrnodes[ind] <> nil then
-    end; //for ind := 0 to self.imaxcount - 1 do
 
-    //Do the Clearing of the Nodes
-    inherited Clear;
-  end;
+  //Do the Clearing of the Nodes
+  inherited Clear;
+end;
+
+
+
+//----------------------------------------------------------------------------
+//Consultation Methods
+
+
+function TPLStringNodeList.IsValuesOwned: Boolean;
+begin
+  Result := (oplValuesOwned in Self.stoptions);
+end;
+
 
 
 
@@ -112,72 +168,100 @@ end;
   // Class TPLStringHashList
 
 
-  procedure TPLStringHashList.setCapacity(icapacity: Integer);
-  var
-    ibkt: Integer;
-    brbld: Boolean = False;
+
+//----------------------------------------------------------------------------
+//Administration Methods
+
+
+procedure TPLStringHashList.Initialize(icapacity: Integer; iload: Integer);
+begin
+  //Do the Base Initialization
+  inherited Initialize(icapacity, iload);
+
+  //Enable Ownership
+  Self.SetOwned(True);
+end;
+
+procedure TPLStringHashList.SetCapacity(icapacity: Integer);
+var
+  ibkt: Integer;
+  brbld: Boolean = False;
+begin
+  if icapacity > self.imaxkeycount then
   begin
-    if icapacity > self.imaxkeycount then
+    //Set icapacity as Max. Key Count
+    self.imaxkeycount := icapacity;
+
+    //Will the Bucket Count increase
+    if floor(self.imaxkeycount / self.iloadfactor) > self.ibucketcount then
     begin
-      //Set icapacity as Max. Key Count
-      self.imaxkeycount := icapacity;
+      self.ibucketcount := ceil(self.imaxkeycount / self.iloadfactor);
 
-      //Will the Bucket Count increase
-      if floor(self.imaxkeycount / self.iloadfactor) > self.ibucketcount then
+      //Forcing a uneven Bucket Count
+      if (self.ibucketcount mod 2) = 0 then
+        dec(self.ibucketcount);
+
+      SetLength(self.arrbuckets, self.ibucketcount);
+
+      for ibkt := 0 to self.ibucketcount - 1 do
       begin
-        self.ibucketcount := ceil(self.imaxkeycount / self.iloadfactor);
-
-        //Forcing a uneven Bucket Count
-        if (self.ibucketcount mod 2) = 0 then
-          dec(self.ibucketcount);
-
-        SetLength(self.arrbuckets, self.ibucketcount);
-
-        for ibkt := 0 to self.ibucketcount - 1 do
+        if self.arrbuckets[ibkt] = nil then
         begin
-          if self.arrbuckets[ibkt] = nil then
-          begin
-            self.arrbuckets[ibkt] := TPLPointerNodeList.Create(ibkt);
+          self.arrbuckets[ibkt] := TPLPointerNodeList.Create(ibkt);
 
-            TPLStringNodeList(self.arrbuckets[ibkt]).GrowFactor := self.iloadfactor;
+          TPLStringNodeList(self.arrbuckets[ibkt]).Owned := self.bowned;
+          TPLStringNodeList(self.arrbuckets[ibkt]).GrowFactor := self.iloadfactor;
 
-            brbld := True;
-          end;  //if self.arrbuckets[ibkt] = nil then
-        end;  //for ibkt := 0 to self.ibucketcount - 1 do
+          brbld := True;
+        end;  //if self.arrbuckets[ibkt] = nil then
+      end;  //for ibkt := 0 to self.ibucketcount - 1 do
 
-        if brbld then
-          //Reindex the Nodes
-          Self.rebuildList(0, Self.ibucketcount - 1, Self.ibucketcount);
+      if brbld then
+        //Reindex the Nodes
+        Self.rebuildList(0, Self.ibucketcount - 1, Self.ibucketcount);
 
-      end;  //if floor(self.imaxkeycount / self.iloadfactor) > self.ibucketcount then
-    end; //if icapacity > self.imaxkeycount then
-  end;
+    end;  //if floor(self.imaxkeycount / self.iloadfactor) > self.ibucketcount then
+  end; //if icapacity > self.imaxkeycount then
+end;
 
-  procedure TPLStringHashList.extendList(brebuild: Boolean = True);
-  var
-    ibkt: Integer;
+procedure TPLStringHashList.SetOwned(bisowned: Boolean);
+var
+  ibkt: Integer;
+begin
+  self.bowned := bisowned;
+
+  for ibkt := 0 to self.ibucketcount - 1 do
   begin
-    self.ibucketcount := self.ibucketcount + self.igrowfactor;
-    self.imaxkeycount := (self.ibucketcount * self.iloadfactor) - 1;
+    TPLStringNodeList(self.arrbuckets[ibkt]).Owned := self.bowned;
+  end;  //for ibkt := 0 to self.ibucketcount - 1 do
+end;
 
-    SetLength(self.arrbuckets, self.ibucketcount);
+procedure TPLStringHashList.ExtendList(brebuild: Boolean = True);
+var
+  ibkt: Integer;
+begin
+  self.ibucketcount := self.ibucketcount + self.igrowfactor;
+  self.imaxkeycount := (self.ibucketcount * self.iloadfactor) - 1;
 
-    for ibkt := 0 to self.ibucketcount - 1 do
+  SetLength(self.arrbuckets, self.ibucketcount);
+
+  for ibkt := 0 to self.ibucketcount - 1 do
+  begin
+    //Create the Buckets as TPLStringNodeList
+    if self.arrbuckets[ibkt] = nil then
     begin
-      //Create the Buckets as TPLStringNodeList
-      if self.arrbuckets[ibkt] = nil then
-      begin
-        self.arrbuckets[ibkt] := TPLStringNodeList.Create(ibkt);
+      self.arrbuckets[ibkt] := TPLStringNodeList.Create(ibkt);
 
-        TPLStringNodeList(self.arrbuckets[ibkt]).GrowFactor := self.iloadfactor;
-      end;
-    end;  //for ibkt := 0 to self.ibucketcount - 1 do
+      TPLStringNodeList(self.arrbuckets[ibkt]).Owned := self.bowned;
+      TPLStringNodeList(self.arrbuckets[ibkt]).GrowFactor := self.iloadfactor;
+    end;
+  end;  //for ibkt := 0 to self.ibucketcount - 1 do
 
-    if brebuild then
-      //Reindex the Nodes
-      Self.rebuildList(0, Self.ibucketcount - 1, Self.ibucketcount);
+  if brebuild then
+    //Reindex the Nodes
+    Self.rebuildList(0, Self.ibucketcount - 1, Self.ibucketcount);
 
-  end;
+end;
 
 procedure TPLStringHashList.Add(const skey: String; svalue: String);
 var

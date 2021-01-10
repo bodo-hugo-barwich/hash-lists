@@ -14,7 +14,7 @@ type
   TPLObjectNodeList = class(TPLPointerNodeList)
   protected
     procedure Initialize(ibucket, igrowth: Integer); override;
-    procedure setOwned(bisowned: Boolean);
+    procedure SetOwned(bisowned: Boolean);
     function IsValuesOwned: Boolean; inline;
   public
     destructor Destroy; override;
@@ -29,7 +29,7 @@ type
     bowned: Boolean;
     procedure Initialize(icapacity: Integer; iload: Integer); override;
     procedure setCapacity(icapacity: Integer); override;
-    procedure setOwned(bisowned: Boolean);
+    procedure SetOwned(bisowned: Boolean);
     procedure extendList(brebuild: Boolean = True); override;
   public
     procedure Add(const skey: String; value: TObject); overload;
@@ -75,14 +75,20 @@ begin
   inherited Destroy;
 end;
 
+
+
+//----------------------------------------------------------------------------
+//Administration Methods
+
+
 procedure TPLObjectNodeList.Initialize(ibucket, igrowth: Integer);
 begin
-  inherited Initialize(ibucket, igrowth: Integer);
+  inherited Initialize(ibucket, igrowth);
 
   Self.setOwned(True);
 end;
 
-procedure TPLObjectNodeList.setOwned(bisowned: Boolean);
+procedure TPLObjectNodeList.SetOwned(bisowned: Boolean);
 var
   stlstopts: TListOptions;
 begin
@@ -154,23 +160,23 @@ end;
 
 
 
-  (*==========================================================================*)
-  (* Class TPLObjectHashList *)
+(*==========================================================================*)
+(* Class TPLObjectHashList *)
 
 
 
-  //----------------------------------------------------------------------------
-  //Administration Methods
+//----------------------------------------------------------------------------
+//Administration Methods
 
 
-  procedure TPLObjectHashList.Initialize(icapacity: Integer; iload: Integer);
-  begin
-    //Do the Base Initialization
-    inherited Initialize(icapacity, iload);
+procedure TPLObjectHashList.Initialize(icapacity: Integer; iload: Integer);
+begin
+  //Do the Base Initialization
+  inherited Initialize(icapacity, iload);
 
-    //Enable Ownership
-    Self.setOwned(True);
-  end;
+  //Enable Ownership
+  Self.setOwned(True);
+end;
 
   procedure TPLObjectHashList.setCapacity(icapacity: Integer);
   var
@@ -214,7 +220,9 @@ end;
     end; //if icapacity > self.imaxkeycount then
   end;
 
-procedure TPLObjectHashList.setOwned(bisowned: Boolean);
+procedure TPLObjectHashList.SetOwned(bisowned: Boolean);
+var
+  ibkt: Integer;
 begin
   self.bowned := bisowned;
 
