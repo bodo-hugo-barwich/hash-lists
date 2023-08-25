@@ -1,5 +1,4 @@
-![Automated Tests](https://github.com/bodo-hugo-barwich/hash-lists/workflows/Automated%20Tests/badge.svg)
-[![Build Status](https://travis-ci.com/bodo-hugo-barwich/hash-lists.svg?branch=master)](https://travis-ci.com/bodo-hugo-barwich/hash-lists)
+[![Automated Tests](https://github.com/bodo-hugo-barwich/hash-lists/actions/workflows/testing.yml/badge.svg)](https://github.com/bodo-hugo-barwich/hash-lists/actions/workflows/testing.yml)
 
 # hash-lists
 ObjectPascal Implementation of the Perl Data Structure known as `%hash` inspired by the Documentation at 
